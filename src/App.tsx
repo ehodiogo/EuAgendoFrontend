@@ -1,7 +1,9 @@
 import { Routes, Route } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+
 import Home from "./views/Home";
 import EmpresasSearch from "./views/EmpresasSearch";
-import "bootstrap/dist/css/bootstrap.min.css";
+import Agendar from "./views/Agendar";
 
 function App() {
   return (
@@ -9,7 +11,7 @@ function App() {
         <Route path="/" element={<Home />} />
 
         <Route path="/empresas" element={<EmpresasSearch />} />
-        <Route path="/agendar/:empresa" element={<h1>Agendar</h1>} />
+        <Route path="/agendar/:empresa" element={<Agendar />} />
         <Route path="/agendamentos" element={<h1>Agendamentos</h1>} />
         <Route path="/dashboard" element={<h1>Dashboard</h1>} />
 
