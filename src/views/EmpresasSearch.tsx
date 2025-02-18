@@ -1,22 +1,15 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useFetch } from "../functions/GetData";
+import { Empresa } from "../interfaces/Empresa";
 
 function EmpresasSearch() {
   const [search, setSearch] = useState("");
-  const [results, setResults] = useState<string[]>([]);
+  const empresas = useFetch<Empresa[]>("api/empresa");
 
-  const empresas = [
-    "Clínica PetLife",
-    "Studio Fit",
-    "Auto Center",
-    "Salão Bella",
-    "Tech Solutions",
-  ];
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value.toLowerCase();
-    setSearch(query);
-    setResults(empresas.filter((emp) => emp.toLowerCase().includes(query)));
-  };
+  const filteredEmpresas = empresas.data?.filter((empresa: Empresa) =>
+    empresa.nome.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="p-4 bg-light border rounded shadow-sm">
@@ -28,19 +21,27 @@ function EmpresasSearch() {
           className="form-control"
           placeholder="Digite o nome da empresa..."
           value={search}
-          onChange={handleSearch}
+          onChange={(e) => setSearch(e.target.value)}
         />
-        <button className="btn btn-outline-danger" disabled={!search}>
-          Buscar
+        <button
+          className="btn btn-outline-danger"
+          onClick={() => setSearch("")}
+        >
+          Limpar
         </button>
       </div>
 
       {search && (
         <ul className="list-group">
-          {results.length > 0 ? (
-            results.map((empresa, index) => (
+          {filteredEmpresas && filteredEmpresas.length > 0 ? (
+            filteredEmpresas.map((empresa, index) => (
               <li key={index} className="list-group-item">
-                {empresa}
+                <Link
+                  to={`/empresas/${empresa.nome}`}
+                  className="text-decoration-none"
+                >
+                  {empresa.nome} - {empresa.cnpj}
+                </Link>
               </li>
             ))
           ) : (

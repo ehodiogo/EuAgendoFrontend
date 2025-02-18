@@ -6,6 +6,7 @@ export interface Empresa {
   telefone: string;
   email: string;
   servicos: number[];
+  logo: string;
 
   horario_abertura_dia_semana: string;
   horario_fechamento_dia_semana: string;
