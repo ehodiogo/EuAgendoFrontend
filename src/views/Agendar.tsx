@@ -37,12 +37,12 @@ const Agendar = () => {
         Escolha o funcionário para agendar o serviço
       </h4>
 
-      <div className="row">
+      <div className="row d-flex justify-content-center">
         {empresa.funcionarios && empresa.funcionarios.length > 0 ? (
           empresa.funcionarios.map((funcionario, index) => (
-            <div key={index} className="col-md-4 mb-3">
+            <div key={index} className="col-12 col-sm-6 col-md-4 mb-3">
               <div
-                className="card"
+                className="card text-center"
                 onClick={() => handleFuncionarioClick(funcionario.id)} // Atualiza o ID ao clicar
                 style={{
                   cursor: "pointer",
@@ -55,7 +55,7 @@ const Agendar = () => {
                 <img
                   src={`${funcionario.foto_url}`}
                   alt={funcionario.nome}
-                  className="card-img-top rounded-circle"
+                  className="card-img-top rounded-circle mx-auto"
                   style={{
                     width: "100px",
                     height: "100px",
@@ -91,10 +91,12 @@ const Agendar = () => {
           <h4 className="text-danger mb-3">Escolha o horário para o serviço</h4>
           <HorariosTabela
             funcionario_id={funcionarioSelecionado}
-            servicos={
-              empresa.funcionarios.find(
-                (funcionario) => funcionario.id === funcionarioSelecionado
-              )?.servicos.map(servico => servico.nome) || []
+            servicos_id={
+              empresa.funcionarios
+                .find(
+                  (funcionario) => funcionario.id === funcionarioSelecionado
+                )
+                ?.servicos.map((servico) => servico.id) || []
             }
             key={funcionarioSelecionado} // Adicionando a chave para forçar re-renderização
           />

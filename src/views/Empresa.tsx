@@ -22,6 +22,8 @@ function EmpresaDetails() {
     );
   }
 
+  console.log("Empresa service", empresa.servicos);
+
   return (
     <div className="p-4 bg-light border rounded shadow-sm">
       <h2 className="text-danger mb-4">🏢 {empresa.nome}</h2>
@@ -46,7 +48,7 @@ function EmpresaDetails() {
         {empresa.servicos && empresa.servicos.length > 0 ? (
           empresa.servicos.map((servico, index) => (
             <li key={index} className="list-group-item">
-              {servico}
+              {servico.nome}
             </li>
           ))
         ) : (

@@ -1,3 +1,9 @@
+interface Servico {
+  nome: string;
+  preco: number;
+  duracao: string;
+}
+
 export interface Empresa {
   id: number;
   nome: string;
@@ -5,7 +11,7 @@ export interface Empresa {
   endereco: string;
   telefone: string;
   email: string;
-  servicos: number[];
+  servicos: Servico[];
   logo: string;
 
   horario_abertura_dia_semana: string;
