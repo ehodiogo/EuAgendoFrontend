@@ -1,5 +1,5 @@
 export interface Funcionario {
   id: number;
   nome: string;
-  foto: number;
+  foto: string;
 }
