@@ -7,6 +7,10 @@ import { Modal, Button } from "react-bootstrap";
 import ReactDatePicker from "react-datepicker"; 
 import "react-datepicker/dist/react-datepicker.css"; 
 
+// TODO:
+// Filtrar os agendamentos por funcionário e data
+// Exibir os horários disponíveis
+
 interface HorariosTabelaProps {
   funcionario_id: number;
   servicos_nome: string[];
