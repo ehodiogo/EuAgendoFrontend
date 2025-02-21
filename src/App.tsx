@@ -11,6 +11,10 @@ const Sobre = lazy(() => import("./views/Sobre"));
 const Planos = lazy(() => import("./views/Planos"));
 const Termos = lazy(() => import("./views/Termos"));
 const Contato = lazy(() => import("./views/Contato"));
+const Dashboard = lazy(() => import("./views/Dashboard"));
+const Login = lazy(() => import("./views/Login"));
+const Register = lazy(() => import("./views/Cadastro"));
+const ForgotPassword = lazy(() => import("./views/EsqueciSenha"));
 
 function App() {
 
@@ -22,10 +26,12 @@ function App() {
       <Route path="/empresas/:empresa" element={<EmpresaDetails />} />
       <Route path="/agendar/:empresa" element={<Agendar />} />
       <Route path="/agendamentos" element={<h1>Agendamentos</h1>} />
-      <Route path="/dashboard" element={<h1>Dashboard</h1>} />
+      <Route path="/dashboard" element={<Dashboard />} />
 
-      <Route path="/login" element={<h1>Login</h1>} />
-      <Route path="/cadastro" element={<h1>Cadastro</h1>} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/cadastro" element={<Register />} />
+      <Route path="/esqueci-senha" element={<ForgotPassword />} />
+
       <Route path="/perfil" element={<h1>Perfil</h1>} />
 
       <Route path="/contato" element={<Contato />} />

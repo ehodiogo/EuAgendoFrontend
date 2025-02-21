@@ -1,8 +1,11 @@
 import { useFetch } from "../functions/GetData";
 import { ServicosFuncionariosEmpresa } from "../interfaces/ServicosFuncionarios";
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import HorariosTabela from "../components/TabelaHorario";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import Navbar from "../components/Navbar";
 
 const Agendar = () => {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
@@ -14,98 +17,119 @@ const Agendar = () => {
     number | null
   >(null);
 
+  useEffect(() => {
+    AOS.init({ duration: 800 }); // Ativando animações
+  }, []);
+
   if (!empresasData.data) {
     return (
-      <div className="p-4 bg-light border rounded shadow-sm">
-        Empresa não encontrada.
+      <div className="text-center text-danger py-5">
+        <h4>❌ Empresa não encontrada.</h4>
       </div>
     );
   }
 
   const empresa = empresasData.data[0]; // Supondo que há pelo menos uma empresa
 
-  const handleFuncionarioClick = (id: number) => {
-    // Atualiza o estado com o ID do funcionário selecionado
-    setFuncionarioSelecionado(id);
-  };
-
   return (
-    <div className="p-4 bg-light border rounded shadow-sm text-center">
-      <h2 className="text-danger mb-4">🏢 {empresa.nome}</h2>
+    <div className="bg-light min-vh-100">
+      
+      <Navbar />
 
-      <h4 className="text-danger mb-3">
-        Escolha o funcionário para agendar o serviço
-      </h4>
+      {/* Header */}
+      <header
+        className="text-center text-white bg-primary py-5"
+        data-aos="fade-down"
+      >
+        <div className="container">
+          <h1 className="display-4 fw-bold">📅 Agendamento de Serviços</h1>
+          <p className="lead">
+            Escolha um funcionário e marque seu horário facilmente.
+          </p>
+        </div>
+      </header>
 
-      <div className="row d-flex justify-content-center">
-        {empresa.funcionarios && empresa.funcionarios.length > 0 ? (
-          empresa.funcionarios.map((funcionario, index) => (
-            <div key={index} className="col-12 col-sm-6 col-md-4 mb-3">
-              <div
-                className="card text-center"
-                onClick={() => handleFuncionarioClick(funcionario.id)} // Atualiza o ID ao clicar
-                style={{
-                  cursor: "pointer",
-                  border:
+      {/* Escolha de Funcionário */}
+      <section className="container py-5 text-center">
+        <h2 className="text-primary fw-bold">Escolha um Funcionário</h2>
+        <div className="row justify-content-center mt-4">
+          {empresa.funcionarios.length > 0 ? (
+            empresa.funcionarios.map((funcionario, index) => (
+              <div key={index} className="col-md-4 mb-4" data-aos="zoom-in">
+                <div
+                  className={`card shadow-lg border-0 text-center ${
                     funcionarioSelecionado === funcionario.id
-                      ? "2px solid #b03a2e"
-                      : "", // Destaque ao selecionar
-                }}
-              >
-                <img
-                  src={`${funcionario.foto_url}`}
-                  alt={funcionario.nome}
-                  className="card-img-top rounded-circle mx-auto"
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                    objectFit: "cover",
-                  }}
-                />
-                <div className="card-body">
-                  <h5 className="card-title">{funcionario.nome}</h5>
-                  <p className="card-text">
-                    {funcionario.servicos && funcionario.servicos.length > 0 ? (
-                      funcionario.servicos.map((servico, i) => (
-                        <span key={i} className="badge bg-danger me-2">
-                          {servico.nome}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="badge bg-muted">
-                        Nenhum serviço disponível
-                      </span>
-                    )}
-                  </p>
+                      ? "border-danger"
+                      : ""
+                  }`}
+                  onClick={() => setFuncionarioSelecionado(funcionario.id)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <img
+                    src={funcionario.foto_url || "default-avatar.png"}
+                    alt={funcionario.nome}
+                    className="card-img-top rounded-circle mx-auto mt-3"
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <div className="card-body">
+                    <h5 className="card-title text-primary fw-bold">
+                      {funcionario.nome}
+                    </h5>
+                    <h6 className="text-danger">Serviços:</h6>
+                    <ul className="list-unstyled">
+                      {funcionario.servicos.map((servico, i) => (
+                        <li key={i} className="text-muted">
+                          • {servico.nome}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div
+              className="alert alert-warning w-50 mx-auto"
+              data-aos="fade-up"
+            >
+              Nenhum funcionário disponível no momento.
             </div>
-          ))
-        ) : (
-          <p className="text-muted">Nenhum funcionário encontrado.</p>
-        )}
-      </div>
+          )}
+        </div>
+      </section>
 
+      {/* Escolha de Horário */}
       {funcionarioSelecionado ? (
-        <>
-          <h4 className="text-danger mb-3">Escolha o horário para o serviço</h4>
+        <section className="container pb-5 text-center">
+          <h2 className="text-primary fw-bold" data-aos="fade-up">
+            Escolha um Horário
+          </h2>
           <HorariosTabela
             funcionario_id={funcionarioSelecionado}
             servicos_nome={
               empresa.funcionarios
-                .find(
-                  (funcionario) => funcionario.id === funcionarioSelecionado
-                )
-                ?.servicos.map((servico) => servico.nome) || []
+                .find((f) => f.id === funcionarioSelecionado)
+                ?.servicos.map((s) => s.nome) || []
             }
-            key={funcionarioSelecionado} // Adicionando a chave para forçar re-renderização
+            key={funcionarioSelecionado}
           />
-        </>
+        </section>
       ) : (
-        <div className="text-muted">
-          Selecione um funcionário para ver os horários.
+        <div className="text-muted text-center pb-5" data-aos="fade-up">
+          Selecione um funcionário para ver os horários disponíveis.
         </div>
       )}
+
+      {/* Footer */}
+      <footer className="bg-primary text-white text-center py-3">
+        <p className="mb-0">
+          &copy; 2025 EuAgendo. Todos os direitos reservados.
+        </p>
+      </footer>
     </div>
   );
 };

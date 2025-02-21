@@ -1,76 +1,121 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import Navbar from "../components/Navbar";
 
 function EmpresasSearch() {
   const [search, setSearch] = useState("");
   const empresas = useFetch<Empresa[]>("api/empresa");
+
+  useEffect(() => {
+    AOS.init({ duration: 800 }); // Ativa animações
+  }, []);
 
   const filteredEmpresas = empresas.data?.filter((empresa: Empresa) =>
     empresa.nome.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="p-4 bg-light border rounded shadow-sm text-center">
-      <h2 className="text-danger mb-4">🔍 Buscar Empresas</h2>
+    <div className="bg-light min-vh-100">
+      
+      <Navbar />
 
-      <div className="input-group mb-4">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Digite o nome da empresa..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button
-          className="btn btn-outline-danger"
-          onClick={() => setSearch("")}
-        >
-          Limpar
-        </button>
-      </div>
+      {/* Header */}
+      <header
+        className="text-center text-white bg-primary py-5"
+        data-aos="fade-down"
+      >
+        <div className="container">
+          <h1 className="display-4 fw-bold">🔍 Encontre Empresas</h1>
+          <p className="lead">
+            Busque empresas cadastradas e agende seus serviços com facilidade.
+          </p>
+        </div>
+      </header>
 
-      {/* Mostrar empresas filtradas quando houver pesquisa */}
-      <div className="row">
-        {filteredEmpresas && filteredEmpresas.length > 0 ? (
-          filteredEmpresas.map((empresa, index) => (
-            <div key={index} className="col-md-4 mb-4">
-              <div className="card shadow-lg">
-                <img
-                  src={empresa.logo || "default-logo.png"} // Logo padrão
-                  alt={empresa.nome}
-                  className="card-img-top"
-                  style={{ height: "200px", objectFit: "cover" }}
-                />
-                <div className="card-body">
-                  <h5 className="card-title text-primary">{empresa.nome}</h5>
-                  <p className="card-text">
-                    <strong>Endereço:</strong> {empresa.endereco} <br />
-                    <strong>Telefone:</strong> {empresa.telefone} <br />
-                    <strong>Serviços:</strong>
-                    <ul>
-                      {empresa.servicos.map((servico, index) => (
-                        <li key={index}>{servico.nome}</li> // Exibindo apenas o nome do serviço
+      {/* Busca */}
+      <section className="container py-5 text-center" data-aos="fade-up">
+        <h2 className="text-primary fw-bold">Pesquise por Empresas</h2>
+        <div className="input-group mt-3 w-50 mx-auto">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Digite o nome da empresa..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button className="btn btn-warning" onClick={() => setSearch("")}>
+            ❌ Limpar
+          </button>
+        </div>
+      </section>
+
+      {/* Lista de Empresas */}
+      <section className="container pb-5">
+        <div className="row">
+          {filteredEmpresas && filteredEmpresas.length > 0 ? (
+            filteredEmpresas.map((empresa, index) => (
+              <div key={index} className="col-md-4 mb-4" data-aos="zoom-in">
+                <div className="card shadow-lg border-0">
+                  <img
+                    src={empresa.logo || "default-logo.png"}
+                    alt={empresa.nome}
+                    className="card-img-top"
+                    style={{
+                      height: "200px",
+                      objectFit: "cover",
+                      borderRadius: "10px 10px 0 0",
+                    }}
+                  />
+                  <div className="card-body text-center">
+                    <h5 className="card-title text-primary fw-bold">
+                      {empresa.nome}
+                    </h5>
+                    <p className="text-muted">
+                      <strong>Endereço:</strong> {empresa.endereco}
+                    </p>
+                    <p className="text-muted">
+                      <strong>Telefone:</strong> {empresa.telefone}
+                    </p>
+                    <h6 className="text-primary">Serviços:</h6>
+                    <ul className="list-unstyled">
+                      {empresa.servicos.map((servico, i) => (
+                        <li key={i} className="text-muted">
+                          • {servico.nome}
+                        </li>
                       ))}
                     </ul>
-                  </p>
-                  <Link
-                    to={`/empresas/${empresa.nome}`}
-                    className="btn btn-danger btn-sm"
-                  >
-                    Ver Detalhes
-                  </Link>
+                    <Link
+                      to={`/empresas/${empresa.nome}`}
+                      className="btn btn-success fw-semibold"
+                    >
+                      Ver Detalhes 🔎
+                    </Link>
+                  </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div
+              className="alert alert-warning w-75 mx-auto text-center"
+              role="alert"
+              data-aos="fade-up"
+            >
+              Nenhuma empresa encontrada para "<strong>{search}</strong>".
             </div>
-          ))
-        ) : (
-          <div className="alert alert-warning mt-4" role="alert">
-            Nenhuma empresa encontrada para "{search}".
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-primary text-white text-center py-3">
+        <p className="mb-0">
+          &copy; 2025 EuAgendo. Todos os direitos reservados.
+        </p>
+      </footer>
     </div>
   );
 }
