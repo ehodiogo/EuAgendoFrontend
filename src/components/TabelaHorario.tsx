@@ -186,8 +186,8 @@ const HorariosTabela = ({
 
   const confirmarAgendamento = async () => {
     const agendamentoData = {
-      funcionario_id,
-      servico: servicoSelecionado,
+      id_funcionario: funcionario_id,
+      servico_nome: servicoSelecionado,
       data: dataSelecionadaString,
       hora: horarioSelecionado,
       cliente_nome: clienteNome,
@@ -195,8 +195,26 @@ const HorariosTabela = ({
       cliente_numero: clienteNumero,
     };
 
-    console.log("Dados do agendamento:", agendamentoData);
+
+    try {
+      const response = await fetch("http://localhost:8000/api/agendamento/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(agendamentoData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ao agendar: ${response.status}`);
+      }
+
+      setModalAberto(false);
+    } catch (error) {
+      console.error("Erro ao agendar:", error);
+    }
   };
+
 
   return (
     <div className="container py-4">
