@@ -1,7 +1,7 @@
 export interface Agendamento {
   id: number;
-  servico: number; 
-  cliente: number; 
+  servico: string; 
+  cliente: string; 
   funcionario: number;
   data: string; 
   hora: string; 

@@ -91,12 +91,12 @@ const Agendar = () => {
           <h4 className="text-danger mb-3">Escolha o horário para o serviço</h4>
           <HorariosTabela
             funcionario_id={funcionarioSelecionado}
-            servicos_id={
+            servicos_nome={
               empresa.funcionarios
                 .find(
                   (funcionario) => funcionario.id === funcionarioSelecionado
                 )
-                ?.servicos.map((servico) => servico.id) || []
+                ?.servicos.map((servico) => servico.nome) || []
             }
             key={funcionarioSelecionado} // Adicionando a chave para forçar re-renderização
           />
