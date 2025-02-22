@@ -22,6 +22,7 @@ const Register = lazy(() => import("./views/Cadastro"));
 const ForgotPassword = lazy(() => import("./views/EsqueciSenha"));
 const Financeiro = lazy(() => import("./views/Financeiro"));
 const NotFound = lazy(() => import("./views/404NotFound"));
+const EmpresasUsuario = lazy(() => import("./views/AgendamentosEmpresa"));
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const isAuthenticated = localStorage.getItem("access_token");
@@ -44,6 +45,14 @@ function App() {
         <Route path="/cadastro" element={<Register />} />
         <Route path="/esqueci-senha" element={<ForgotPassword />} />
 
+        <Route 
+          path="/minhas-empresas"
+          element={
+            <ProtectedRoute>
+              <EmpresasUsuario />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/perfil"
           element={
@@ -89,14 +98,6 @@ function App() {
           element={
             <ProtectedRoute>
               <h1>Histórico</h1>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/agendamentos-hoje"
-          element={
-            <ProtectedRoute>
-              <h1>Agendamentos Hoje</h1>
             </ProtectedRoute>
           }
         />
