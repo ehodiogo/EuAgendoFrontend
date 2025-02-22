@@ -170,7 +170,7 @@ function Dashboard() {
             />
           </div>
 
-          <button onClick={handleLogout} className="btn btn-success w-100 mt-4">
+          <button onClick={handleLogout} className="btn btn-danger w-100 mt-4">
             Sair
           </button>
         </div>
