@@ -11,7 +11,7 @@ function EmpresaDetails() {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
   const empresas = useFetch<Empresa[]>("api/empresa/?q=" + empresaNome);
   const funcionarios = useFetch<Funcionario[]>(
-    `api/funcionario/?empresa=${empresaNome}`
+    `api/funcionario/?empresa_nome=${empresaNome}`
   );
 
   useEffect(() => {

@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import axios from "axios";
 import "aos/dist/aos.css";
 import AOS from "aos";
 import Navbar from "../components/Navbar";
@@ -7,22 +8,35 @@ import Navbar from "../components/Navbar";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login com", email, password);
+    try {
+      const response = await axios.post("http://localhost:8000/api/login/", {
+        email: email,
+        password: password,
+      });
+      const { access, refresh } = response.data;
+
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
+
+      navigate("/dashboard");
+    } catch (err) {
+      setError("Credenciais inválidas ou erro ao autenticar.");
+      console.error("Erro no login", err);
+    }
   };
 
   return (
     <div className="bg-light min-vh-100">
-      
       <Navbar />
-
-      {/* Página de Login */}
       <div className="d-flex justify-content-center align-items-center min-vh-100">
         <div
           className="card shadow-lg border-0 p-5"
@@ -53,11 +67,11 @@ function Login() {
                 required
               />
             </div>
+            {error && <div className="alert alert-danger">{error}</div>}
             <button type="submit" className="btn btn-success w-100 mb-3">
               Entrar
             </button>
           </form>
-
           <div className="d-flex justify-content-between">
             <Link to="/cadastro" className="text-primary">
               Criar conta

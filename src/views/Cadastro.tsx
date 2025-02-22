@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import axios from "axios";
 import "aos/dist/aos.css";
 import AOS from "aos";
 import Navbar from "../components/Navbar";
@@ -8,23 +9,35 @@ function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Cadastro com", name, email, password);
-    // Aqui você pode adicionar lógica para registrar o usuário
+    try {
+      const response = await axios.post("http://localhost:8000/api/register/", {
+        username: email,
+        first_name: name,
+        email: email,
+        password: password,
+      });
+
+      console.log("Resposta do registro", response.data);
+
+      navigate("/login");
+    } catch (err) {
+      setError("Erro ao registrar. Tente novamente.");
+      console.error("Erro no registro", err);
+    }
   };
 
   return (
     <div className="bg-light min-vh-100">
-      
       <Navbar />
-
-      {/* Página de Registro */}
       <div className="d-flex justify-content-center align-items-center min-vh-100">
         <div
           className="card shadow-lg border-0 p-5"
@@ -65,6 +78,7 @@ function Register() {
                 required
               />
             </div>
+            {error && <div className="alert alert-danger">{error}</div>}
             <button type="submit" className="btn btn-success w-100 mb-3">
               Registrar
             </button>

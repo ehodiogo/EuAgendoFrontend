@@ -1,13 +1,4 @@
-import { Link } from "react-router-dom";
-
-interface DashboardData {
-  customersGrowth: number[];
-  weeklyAppointments: number[];
-  appointmentsToday: number;
-  customerSatisfaction: number[];
-}
-
-import { Line, Bar, Doughnut } from "react-chartjs-2";
+import { Line, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -18,13 +9,20 @@ import {
   Title,
   Tooltip,
   Legend,
-  ArcElement,
 } from "chart.js";
 import { useState, useEffect } from "react";
+
+interface DashboardData {
+  customersGrowth: number[];
+  weeklyAppointments: number[];
+  appointmentsToday: number;
+  weeklyEarnings: number[];
+}
 import "bootstrap/dist/css/bootstrap.min.css";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "../components/Navbar";
+import { Link } from "react-router-dom"; // Importando Link para navegação
 
 ChartJS.register(
   CategoryScale,
@@ -34,12 +32,10 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend,
-  ArcElement
+  Legend
 );
 
 function Dashboard() {
-
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
@@ -52,7 +48,7 @@ function Dashboard() {
       customersGrowth: [10, 20, 30, 40, 50, 60, 70],
       weeklyAppointments: [3, 5, 8, 6, 7, 10, 11],
       appointmentsToday: 5,
-      customerSatisfaction: [90, 85, 88, 92, 93],
+      weeklyEarnings: [100, 150, 200, 250, 300, 350, 400], // Ganhos semanais
     });
   }, []);
 
@@ -84,21 +80,27 @@ function Dashboard() {
     ],
   };
 
-  const customerSatisfactionChartData = {
-    labels: ["Satisfeito", "Neutro", "Insatisfeito"],
+  const weeklyEarningsChartData = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
     datasets: [
       {
-        data: data.customerSatisfaction,
-        backgroundColor: ["#27ae60", "#f39c12", "#e74c3c"],
-        borderColor: "#fff",
-        borderWidth: 1,
+        label: "Valor Ganho por Semana",
+        data: data.weeklyEarnings,
+        fill: false,
+        borderColor: "#2ecc71",
+        tension: 0.1,
       },
     ],
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    window.location.href = "/";
+  };
+
   return (
     <div className="bg-light min-vh-100">
-      
       <Navbar />
 
       {/* Painel do Usuário */}
@@ -109,6 +111,16 @@ function Dashboard() {
             Bem-vindo ao seu painel! Aqui você pode gerenciar suas configurações
             e visualizar seus dados.
           </p>
+
+          {/* Links para Perfil e Financeiro */}
+          <div className="d-flex justify-content-center mb-4 p-4 m-1">
+            <Link to="/perfil" className="btn btn-primary w-48 me-2">
+              Ir para Perfil
+            </Link>
+            <Link to="/financeiro" className="btn btn-success w-48">
+              Ir para Financeiro
+            </Link>
+          </div>
 
           <div className="d-flex justify-content-between mb-4">
             <div className="d-flex flex-column align-items-center">
@@ -136,7 +148,7 @@ function Dashboard() {
             />
           </div>
 
-          <div className="mb-4" style={{ height: "300px" }}>
+          <div className="mb-4 mt-4" style={{ height: "300px" }}>
             <h4 className="text-primary mb-3">Agendamentos Semanais</h4>
             <Bar
               data={weeklyAppointmentsChartData}
@@ -147,10 +159,10 @@ function Dashboard() {
             />
           </div>
 
-          <div className="mb-4" style={{ height: "300px" }}>
-            <h4 className="text-primary mb-3">Satisfação dos Clientes</h4>
-            <Doughnut
-              data={customerSatisfactionChartData}
+          <div className="mb-4 mt-4" style={{ height: "300px" }}>
+            <h4 className="text-primary mb-3">Valor Ganho por Semana</h4>
+            <Line
+              data={weeklyEarningsChartData}
               options={{
                 responsive: true,
                 maintainAspectRatio: false,
@@ -158,9 +170,9 @@ function Dashboard() {
             />
           </div>
 
-          <Link to="/" className="btn btn-success w-100 mt-4">
+          <button onClick={handleLogout} className="btn btn-success w-100 mt-4">
             Sair
-          </Link>
+          </button>
         </div>
       </div>
 
