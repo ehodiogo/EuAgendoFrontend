@@ -21,6 +21,7 @@ const Login = lazy(() => import("./views/Login"));
 const Register = lazy(() => import("./views/Cadastro"));
 const ForgotPassword = lazy(() => import("./views/EsqueciSenha"));
 const Financeiro = lazy(() => import("./views/Financeiro"));
+const NotFound = lazy(() => import("./views/404NotFound"));
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const isAuthenticated = localStorage.getItem("access_token");
@@ -113,7 +114,7 @@ function App() {
         <Route path="/planos" element={<Planos />} />
         <Route path="/termos" element={<Termos />} />
 
-        <Route path="*" element={<h1>404</h1>} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
   );
 }

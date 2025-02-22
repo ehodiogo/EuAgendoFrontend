@@ -62,7 +62,7 @@ function Home() {
           {[
             {
               title: "Para Empresas",
-              desc: "Otimize sua agenda e evite falhas na organização.",
+              desc: "Otimize sua agenda e evite falhas na organização dos serviços.",
             },
             {
               title: "Para Clientes",
