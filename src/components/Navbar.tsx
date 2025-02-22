@@ -14,7 +14,7 @@ const Navbar = () => {
       <div className="container">
         <a className="navbar-brand fw-bold" href="/">
           <img
-            src="/public/eu-agendo-ico.ico"
+            src="eu-agendo-ico.ico"
             alt="Logo"
             style={{ width: "40px", height: "40px", marginRight: "10px" }} 
           />

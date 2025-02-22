@@ -37,7 +37,7 @@ function Home() {
           </div>
           <div className="ms-5">
             <img
-              src={"/public/eu-agendo.png"} 
+              src={"eu-agendo.png"} 
               alt="Imagem do EuAgendo"
               className="img-fluid rounded"
               style={{ maxWidth: "300px", height: "auto" }}
