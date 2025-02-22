@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 const Navbar = () => {
   const navigate = useNavigate();
 
-  // Verificando se ambos os tokens estão presentes no localStorage
   const isAuthenticated =
     localStorage.getItem("access_token") !== null &&
     localStorage.getItem("refresh_token") !== null;
@@ -14,6 +13,11 @@ const Navbar = () => {
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
       <div className="container">
         <a className="navbar-brand fw-bold" href="/">
+          <img
+            src="/public/eu-agendo-ico.ico"
+            alt="Logo"
+            style={{ width: "40px", height: "40px", marginRight: "10px" }} 
+          />
           EuAgendo
         </a>
         <button

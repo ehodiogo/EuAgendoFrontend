@@ -9,37 +9,43 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    AOS.init({ duration: 1000 }); 
-
+    AOS.init({ duration: 1000 });
   }, []);
 
   return (
     <div className="bg-light min-vh-100">
-      
       <Navbar />
 
-      {/* Hero Section */}
       <header
-        className="text-center text-white bg-primary py-5"
+        className="d-flex align-items-center text-white bg-primary py-5"
         data-aos="fade-down"
       >
-        <div className="container">
-          <h1 className="display-4 fw-bold">
-            Gerencie seus Agendamentos com Facilidade
-          </h1>
-          <p className="lead">
-            Organize compromissos, reduza faltas e aumente sua produtividade.
-          </p>
-          <button
-            className="btn btn-warning btn-lg px-4 shadow-sm fw-semibold"
-            onClick={() => navigate("/empresas")}
-          >
-            Comece agora
-          </button>
+        <div className="container d-flex align-items-center">
+          <div className="text-center">
+            <h1 className="display-4 fw-bold">
+              Gerencie seus Agendamentos com Facilidade
+            </h1>
+            <p className="lead">
+              Organize compromissos, reduza faltas e aumente sua produtividade.
+            </p>
+            <button
+              className="btn btn-warning btn-lg px-4 shadow-sm fw-semibold"
+              onClick={() => navigate("/empresas")}
+            >
+              Comece agora
+            </button>
+          </div>
+          <div className="ms-5">
+            <img
+              src={"/public/eu-agendo.png"} 
+              alt="Imagem do EuAgendo"
+              className="img-fluid rounded"
+              style={{ maxWidth: "300px", height: "auto" }}
+            />
+          </div>
         </div>
       </header>
 
-      {/* O que é o EuAgendo */}
       <section className="container py-5 text-center" data-aos="fade-up">
         <h2 className="text-primary fw-bold">O que é o EuAgendo?</h2>
         <p className="text-muted mx-auto w-75">
@@ -50,7 +56,6 @@ function Home() {
         </p>
       </section>
 
-      {/* Benefícios */}
       <section className="container py-5 text-center" data-aos="fade-up">
         <h2 className="text-primary fw-bold">Benefícios para Você</h2>
         <div className="row mt-4">
@@ -78,11 +83,12 @@ function Home() {
         </div>
       </section>
 
-      {/* Depoimentos */}
       <section className="py-5 bg-light" data-aos="fade-up">
-        <div className="container text-center">
-          <h2 className="text-primary fw-bold">O que nossos clientes dizem</h2>
-          <div className="row mt-4">
+        <div className="container">
+          <h2 className="text-primary fw-bold text-center">
+            O que nossos clientes dizem
+          </h2>
+          <div className="row mt-4 justify-content-center">
             {[
               {
                 name: "Mariana R.",
@@ -103,7 +109,7 @@ function Home() {
                 stars: "⭐⭐⭐⭐⭐",
               },
             ].map((item, index) => (
-              <div key={index} className="col-md-4">
+              <div key={index} className="col-md-4 mb-4">
                 <div className="card border-0 shadow-lg p-4">
                   <p className="fw-semibold">"{item.review}"</p>
                   <p className="text-warning fs-4">{item.stars}</p>
@@ -115,7 +121,6 @@ function Home() {
         </div>
       </section>
 
-      {/* Planos */}
       <section className="py-5" data-aos="fade-up">
         <div className="container text-center">
           <h2 className="text-primary fw-bold">Escolha seu Plano</h2>
@@ -134,7 +139,7 @@ function Home() {
                   </p>
                   <button
                     className="btn btn-warning px-4 fw-semibold"
-                    onClick={() => navigate("/empresas")}
+                    onClick={() => navigate("/planos")}
                   >
                     Assine agora
                   </button>
@@ -145,7 +150,6 @@ function Home() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-primary text-white text-center py-3">
         <p className="mb-0">
           &copy; 2025 EuAgendo. Todos os direitos reservados.
