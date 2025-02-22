@@ -117,8 +117,11 @@ function Dashboard() {
             <Link to="/perfil" className="btn btn-primary w-48 me-2">
               Ir para Perfil
             </Link>
-            <Link to="/financeiro" className="btn btn-success w-48">
+            <Link to="/financeiro" className="btn btn-success w-48 me-2">
               Ir para Financeiro
+            </Link>
+            <Link to="/minhas-empresas" className="btn btn-primary w-48">
+              Ir para Minhas Empresas
             </Link>
           </div>
 

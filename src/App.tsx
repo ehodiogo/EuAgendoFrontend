@@ -23,6 +23,10 @@ const ForgotPassword = lazy(() => import("./views/EsqueciSenha"));
 const Financeiro = lazy(() => import("./views/Financeiro"));
 const NotFound = lazy(() => import("./views/404NotFound"));
 const EmpresasUsuario = lazy(() => import("./views/AgendamentosEmpresa"));
+const Profile = lazy(() => import("./views/Perfil"));
+const Carrinho = lazy(() => import("./views/Carrinho"));
+const Checkout = lazy(() => import("./views/Checkout"));
+const Confirmacao = lazy(() => import("./views/Confirmacao"));
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const isAuthenticated = localStorage.getItem("access_token");
@@ -57,7 +61,7 @@ function App() {
           path="/perfil"
           element={
             <ProtectedRoute>
-              <h1>Perfil</h1>
+              <Profile />
             </ProtectedRoute>
           }
         />
@@ -73,15 +77,15 @@ function App() {
           path="/carrinho"
           element={
             <ProtectedRoute>
-              <h1>Carinho</h1>
+              <Carrinho />
             </ProtectedRoute>
           }
         />
         <Route
-          path="/pagamento"
+          path="/checkout"
           element={
             <ProtectedRoute>
-              <h1>Pagamento</h1>
+              <Checkout />
             </ProtectedRoute>
           }
         />
@@ -89,7 +93,7 @@ function App() {
           path="/confirmacao"
           element={
             <ProtectedRoute>
-              <h1>Confirmação</h1>
+              <Confirmacao />
             </ProtectedRoute>
           }
         />
