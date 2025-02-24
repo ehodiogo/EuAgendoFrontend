@@ -11,19 +11,43 @@ const Profile = () => {
 
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [paymentHistory] = useState([
+
+  // Dados fictícios de empresas e funcionários
+  const [companies] = useState([
     {
-      date: "2025-01-15",
-      amount: "R$249,99",
-      status: "Pago",
-      method: "cartao",
+      name: "Empresa A",
+      created_at: "2025-01-01",
+      employees_count: 45, // Número de funcionários
+      max_employees: 50, // Limite de funcionários
     },
-    { date: "2024-12-15", amount: "R$249,99", status: "Pago", method: "pix" },
+    {
+      name: "Empresa B",
+      created_at: "2024-12-15",
+      employees_count: 10,
+      max_employees: 20,
+    },
   ]);
+
   const [planDetails] = useState({
     name: "Plano Premium",
     expiry_date: "2024-12-31",
   });
+
+  const [paymentHistory] = useState([
+    {
+      date: "2025-02-01",
+      amount: "R$ 150,00",
+      status: "Pago",
+      method: "cartao",
+    },
+    { date: "2025-01-15", amount: "R$ 120,00", status: "Pago", method: "pix" },
+    {
+      date: "2024-12-20",
+      amount: "R$ 100,00",
+      status: "Pendente",
+      method: "cartao",
+    },
+  ]);
 
   useEffect(() => {
     if (user.data) {
@@ -62,6 +86,22 @@ const Profile = () => {
     }
   };
 
+  // Função para calcular a porcentagem do limite de empresas ou funcionários
+  const calculateProgress = (current: number, max: number) => {
+    return Math.min((current / max) * 100, 100); // Limita a porcentagem a 100
+  };
+
+  // Função para determinar a cor da barra de progresso
+  const getProgressBarColor = (percentage: number) => {
+    if (percentage < 50) {
+      return "bg-success"; // Verde
+    } else if (percentage >= 50 && percentage <= 80) {
+      return "bg-warning"; // Amarela
+    } else {
+      return "bg-danger"; // Vermelha
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -70,6 +110,7 @@ const Profile = () => {
           Suas Informações
         </h1>
 
+        {/* Informações do Perfil */}
         <div className="card shadow-lg p-4">
           <h4 className="card-title text-primary text-center mb-4">
             Informações do Perfil
@@ -143,23 +184,73 @@ const Profile = () => {
           <p className="text-muted">Válido até: {planDetails.expiry_date}</p>
         </div>
 
+        {/* Progresso das Empresas Criadas */}
+        <div className="card shadow-lg p-4 mt-4 border-warning">
+          <h4 className="text-warning text-center mb-4">
+            Limite de Empresas Criadas
+          </h4>
+          <div className="progress">
+            <div
+              className={`progress-bar ${getProgressBarColor(
+                calculateProgress(companies.length, 5)
+              )}`}
+              role="progressbar"
+              style={{ width: `${calculateProgress(companies.length, 5)}%` }}
+              aria-valuenow={companies.length}
+              aria-valuemin={0}
+              aria-valuemax={5}
+            >
+              {companies.length}/5 Empresas Criadas
+            </div>
+          </div>
+        </div>
+
+        {/* Progresso de Funcionários por Empresa */}
+        {companies.map((company, index) => (
+          <div key={index} className="card shadow-lg p-4 mt-4 border-secondary">
+            <h4 className="text-secondary text-center mb-4">{company.name}</h4>
+            <div className="progress">
+              <div
+                className={`progress-bar ${getProgressBarColor(
+                  calculateProgress(
+                    company.employees_count,
+                    company.max_employees
+                  )
+                )}`}
+                role="progressbar"
+                style={{
+                  width: `${calculateProgress(
+                    company.employees_count,
+                    company.max_employees
+                  )}%`,
+                }}
+                aria-valuenow={company.employees_count}
+                aria-valuemin={0}
+                aria-valuemax={company.max_employees}
+              >
+                {company.employees_count}/{company.max_employees} Funcionários
+              </div>
+            </div>
+          </div>
+        ))}
+
         {/* Histórico de Pagamentos */}
         <div className="card shadow-lg p-4 mt-4 border-info">
           <h4 className="text-info text-center mb-4">
             Histórico de Pagamentos
           </h4>
-          {paymentHistory.length > 0 ? (
-            <table className="table table-striped text-center">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Valor</th>
-                  <th>Status</th>
-                  <th>Método</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paymentHistory.map((payment, index) => (
+          <table className="table table-striped text-center">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Método</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paymentHistory.length > 0 ? (
+                paymentHistory.map((payment, index) => (
                   <tr key={index}>
                     <td>{payment.date}</td>
                     <td>{payment.amount}</td>
@@ -174,12 +265,16 @@ const Profile = () => {
                       )}
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p className="text-center">Nenhum pagamento registrado.</p>
-          )}
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="text-center">
+                    Nenhum pagamento registrado.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </>
