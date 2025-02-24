@@ -1,3 +1,4 @@
+import { FaPix, FaCcVisa, FaCcMastercard } from "react-icons/fa6";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 
@@ -11,114 +12,56 @@ function Planos() {
 
   const adicionarAoCarrinho = (plano: Plano) => {
     console.log(`Adicionando ao carrinho: ${plano.nome} - R$${plano.preco}`);
-
-    // Recuperar o carrinho atual do localStorage
     const carrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
-
-    // Adicionar o novo plano ao carrinho
     carrinho.push(plano);
-
-    // Salvar o carrinho de volta no localStorage
     localStorage.setItem("carrinho", JSON.stringify(carrinho));
-
-    // Redireciona para o checkout
     navigate("/carrinho");
   };
 
   return (
-    <div>
+    <div className="bg-light min-vh-100">
       <Navbar />
-      <div className="container mt-5">
-        <section className="text-center mb-5">
-          <h1 className="display-3 text-primary">Nossos Planos</h1>
-          <p className="lead text-muted">
-            Escolha o plano que melhor se adapta às suas necessidades.
-          </p>
-        </section>
+      <div className="container mt-5 text-center">
+        <h1 className="display-4 text-dark fw-bold">Nossos Planos</h1>
+        <p className="lead text-muted">Escolha o plano ideal para você.</p>
 
-        <div className="row justify-content-center">
-          {/* Plano Básico */}
-          <div className="col-md-4">
-            <div className="card shadow-lg">
-              <div className="card-body text-center">
-                <h4 className="card-title text-success">Plano Básico</h4>
-                <p className="card-text fw-bold">R$49/mês</p>
-                <ul className="list-unstyled">
-                  <li>Agendamentos ilimitados</li>
-                  <li className="fw-bold">1 empresa</li>
-                  <li>Suporte via e-mail</li>
-                  <li>Relatórios básicos</li>
-                  <li>Painel financeiro</li>
-                </ul>
-                <button
-                  className="btn btn-success"
-                  onClick={() =>
-                    adicionarAoCarrinho({
-                      nome: "Plano Básico",
-                      preco: 49,
-                    })
-                  }
-                >
-                  Adquirir
-                </button>
+        <div className="row justify-content-center mt-4">
+          {[
+            { nome: "Plano Básico", preco: 49, cor: "success" },
+            { nome: "Plano Profissional", preco: 149, cor: "danger" },
+            { nome: "Plano Corporativo", preco: 299, cor: "primary" },
+          ].map((plano, index) => (
+            <div key={index} className="col-md-4 mb-4">
+              <div className="card shadow-lg border-0">
+                <div className="card-body text-center">
+                  <h4 className={`card-title text-${plano.cor}`}>
+                    {plano.nome}
+                  </h4>
+                  <p className="card-text fw-bold">R${plano.preco}/mês</p>
+                  <ul className="list-unstyled text-muted">
+                    <li>Agendamentos ilimitados</li>
+                    <li>Suporte via e-mail</li>
+                    <li>Relatórios avançados</li>
+                    <li>Painel financeiro</li>
+                  </ul>
+                  <button
+                    className="btn btn-success w-100"
+                    onClick={() => adicionarAoCarrinho(plano)}
+                  >
+                    Adquirir
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Plano Profissional */}
-          <div className="col-md-4">
-            <div className="card shadow-lg">
-              <div className="card-body text-center">
-                <h4 className="card-title text-danger">Plano Profissional</h4>
-                <p className="card-text fw-bold">R$149/mês</p>
-                <ul className="list-unstyled">
-                  <li>Agendamentos ilimitados</li>
-                  <li className="fw-bold">5 empresas</li>
-                  <li>Suporte via e-mail</li>
-                  <li>Relatórios avançados</li>
-                  <li>Painel financeiro</li>
-                </ul>
-                <button
-                  className="btn btn-success"
-                  onClick={() =>
-                    adicionarAoCarrinho({
-                      nome: "Plano Profissional",
-                      preco: 149,
-                    })
-                  }
-                >
-                  Adquirir
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Plano Corporativo */}
-          <div className="col-md-4">
-            <div className="card shadow-lg">
-              <div className="card-body text-center">
-                <h4 className="card-title text-primary">Plano Corporativo</h4>
-                <p className="card-text fw-bold">R$299/mês</p>
-                <ul className="list-unstyled">
-                  <li>Agendamentos ilimitados</li>
-                  <li className="fw-bold">20 empresas</li>
-                  <li>Suporte via e-mail</li>
-                  <li>Relatórios avançados</li>
-                  <li>Painel financeiro</li>
-                </ul>
-                <button
-                  className="btn btn-success"
-                  onClick={() =>
-                    adicionarAoCarrinho({
-                      nome: "Plano Corporativo",
-                      preco: 299,
-                    })
-                  }
-                >
-                  Adquirir
-                </button>
-              </div>
-            </div>
+        <div className="mt-5 text-center">
+          <h5 className="text-dark">Formas de Pagamento Aceitas</h5>
+          <div className="d-flex justify-content-center gap-3 mt-2">
+            <FaPix size={40} className="text-success" />
+            <FaCcVisa size={40} className="text-primary" />
+            <FaCcMastercard size={40} className="text-danger" />
           </div>
         </div>
       </div>
