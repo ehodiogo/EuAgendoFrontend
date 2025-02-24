@@ -20,7 +20,6 @@ function EmpresasSearch() {
 
   return (
     <div className="bg-light min-vh-100">
-      
       <Navbar />
 
       {/* Header */}
@@ -59,7 +58,10 @@ function EmpresasSearch() {
           {filteredEmpresas && filteredEmpresas.length > 0 ? (
             filteredEmpresas.map((empresa, index) => (
               <div key={index} className="col-md-4 mb-4" data-aos="zoom-in">
-                <div className="card shadow-lg border-0">
+                <div
+                  className="card shadow-lg border-0 d-flex flex-column"
+                  style={{ height: "100%" }}
+                >
                   <img
                     src={empresa.logo || "default-logo.png"}
                     alt={empresa.nome}
@@ -70,7 +72,10 @@ function EmpresasSearch() {
                       borderRadius: "10px 10px 0 0",
                     }}
                   />
-                  <div className="card-body text-center">
+                  <div
+                    className="card-body text-center d-flex flex-column"
+                    style={{ flexGrow: 1 }}
+                  >
                     <h5 className="card-title text-primary fw-bold">
                       {empresa.nome}
                     </h5>
@@ -81,7 +86,7 @@ function EmpresasSearch() {
                       <strong>Telefone:</strong> {empresa.telefone}
                     </p>
                     <h6 className="text-primary">Serviços:</h6>
-                    <ul className="list-unstyled">
+                    <ul className="list-unstyled" style={{ flexGrow: 1 }}>
                       {empresa.servicos.map((servico, i) => (
                         <li key={i} className="text-muted">
                           • {servico.nome}
@@ -90,7 +95,8 @@ function EmpresasSearch() {
                     </ul>
                     <Link
                       to={`/empresas/${empresa.nome}`}
-                      className="btn btn-success fw-semibold"
+                      className="btn btn-success fw-semibold mt-auto"
+                      style={{ marginTop: "auto" }}
                     >
                       Ver Detalhes 🔎
                     </Link>

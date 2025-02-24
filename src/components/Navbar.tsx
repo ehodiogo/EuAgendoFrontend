@@ -7,8 +7,6 @@ const Navbar = () => {
     localStorage.getItem("access_token") !== null &&
     localStorage.getItem("refresh_token") !== null;
 
-  console.log("isAuthenticated", isAuthenticated);
-
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
       <div className="container">

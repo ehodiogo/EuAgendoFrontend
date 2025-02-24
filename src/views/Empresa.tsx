@@ -9,7 +9,7 @@ import Navbar from "../components/Navbar";
 
 function EmpresaDetails() {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
-  const empresas = useFetch<Empresa[]>("api/empresa/?q=" + empresaNome);
+  const empresas = useFetch<Empresa[]>(`api/empresa/?q=${empresaNome}`);
   const funcionarios = useFetch<Funcionario[]>(
     `api/funcionario/?empresa_nome=${empresaNome}`
   );
@@ -92,13 +92,19 @@ function EmpresaDetails() {
         </div>
 
         {/* Lista de funcionários */}
-        <div className="mt-5" data-aos="fade-up">
+        <div className="mt-5 text-center" data-aos="fade-up">
           <h4 className="text-primary mb-3">👨‍💼 Funcionários</h4>
-          <div className="row">
+          <div className="row justify-content-center">
             {funcionarios.data && funcionarios.data.length > 0 ? (
               funcionarios.data.map((funcionario) => (
-                <div key={funcionario.id} className="col-md-4 col-sm-6 mb-3">
-                  <div className="card text-center shadow">
+                <div
+                  key={funcionario.id}
+                  className="col-md-4 col-sm-6 mb-3 d-flex justify-content-center"
+                >
+                  <div
+                    className="card text-center shadow"
+                    style={{ width: "250px" }}
+                  >
                     <img
                       src={funcionario.foto || "/default-user.png"}
                       alt={funcionario.nome}
