@@ -37,7 +37,7 @@ function Home() {
           </div>
           <div className="ms-5">
             <img
-              src={"eu-agendo.png"} 
+              src={"eu-agendo.png"}
               alt="Imagem do EuAgendo"
               className="img-fluid rounded"
               style={{ maxWidth: "300px", height: "auto" }}
@@ -99,7 +99,7 @@ function Home() {
               {
                 name: "Carlos M.",
                 review:
-                  "Reduziu as faltas nos meus atendimentos em 70% com os lembretes automáticos!",
+                  "Reduziu o tempo de organizar meus atendimentos em 90% com a facilidade para visualizar horários disponíveis!",
                 stars: "⭐⭐⭐⭐⭐",
               },
               {
@@ -110,7 +110,7 @@ function Home() {
               },
             ].map((item, index) => (
               <div key={index} className="col-md-4 mb-4">
-                <div className="card border-0 shadow-lg p-4">
+                <div className="card border-0 shadow-lg d-flex flex-column h-100 p-4">
                   <p className="fw-semibold">"{item.review}"</p>
                   <p className="text-warning fs-4">{item.stars}</p>
                   <h5 className="text-muted">- {item.name}</h5>
@@ -133,7 +133,7 @@ function Home() {
                     {plano === "Básico"
                       ? "Ideal para pequenos negócios"
                       : plano === "Profissional"
-                      ? "Para autônomos"
+                      ? "Para negócios crescentes"
                       : "Para grandes empresas"}
                     .
                   </p>

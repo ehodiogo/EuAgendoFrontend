@@ -147,7 +147,7 @@ function Checkout() {
 
             <input
               type="text"
-              className="form-control mb-3"
+              className="form-control mb-3 mt-3"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               placeholder="Nome Completo"

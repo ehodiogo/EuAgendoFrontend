@@ -11,6 +11,9 @@ const Profile = () => {
 
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
+  const [currentPassword, setCurrentPassword] = useState(""); // Senha atual
 
   // Dados fictícios de empresas e funcionários
   const [companies] = useState([
@@ -86,6 +89,39 @@ const Profile = () => {
     }
   };
 
+  const handleChangePassword = async () => {
+    if (newPassword !== newPasswordConfirm) {
+      alert("As senhas não coincidem!");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "http://localhost:8000/api/change-password/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            usuario_token: token,
+            current_password: user.data?.password, // Enviando a senha atual
+            new_password: newPassword,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Erro ao alterar a senha.");
+        return;
+      }
+
+      alert("Senha alterada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao se comunicar com o servidor." + error);
+    }
+  };
+
   // Função para calcular a porcentagem do limite de empresas ou funcionários
   const calculateProgress = (current: number, max: number) => {
     return Math.min((current / max) * 100, 100); // Limita a porcentagem a 100
@@ -156,6 +192,47 @@ const Profile = () => {
                   disabled={!isEditing}
                 />
               </div>
+
+              {/* Senha Atual (somente leitura) */}
+              <div className="mb-3">
+                <label className="form-label">
+                  <strong>Senha Atual:</strong>
+                </label>
+                <input
+                  type="password"
+                  className="form-control"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  disabled={true} // Campo de senha atual desabilitado
+                />
+              </div>
+
+              {/* Alteração de senha */}
+              <div className="mb-3">
+                <label className="form-label">
+                  <strong>Nova Senha:</strong>
+                </label>
+                <input
+                  type="password"
+                  className="form-control"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  disabled={!isEditing}
+                />
+              </div>
+              <div className="mb-3">
+                <label className="form-label">
+                  <strong>Confirmar Nova Senha:</strong>
+                </label>
+                <input
+                  type="password"
+                  className="form-control"
+                  value={newPasswordConfirm}
+                  onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                  disabled={!isEditing}
+                />
+              </div>
+
               {!isEditing ? (
                 <button
                   type="button"
@@ -165,13 +242,22 @@ const Profile = () => {
                   Editar Informações
                 </button>
               ) : (
-                <button
-                  type="button"
-                  className="btn btn-success w-100 mt-3"
-                  onClick={handleSave}
-                >
-                  Salvar Alterações
-                </button>
+                <div>
+                  <button
+                    type="button"
+                    className="btn btn-success w-100 mt-3"
+                    onClick={handleSave}
+                  >
+                    Salvar Alterações
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-warning w-100 mt-3"
+                    onClick={handleChangePassword}
+                  >
+                    Alterar Senha
+                  </button>
+                </div>
               )}
             </form>
           )}
@@ -204,35 +290,6 @@ const Profile = () => {
             </div>
           </div>
         </div>
-
-        {/* Progresso de Funcionários por Empresa */}
-        {companies.map((company, index) => (
-          <div key={index} className="card shadow-lg p-4 mt-4 border-secondary">
-            <h4 className="text-secondary text-center mb-4">{company.name}</h4>
-            <div className="progress">
-              <div
-                className={`progress-bar ${getProgressBarColor(
-                  calculateProgress(
-                    company.employees_count,
-                    company.max_employees
-                  )
-                )}`}
-                role="progressbar"
-                style={{
-                  width: `${calculateProgress(
-                    company.employees_count,
-                    company.max_employees
-                  )}%`,
-                }}
-                aria-valuenow={company.employees_count}
-                aria-valuemin={0}
-                aria-valuemax={company.max_employees}
-              >
-                {company.employees_count}/{company.max_employees} Funcionários
-              </div>
-            </div>
-          </div>
-        ))}
 
         {/* Histórico de Pagamentos */}
         <div className="card shadow-lg p-4 mt-4 border-info">

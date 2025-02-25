@@ -19,11 +19,11 @@ const FinanceiroDados = ({ empresa_id }: FinanceiroProps) => {
           {dadosFinanceiros?.data?.total_ganhos || 0}
         </li>
         <li className="list-group-item">
-          <strong>Receita Mensal:</strong> R${" "}
-          {dadosFinanceiros?.data?.ganhos_por_mes || 0}
+          <strong>Receita Mensal Atual:</strong> R${" "}
+          {dadosFinanceiros?.data?.ganhos_por_mes || 0} 
         </li>
         <li className="list-group-item">
-          <strong>Receita Semanal:</strong> R${" "}
+          <strong>Receita Semanal Atual:</strong> R${" "}
           {dadosFinanceiros?.data?.ganhos_por_semana || 0}
         </li>
         <li className="list-group-item">

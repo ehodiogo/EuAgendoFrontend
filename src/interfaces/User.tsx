@@ -4,4 +4,5 @@ export interface UserProfile {
     username: string;
     email: string;
     first_name: string;
+    password: string;
 }

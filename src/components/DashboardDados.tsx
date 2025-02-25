@@ -17,22 +17,23 @@ const DashBoardDados = ({ empresa_id }: DashBoardDadosProps) => {
       </h4>
       <ul className="list-group list-group-flush">
         <li className="list-group-item">
-          <strong>Total de Clientes:</strong> R$ {dadosDashboard.data?.total_clientes}
+          <strong>Total de Serviços Prestados: </strong> 
+          {dadosDashboard.data?.total_servicos}
         </li>
         <li className="list-group-item">
-            <strong>Total de Clientes:</strong>
+            <strong>Total de Clientes: </strong>
             {dadosDashboard.data?.total_clientes}
         </li>
         <li className="list-group-item">
-            <strong>Total de Funcionários:</strong>
+            <strong>Total de Funcionários: </strong>
             {dadosDashboard.data?.total_funcionarios}
         </li>
         <li className="list-group-item">
-            <strong>Total de Agendamentos para Hoje:</strong>
+            <strong>Total de Agendamentos para Hoje: </strong>
             {dadosDashboard.data?.agendamentos_hoje}
         </li>
         <li className="list-group-item">
-            <strong>Total de Agendamentos Futuros:</strong>
+            <strong>Total de Agendamentos Futuros: </strong>
             {dadosDashboard.data?.agendamentos_pendentes}
         </li>
       </ul>

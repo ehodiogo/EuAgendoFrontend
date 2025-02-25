@@ -6,11 +6,15 @@ import HorariosTabela from "../components/TabelaHorario";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "../components/Navbar";
+import { Funcionario } from "../interfaces/Funcionario";
 
 const Agendar = () => {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
   const empresasData = useFetch<ServicosFuncionariosEmpresa[]>(
-    `api/empresaservico/?q=${empresaNome}`
+    `api/empresaservico/?empresa_nome=${empresaNome}`
+  );
+  const funcionarios = useFetch<Funcionario[]>(
+    `api/funcionario/?empresa_nome=${empresaNome}`
   );
 
   const [funcionarioSelecionado, setFuncionarioSelecionado] = useState<
@@ -30,6 +34,8 @@ const Agendar = () => {
   }
 
   const empresa = empresasData.data[0]; // Supondo que há pelo menos uma empresa
+
+  console.log("Funcionários", funcionarios.data);
 
   return (
     <div className="bg-light min-vh-100">

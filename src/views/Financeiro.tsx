@@ -41,7 +41,7 @@ const Financeiro = () => {
             >
               <div className="card-body text-center">
                 <h4 className="card-title">{empresa.nome}</h4>
-                <p className="card-text">{empresa.cnpj}</p>
+                <p className="card-text">CNPJ: {empresa.cnpj}</p>
               </div>
             </div>
 
