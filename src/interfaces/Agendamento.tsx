@@ -5,4 +5,5 @@ export interface Agendamento {
   funcionario: number;
   data: string; 
   hora: string; 
+  duracao_servico: number;
 }

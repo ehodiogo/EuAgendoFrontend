@@ -3,15 +3,16 @@ import { Agendamento } from "../interfaces/Agendamento";
 import { useFetch } from "../functions/GetData";
 import { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
+import { Servicos } from "../interfaces/ServicosFuncionarios";
 
 interface Horarios {
-    empresa: Empresa;
-    data_selecionada: Date;
-    funcionario_id: number;
-    servicos_nome: string[];
+  empresa: Empresa;
+  data_selecionada: Date;
+  funcionario_id: number;
+  servicos: Servicos[];
 }
 
-const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos_nome }: Horarios) => {
+const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: Horarios) => {
 
     const dataString = data_selecionada.toISOString().split("T")[0];
     const [modalAberto, setModalAberto] = useState(false);
@@ -33,12 +34,15 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos_nom
      let [hora, minuto] = inicio.split(":").map(Number);
      const [horaFim, minutoFim] = fim.split(":").map(Number);
 
+    const menorDuracaoServico = Math.min(
+      ...servicos.map((servico) => servico.duracao as number)
+    );
+      
      while (hora < horaFim || (hora === horaFim && minuto < minutoFim)) {
        horarios.push(
          `${String(hora).padStart(2, "0")}:${String(minuto).padStart(2, "0")}`
        );
-       minuto += 30; // TODO: não pode ser sempre 30, tem que ser o enor tempo de agendamento de um serviço 
-      //  TODO: exemplo -> barba = 15 minutos cabelo = 30 minutos, divisão de horários a cada 15 minutos! 
+       minuto += menorDuracaoServico; 
        if (minuto >= 60) {
          minuto = 0;
          hora++;
@@ -146,6 +150,9 @@ const diaSelecionado = [
       cliente_nome: clienteNome,
       cliente_email: clienteEmail,
       cliente_numero: clienteNumero,
+      duracao_minima: Math.min(
+        ...servicos.map((servico) => servico.duracao)
+      ),
     };
 
     try {
@@ -162,6 +169,10 @@ const diaSelecionado = [
 
       if (!response.ok) {
         throw new Error(`Erro ao agendar: ${response.status}`);
+      }
+
+      if (response.status === 201) {
+        window.location.reload();
       }
 
       setModalAberto(false);
@@ -215,17 +226,17 @@ const diaSelecionado = [
           </p>
           <div>
             <h5>Escolha o serviço:</h5>
-            {servicos_nome.map((servico) => (
-              <div key={servico}>
+            {servicos.map((servico) => (
+              <div key={servico.id}>
                 <input
                   type="radio"
-                  id={servico}
+                  id={servico.id + servico.nome}
                   name="servico"
-                  value={servico}
-                  checked={servicoSelecionado === servico}
-                  onChange={() => setServicoSelecionado(servico)}
+                  value={servico.nome}
+                  checked={servicoSelecionado === servico.nome}
+                  onChange={() => setServicoSelecionado(servico.nome) }
                 />
-                <label htmlFor={servico}>{servico}</label>
+                <label htmlFor={servico.id + servico.nome}>{servico.nome}</label>
               </div>
             ))}
           </div>

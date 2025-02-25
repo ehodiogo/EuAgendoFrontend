@@ -1,9 +1,9 @@
 
-interface Servicos {
+export interface Servicos {
     id: number;
     nome: string;
     preco: number;
-    duracao: string;
+    duracao: number;
 }
 export interface FuncionarioServicos {
     id: number;

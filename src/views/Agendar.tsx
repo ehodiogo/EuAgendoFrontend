@@ -6,15 +6,11 @@ import HorariosTabela from "../components/TabelaHorario";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "../components/Navbar";
-import { Funcionario } from "../interfaces/Funcionario";
 
 const Agendar = () => {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
   const empresasData = useFetch<ServicosFuncionariosEmpresa[]>(
     `api/empresaservico/?empresa_nome=${empresaNome}`
-  );
-  const funcionarios = useFetch<Funcionario[]>(
-    `api/funcionario/?empresa_nome=${empresaNome}`
   );
 
   const [funcionarioSelecionado, setFuncionarioSelecionado] = useState<
@@ -34,8 +30,6 @@ const Agendar = () => {
   }
 
   const empresa = empresasData.data[0];
-
-  console.log("Funcionários", funcionarios.data);
 
   return (
     <div className="bg-light min-vh-100">
@@ -93,7 +87,7 @@ const Agendar = () => {
                         >
                           <span className="fw-medium">{servico.nome}</span>
                           <span className="badge bg-info text-dark">
-                            R${servico.preco} | {servico.duracao.split(":")[2]}{" "}
+                            R${servico.preco} | {servico.duracao}
                             min
                           </span>
                         </li>
@@ -121,11 +115,9 @@ const Agendar = () => {
           </h2>
           <HorariosTabela
             funcionario_id={funcionarioSelecionado}
-            servicos_nome={
-              empresa.funcionarios
-                .find((f) => f.id === funcionarioSelecionado)
-                ?.servicos.map((s) => s.nome) || []
-            }
+            servicos={empresa.funcionarios.find(
+              (f) => f.id === funcionarioSelecionado
+            )?.servicos || []}
             key={funcionarioSelecionado}
           />
         </section>

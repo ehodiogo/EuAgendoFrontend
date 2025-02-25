@@ -5,15 +5,16 @@ import { Empresa } from "../interfaces/Empresa";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import HorariosDoDia from "./Horarios";
+import { Servicos } from "../interfaces/ServicosFuncionarios";
 
 interface HorariosTabelaProps {
   funcionario_id: number;
-  servicos_nome: string[];
+  servicos: Servicos[];
 }
 
 const HorariosTabela = ({
   funcionario_id,
-  servicos_nome,
+  servicos,
 }: HorariosTabelaProps) => {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
   const [dataSelecionada, setDataSelecionada] = useState(new Date());
@@ -80,7 +81,7 @@ const HorariosTabela = ({
           empresa={empresa}
           data_selecionada={dataSelecionada}
           funcionario_id={funcionario_id}
-          servicos_nome={servicos_nome}
+          servicos={servicos}
         />
       )}
     </div>
