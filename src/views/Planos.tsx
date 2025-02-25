@@ -1,4 +1,4 @@
-import { FaPix, FaCcVisa, FaCcMastercard } from "react-icons/fa6";
+import { FaPix, FaCcVisa, FaCcMastercard, FaCcAmazonPay, FaCcApplePay, FaCreditCard, FaCcAmex, FaCcJcb, FaRegCreditCard } from "react-icons/fa6";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 
@@ -62,6 +62,12 @@ function Planos() {
             <FaPix size={40} className="text-success" />
             <FaCcVisa size={40} className="text-primary" />
             <FaCcMastercard size={40} className="text-danger" />
+            <FaCcAmazonPay size={40} className="text-warning" />
+            <FaCcApplePay size={40} className="text-black" />
+            <FaCreditCard size={40} className="text-secondary" />
+            <FaCcAmex size={40} className="text-info" />
+            <FaCcJcb size={40} className="text-dark" />
+            <FaRegCreditCard size={40} className="text-dark" />
           </div>
         </div>
       </div>
