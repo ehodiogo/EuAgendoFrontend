@@ -319,7 +319,7 @@ const Profile = () => {
                 payments.data.pagamentos.map((payment, index) => (
                   <tr key={index}>
                     <td>{payment.data}</td>
-                    <td>{payment.valor}</td>
+                    <td>R$ {payment.valor}</td>
                     <td>
                       {payment.status === "Pago" ? (
                         <span className="badge bg-success text-white">
