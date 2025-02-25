@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useFetch } from "../functions/GetData";
 import { UserProfile } from "../interfaces/User";
 import Navbar from "../components/Navbar";
-import { FaCreditCard, FaPix } from "react-icons/fa6";
+import { FaCreditCard, FaPix, FaRegCreditCard } from "react-icons/fa6";
 import { Usage } from "../interfaces/Usage";
+import { Pagamentos } from "../interfaces/Pagamentos";
 
 const Profile = () => {
   const token = localStorage.getItem("access_token");
@@ -12,28 +13,15 @@ const Profile = () => {
   const usage = useFetch<Usage>(
     `api/limite-plano-usage/?usuario_token=${token}`
   );
+  const payments = useFetch<Pagamentos>(
+    `api/pagamentos-usuario/?usuario_token=${token}`
+  );
 
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [currentPassword, setCurrentPassword] = useState(""); 
-
-  const [paymentHistory] = useState([
-    {
-      date: "2025-02-01",
-      amount: "R$ 150,00",
-      status: "Pago",
-      method: "cartao",
-    },
-    { date: "2025-01-15", amount: "R$ 120,00", status: "Pago", method: "pix" },
-    {
-      date: "2024-12-20",
-      amount: "R$ 100,00",
-      status: "Pendente",
-      method: "cartao",
-    },
-  ]);
 
   useEffect(() => {
     if (user.data) {
@@ -118,7 +106,7 @@ const Profile = () => {
       return "bg-danger"; 
     }
   };
-
+  
   return (
     <>
       <Navbar />
@@ -301,8 +289,12 @@ const Profile = () => {
                 {item.total_funcionarios}/{usage.data?.limite_funcionarios}{" "}
               </div>
             </div>
-            <p className="text-muted mt-2 text-center">Empresa: {item.empresa}</p>
-            <p className="text-muted text-center">Funcionários: {item.total_funcionarios} / {usage.data?.limite_funcionarios}
+            <p className="text-muted mt-2 text-center">
+              Empresa: {item.empresa}
+            </p>
+            <p className="text-muted text-center">
+              Funcionários: {item.total_funcionarios} /{" "}
+              {usage.data?.limite_funcionarios}
             </p>
           </div>
         ))}
@@ -321,19 +313,35 @@ const Profile = () => {
               </tr>
             </thead>
             <tbody>
-              {paymentHistory.length > 0 ? (
-                paymentHistory.map((payment, index) => (
+              {payments.data?.pagamentos &&
+              Array.isArray(payments.data.pagamentos) &&
+              payments.data.pagamentos.length > 0 ? (
+                payments.data.pagamentos.map((payment, index) => (
                   <tr key={index}>
-                    <td>{payment.date}</td>
-                    <td>{payment.amount}</td>
+                    <td>{payment.data}</td>
+                    <td>{payment.valor}</td>
                     <td>
-                      <span className="badge bg-success">{payment.status}</span>
+                      {payment.status === "Pago" ? (
+                        <span className="badge bg-success text-white">
+                          Pago
+                        </span>
+                      ) : payment.status === "Pendente" ? (
+                        <span className="badge bg-warning text-dark">
+                          Pendente
+                        </span>
+                      ) : (
+                        <span className="badge bg-danger text-white">
+                          Cancelado
+                        </span>
+                      )}
                     </td>
                     <td>
-                      {payment.method === "cartao" ? (
+                      {payment.tipo === "cartao_credito" ? (
                         <FaCreditCard size={20} className="text-primary" />
-                      ) : (
+                      ) : payment.tipo === "pix" ? (
                         <FaPix size={20} className="text-success" />
+                      ) : (
+                        <FaRegCreditCard size={20} className="text-primary" />
                       )}
                     </td>
                   </tr>
