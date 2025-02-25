@@ -3,37 +3,21 @@ import { useFetch } from "../functions/GetData";
 import { UserProfile } from "../interfaces/User";
 import Navbar from "../components/Navbar";
 import { FaCreditCard, FaPix } from "react-icons/fa6";
+import { Usage } from "../interfaces/Usage";
 
 const Profile = () => {
   const token = localStorage.getItem("access_token");
   const url = token ? `api/user/?usuario_token=${token}` : "";
   const user = useFetch<UserProfile>(url);
+  const usage = useFetch<Usage>(
+    `api/limite-plano-usage/?usuario_token=${token}`
+  );
 
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [currentPassword, setCurrentPassword] = useState(""); 
-
-  const [companies] = useState([
-    {
-      name: "Empresa A",
-      created_at: "2025-01-01",
-      employees_count: 45, 
-      max_employees: 50, 
-    },
-    {
-      name: "Empresa B",
-      created_at: "2024-12-15",
-      employees_count: 10,
-      max_employees: 20,
-    },
-  ]);
-
-  const [planDetails] = useState({
-    name: "Plano Premium",
-    expiry_date: "2024-12-31",
-  });
 
   const [paymentHistory] = useState([
     {
@@ -259,8 +243,8 @@ const Profile = () => {
 
         <div className="card shadow-lg p-4 mt-4 text-center border-primary">
           <h4 className="text-primary mb-3">Plano Ativo</h4>
-          <p className="fw-bold fs-5">{planDetails.name}</p>
-          <p className="text-muted">Válido até: {planDetails.expiry_date}</p>
+          <p className="fw-bold fs-5">{usage.data?.plano_ativo}</p>
+          <p className="text-muted">Válido até: {usage.data?.expira_em}</p>
         </div>
 
         <div className="card shadow-lg p-4 mt-4 border-warning">
@@ -270,18 +254,58 @@ const Profile = () => {
           <div className="progress">
             <div
               className={`progress-bar ${getProgressBarColor(
-                calculateProgress(companies.length, 5)
+                calculateProgress(
+                  usage.data?.quantia_empresas_criadas || 0,
+                  usage.data?.limite_empresas || 0
+                )
               )}`}
               role="progressbar"
-              style={{ width: `${calculateProgress(companies.length, 5)}%` }}
-              aria-valuenow={companies.length}
+              style={{
+                width: `${calculateProgress(
+                  usage.data?.quantia_empresas_criadas || 0,
+                  usage.data?.limite_empresas || 0
+                )}%`,
+              }}
+              aria-valuenow={usage.data?.quantia_empresas_criadas}
               aria-valuemin={0}
               aria-valuemax={5}
             >
-              {companies.length}/5 Empresas Criadas
+              {usage.data?.quantia_empresas_criadas}/
+              {usage.data?.limite_empresas} Empresas Criadas
             </div>
           </div>
         </div>
+
+        {usage.data?.funcionarios_por_empresa.map((item, index) => (
+          <div key={index} className="card shadow-lg p-4 mt-4 border-success">
+            <h4 className="text-success text-center mb-4">
+              Limite de Funcionários por Empresa
+            </h4>
+            <div className="progress">
+              <div
+                className={`progress-bar ${getProgressBarColor(
+                  calculateProgress(
+                    item.total_funcionarios,
+                    usage.data?.limite_funcionarios || 0
+                  )
+                )}`}
+                role="progressbar"
+                style={{
+                  width: `${calculateProgress(
+                    item.total_funcionarios,
+                    usage.data?.limite_funcionarios || 0
+                  )}% `,
+                  fontSize: "0.9rem",
+                }}
+              >
+                {item.total_funcionarios}/{usage.data?.limite_funcionarios}{" "}
+              </div>
+            </div>
+            <p className="text-muted mt-2 text-center">Empresa: {item.empresa}</p>
+            <p className="text-muted text-center">Funcionários: {item.total_funcionarios} / {usage.data?.limite_funcionarios}
+            </p>
+          </div>
+        ))}
 
         <div className="card shadow-lg p-4 mt-4 border-info">
           <h4 className="text-info text-center mb-4">
