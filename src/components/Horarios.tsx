@@ -37,7 +37,8 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos_nom
        horarios.push(
          `${String(hora).padStart(2, "0")}:${String(minuto).padStart(2, "0")}`
        );
-       minuto += 30;
+       minuto += 30; // TODO: não pode ser sempre 30, tem que ser o enor tempo de agendamento de um serviço 
+      //  TODO: exemplo -> barba = 15 minutos cabelo = 30 minutos, divisão de horários a cada 15 minutos! 
        if (minuto >= 60) {
          minuto = 0;
          hora++;

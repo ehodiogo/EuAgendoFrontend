@@ -2,6 +2,8 @@
 interface Servicos {
     id: number;
     nome: string;
+    preco: number;
+    duracao: string;
 }
 export interface FuncionarioServicos {
     id: number;

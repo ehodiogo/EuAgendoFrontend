@@ -22,7 +22,7 @@ const Agendar = () => {
   >(null);
 
   useEffect(() => {
-    AOS.init({ duration: 800 }); // Ativando animações
+    AOS.init({ duration: 800 });
   }, []);
 
   if (!empresasData.data) {
@@ -33,16 +33,14 @@ const Agendar = () => {
     );
   }
 
-  const empresa = empresasData.data[0]; // Supondo que há pelo menos uma empresa
+  const empresa = empresasData.data[0];
 
   console.log("Funcionários", funcionarios.data);
 
   return (
     <div className="bg-light min-vh-100">
-      
       <Navbar />
 
-      {/* Header */}
       <header
         className="text-center text-white bg-primary py-5"
         data-aos="fade-down"
@@ -55,7 +53,6 @@ const Agendar = () => {
         </div>
       </header>
 
-      {/* Escolha de Funcionário */}
       <section className="container py-5 text-center">
         <h2 className="text-primary fw-bold">Escolha um Funcionário</h2>
         <div className="row justify-content-center mt-4">
@@ -85,11 +82,20 @@ const Agendar = () => {
                     <h5 className="card-title text-primary fw-bold">
                       {funcionario.nome}
                     </h5>
-                    <h6 className="text-danger">Serviços:</h6>
+
+                    <h6 className="text-danger mb-2">Serviços:</h6>
+
                     <ul className="list-unstyled">
                       {funcionario.servicos.map((servico, i) => (
-                        <li key={i} className="text-muted">
-                          • {servico.nome}
+                        <li
+                          key={i}
+                          className="d-flex justify-content-between align-items-center text-muted"
+                        >
+                          <span className="fw-medium">{servico.nome}</span>
+                          <span className="badge bg-info text-dark">
+                            R${servico.preco} | {servico.duracao.split(":")[2]}{" "}
+                            min
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -108,7 +114,6 @@ const Agendar = () => {
         </div>
       </section>
 
-      {/* Escolha de Horário */}
       {funcionarioSelecionado ? (
         <section className="container pb-5 text-center">
           <h2 className="text-primary fw-bold" data-aos="fade-up">
@@ -130,7 +135,6 @@ const Agendar = () => {
         </div>
       )}
 
-      {/* Footer */}
       <footer className="bg-primary text-white text-center py-3">
         <p className="mb-0">
           &copy; 2025 EuAgendo. Todos os direitos reservados.
