@@ -166,7 +166,7 @@ function Home() {
               Termos de Serviço
             </a>
             <a
-              href="https://www.github.com/ehdiogo"
+              href="https://www.github.com/ehodiogo"
               className="text-white text-decoration-none d-flex align-items-center"
               target="_blank"
               rel="noopener noreferrer"
