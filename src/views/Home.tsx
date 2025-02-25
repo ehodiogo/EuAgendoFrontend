@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "../components/Navbar";
+import { FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa";
+import { BsFillFileLockFill } from "react-icons/bs";
 
 function Home() {
   const navigate = useNavigate();
@@ -150,10 +152,48 @@ function Home() {
         </div>
       </section>
 
-      <footer className="bg-primary text-white text-center py-3">
-        <p className="mb-0">
-          &copy; 2025 EuAgendo. Todos os direitos reservados.
-        </p>
+      <footer className="bg-primary text-white text-center py-5">
+        <div className="container">
+          <p className="mb-0">
+            &copy; 2025 EuAgendo. Todos os direitos reservados.
+          </p>
+          <div className="d-flex justify-content-center gap-4 mt-3">
+            <a
+              href="/termos"
+              className="text-white text-decoration-none d-flex align-items-center"
+            >
+              <BsFillFileLockFill className="me-2" />
+              Termos de Serviço
+            </a>
+            <a
+              href="https://www.github.com/ehdiogo"
+              className="text-white text-decoration-none d-flex align-items-center"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaGithub className="me-2" />
+              GitHub
+            </a>
+            <a
+              href="https://www.instagram.com/ehodiogo"
+              className="text-white text-decoration-none d-flex align-items-center"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaInstagram className="me-2" />
+              Instagram
+            </a>
+            <a
+              href="https://www.linkedin.com/in/dabpereira"
+              className="text-white text-decoration-none d-flex align-items-center"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaLinkedin className="me-2" />
+              LinkedIn
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   );

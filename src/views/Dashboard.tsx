@@ -64,22 +64,44 @@ function Dashboard() {
       {/* Painel do Usuário */}
       <div className="jogos-container">
         <div className="card shadow-lg border-0 p-4 mb-4">
-          <h2 className="text-primary mb-4">📊 Painel do Usuário</h2>
-          <p>
+          <h2 className="text-primary mb-4 text-center">
+            📊 Painel do Usuário
+          </h2>
+          <p className="lead text-muted text-center">
             Bem-vindo ao seu painel! Aqui você pode gerenciar suas configurações
             e visualizar seus dados.
           </p>
 
           <div className="d-flex justify-content-center mb-4 p-4 m-1">
-            <Link to="/perfil" className="btn btn-primary w-25 me-2 mb-2">
-              Ir para Perfil
-            </Link>
-            <Link to="/financeiro" className="btn btn-success w-25 me-2 mb-2">
-              Ir para Financeiro
-            </Link>
-            <Link to="/minhas-empresas" className="btn btn-primary w-25 mb-2">
-              Ir para Minhas Empresas
-            </Link>
+            <div className="text-center me-3">
+              <Link to="/perfil" className="btn btn-primary w-100 mb-1">
+                Ir para Perfil e Pagamentos
+              </Link>
+              <p className="text-muted small">
+                Gerencie suas informações pessoais, histórico de pagamentos e planos ativos.
+              </p>
+            </div>
+
+            <div className="text-center me-3">
+              <Link to="/financeiro" className="btn btn-success w-100 mb-1">
+                Ir para Relatório Financeiro e Estatísticas das Empresas
+              </Link>
+              <p className="text-muted small">
+                Acompanhe seu rendimento, serviços mais rentaveis e menos rentaveis.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <Link
+                to="/minhas-empresas"
+                className="btn btn-warning w-100 mb-1"
+              >
+                Ir para Agendamentos de Hoje das Empresas
+              </Link>
+              <p className="text-muted small">
+                Verifique os agendamentos que estão agendados para suas empresas hoje.
+              </p>
+            </div>
           </div>
 
           <p className="lead text-muted text-center">
@@ -117,7 +139,6 @@ function Dashboard() {
           >
             Sair
           </button>
-
         </div>
       </div>
     </div>
