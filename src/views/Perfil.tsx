@@ -13,15 +13,14 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
-  const [currentPassword, setCurrentPassword] = useState(""); // Senha atual
+  const [currentPassword, setCurrentPassword] = useState(""); 
 
-  // Dados fictícios de empresas e funcionários
   const [companies] = useState([
     {
       name: "Empresa A",
       created_at: "2025-01-01",
-      employees_count: 45, // Número de funcionários
-      max_employees: 50, // Limite de funcionários
+      employees_count: 45, 
+      max_employees: 50, 
     },
     {
       name: "Empresa B",
@@ -105,7 +104,7 @@ const Profile = () => {
           },
           body: JSON.stringify({
             usuario_token: token,
-            current_password: user.data?.password, // Enviando a senha atual
+            current_password: user.data?.password, 
             new_password: newPassword,
           }),
         }
@@ -122,19 +121,17 @@ const Profile = () => {
     }
   };
 
-  // Função para calcular a porcentagem do limite de empresas ou funcionários
   const calculateProgress = (current: number, max: number) => {
-    return Math.min((current / max) * 100, 100); // Limita a porcentagem a 100
+    return Math.min((current / max) * 100, 100); 
   };
 
-  // Função para determinar a cor da barra de progresso
   const getProgressBarColor = (percentage: number) => {
     if (percentage < 50) {
-      return "bg-success"; // Verde
+      return "bg-success"; 
     } else if (percentage >= 50 && percentage <= 80) {
-      return "bg-warning"; // Amarela
+      return "bg-warning";
     } else {
-      return "bg-danger"; // Vermelha
+      return "bg-danger"; 
     }
   };
 
@@ -146,7 +143,6 @@ const Profile = () => {
           Suas Informações
         </h1>
 
-        {/* Informações do Perfil */}
         <div className="card shadow-lg p-4">
           <h4 className="card-title text-primary text-center mb-4">
             Informações do Perfil
@@ -193,7 +189,6 @@ const Profile = () => {
                 />
               </div>
 
-              {/* Senha Atual (somente leitura) */}
               <div className="mb-3">
                 <label className="form-label">
                   <strong>Senha Atual:</strong>
@@ -203,11 +198,10 @@ const Profile = () => {
                   className="form-control"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  disabled={true} // Campo de senha atual desabilitado
+                  disabled={true}
                 />
               </div>
 
-              {/* Alteração de senha */}
               <div className="mb-3">
                 <label className="form-label">
                   <strong>Nova Senha:</strong>
@@ -263,14 +257,12 @@ const Profile = () => {
           )}
         </div>
 
-        {/* Plano Ativo */}
         <div className="card shadow-lg p-4 mt-4 text-center border-primary">
           <h4 className="text-primary mb-3">Plano Ativo</h4>
           <p className="fw-bold fs-5">{planDetails.name}</p>
           <p className="text-muted">Válido até: {planDetails.expiry_date}</p>
         </div>
 
-        {/* Progresso das Empresas Criadas */}
         <div className="card shadow-lg p-4 mt-4 border-warning">
           <h4 className="text-warning text-center mb-4">
             Limite de Empresas Criadas
@@ -291,7 +283,6 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Histórico de Pagamentos */}
         <div className="card shadow-lg p-4 mt-4 border-info">
           <h4 className="text-info text-center mb-4">
             Histórico de Pagamentos
