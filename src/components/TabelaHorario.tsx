@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFetch } from "../functions/GetData";
 import { useParams } from "react-router-dom";
 import { Empresa } from "../interfaces/Empresa";
@@ -12,12 +12,10 @@ interface HorariosTabelaProps {
   servicos: Servicos[];
 }
 
-const HorariosTabela = ({
-  funcionario_id,
-  servicos,
-}: HorariosTabelaProps) => {
+const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
   const [dataSelecionada, setDataSelecionada] = useState(new Date());
+  const [tempoRestanteNegativo, setTempoRestanteNegativo] = useState(false);
 
   const empresaInterfaceList = useFetch<Empresa[]>(
     `api/empresa/?q=${empresaNome}`
@@ -25,6 +23,16 @@ const HorariosTabela = ({
   const empresa = empresaInterfaceList.data?.find(
     (empresa) => empresa.nome === empresaNome
   );
+
+  useEffect(() => {
+    const tempoRestante = localStorage.getItem("tempo_restante");
+    if (tempoRestante) {
+      const tempoRestanteNumber = parseInt(tempoRestante);
+      if (tempoRestanteNumber < 0) {
+        setTempoRestanteNegativo(true);
+      }
+    }
+  }, []);
 
   if (!empresa) {
     return (
@@ -50,6 +58,19 @@ const HorariosTabela = ({
     (diaSelecionado === "Sábado" && !empresa.abre_sabado) ||
     (diaSelecionado === "Domingo" && !empresa.abre_domingo);
 
+  const limitarDatasDisponiveis = (date: Date) => {
+    const hoje = new Date();
+    const amanha = new Date();
+    amanha.setDate(hoje.getDate() + 1);
+
+    if (tempoRestanteNegativo) {
+      return (
+        date.getDate() === hoje.getDate() || date.getDate() === amanha.getDate()
+      );
+    }
+    return true; 
+  };
+
   return (
     <div className="container py-4">
       <h2>Horários Disponíveis</h2>
@@ -60,9 +81,11 @@ const HorariosTabela = ({
         </label>
         <ReactDatePicker
           selected={dataSelecionada}
+          minDate={new Date()}
           onChange={(date: Date | null) => date && setDataSelecionada(date)}
           dateFormat="dd/MM/yyyy"
           className="form-control"
+          filterDate={limitarDatasDisponiveis} 
         />
       </div>
 
