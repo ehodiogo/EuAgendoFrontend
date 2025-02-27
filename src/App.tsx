@@ -2,11 +2,11 @@ import {
   Routes,
   Route,
   Navigate,
+  useNavigate,
 } from "react-router-dom";
-import { lazy } from "react";
+import { lazy, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// Carregamento preguiçoso dos componentes
 const Home = lazy(() => import("./views/Home"));
 const EmpresasSearch = lazy(() => import("./views/EmpresasSearch"));
 const Agendar = lazy(() => import("./views/Agendar"));
@@ -40,6 +40,36 @@ function ProtectedRoute({ children }: { children: JSX.Element }) {
 }
 
 function App() {
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+
+    const verificaTempoConexao = () => {
+      const token = localStorage.getItem("access_token");
+      const ultimoAcesso = localStorage.getItem("ultimo_acesso");
+      const agora = new Date().getTime();
+
+      if (ultimoAcesso && token) {
+
+        const diferenca = agora - parseInt(ultimoAcesso);
+        const minutos = Math.floor(diferenca / 60000);
+
+        if (minutos > 3) {
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+          localStorage.removeItem("ultimo_acesso");
+          localStorage.removeItem("carrinho");
+          navigate("/login");
+        }
+      }
+
+    };
+
+    verificaTempoConexao();
+  }
+  , [navigate]);
+
   return (
       <Routes>
         <Route path="/" element={<Home />} />
