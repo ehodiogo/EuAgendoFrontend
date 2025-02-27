@@ -29,8 +29,8 @@ const SuccessPage = () => {
     setLoading(true);
     try {
       await axios.post("http://localhost:8000/api/payment-success/", {
-          plano_nome: carrinho[0].nome,
-          usuario_token: usuario_token
+        plano_nome: carrinho[0].nome,
+        usuario_token: usuario_token,
       });
       setSuccess(true);
 
@@ -46,33 +46,33 @@ const SuccessPage = () => {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-green-100 p-6">
-        <div className="bg-white shadow-lg rounded-lg p-6 max-w-lg w-full text-center">
-          <h1 className="text-2xl font-semibold text-green-700 mb-4">
-            ✅ Pagamento Aprovado!
-          </h1>
-          <p className="text-gray-700">
-            Seu pagamento foi processado com sucesso. Obrigado pela compra!
-          </p>
+      <div className="d-flex flex-column align-items-center justify-content-center min-vh-100 bg-light p-4">
+        <div
+          className="card shadow-lg p-4 text-center"
+          style={{ maxWidth: "500px" }}
+        >
+          <div className="card-body">
+            <h1 className="text-success fw-bold">✅ Pagamento Aprovado!</h1>
+            <p className="text-muted">
+              Seu pagamento foi processado com sucesso. Obrigado pela compra!
+            </p>
 
-          <button
-            onClick={ativarPlano}
-            className="mt-4 px-4 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 disabled:bg-gray-400"
-            disabled={loading || success}
-          >
-            {loading
-              ? "Ativando..."
-              : success
-              ? "Plano Ativado!"
-              : "Ativar Plano"}
-          </button>
+            <button
+              onClick={ativarPlano}
+              className="btn btn-success w-100 my-2"
+              disabled={loading || success}
+            >
+              {loading
+                ? "Ativando..."
+                : success
+                ? "Plano Ativado!"
+                : "Ativar Plano"}
+            </button>
 
-          <Link
-            to="/"
-            className="mt-4 inline-block px-4 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600"
-          >
-            Voltar ao Início
-          </Link>
+            <Link to="/" className="btn btn-outline-success w-100">
+              Voltar ao Início
+            </Link>
+          </div>
         </div>
       </div>
     </>

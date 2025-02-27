@@ -1,23 +1,99 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import Navbar from "../components/Navbar";
 
 const PendingPage = () => {
+  const [loading, setLoading] = useState(false);
+  const [verified, setVerified] = useState(false);
+
+  interface Plano {
+    nome: string;
+    preco: number;
+  }
+
+  const [carrinho, setCarrinho] = useState<Plano[]>([]);
+
+  useEffect(() => {
+    const itensCarrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
+    setCarrinho(itensCarrinho);
+  }, []);
+
+  const verificarPagamento = async () => {
+    const usuario_token = localStorage.getItem("access_token");
+
+    if (!usuario_token) {
+      console.error("Erro: usuário não autenticado.");
+      return;
+    }
+
+    if (!carrinho.length) {
+      console.error("Erro: carrinho vazio.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/payment-success/",
+        {
+          plano_nome: carrinho[0].nome,
+          usuario_token: usuario_token,
+        }
+      );
+
+      if (response.data.status === "approved") {
+        setVerified(true);
+        window.location.href = "/dashboard";
+      } else {
+        alert("Pagamento ainda não foi aprovado. Tente novamente mais tarde.");
+      }
+    } catch (error) {
+      console.error("Erro ao verificar pagamento:", error);
+      alert("Erro ao verificar pagamento. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-yellow-100 p-6">
-      <div className="bg-white shadow-lg rounded-lg p-6 max-w-lg w-full text-center">
-        <h1 className="text-2xl font-semibold text-yellow-700 mb-4">
-          ⏳ Pagamento Pendente
-        </h1>
-        <p className="text-gray-700">
-          Seu pagamento está sendo processado. Verifique sua conta mais tarde.
-        </p>
-        <Link
-          to="/"
-          className="mt-4 inline-block px-4 py-2 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600"
+    <>
+      <Navbar />
+      <div className="d-flex flex-column align-items-center justify-content-center min-vh-100 bg-light p-4">
+        <div
+          className="card shadow-lg p-4 text-center"
+          style={{ maxWidth: "500px" }}
         >
-          Voltar ao Início
-        </Link>
+          <div className="card-body">
+            <h1 className="text-warning fw-bold">⏳ Pagamento Pendente</h1>
+            <p className="text-muted">
+              Seu pagamento está sendo processado. Você pode clicar no botão
+              abaixo para verificar manualmente.
+            </p>
+            <p className="text-muted fw-bold">
+              Verificar o pagamento a cada 5 minutos pode agilizar a liberação
+              do seu plano!
+            </p>
+
+            <button
+              onClick={verificarPagamento}
+              className="btn btn-warning w-100 my-2"
+              disabled={loading || verified}
+            >
+              {loading
+                ? "Verificando..."
+                : verified
+                ? "Pagamento Confirmado!"
+                : "Verificar Pagamento"}
+            </button>
+
+            <Link to="/" className="btn btn-outline-warning w-100">
+              Voltar ao Início
+            </Link>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

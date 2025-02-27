@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Navbar from "../components/Navbar";
 
 function Carrinho() {
   interface Plano {
@@ -46,7 +47,7 @@ function Carrinho() {
       );
 
       if (response.data.url) {
-        window.location.href = response.data.url; 
+        window.location.href = response.data.url;
       }
     } catch (error) {
       console.error("Erro ao processar o pagamento:", error);
@@ -57,45 +58,55 @@ function Carrinho() {
   };
 
   return (
+    <>
+    <Navbar />
     <div className="container mt-5">
-      <h1 className="display-3 text-primary text-center">Carrinho</h1>
-      <div className="card p-4">
+      <h1 className="display-4 text-center text-primary fw-bold mb-4">
+        🛒 Seu Carrinho
+      </h1>
+      <div className="card shadow-lg p-4">
         {carrinho.length === 0 ? (
-          <p>Seu carrinho está vazio!</p>
+          <div className="text-center text-muted">
+            <h5>Seu carrinho está vazio!</h5>
+          </div>
         ) : (
           <div>
-            <h4>Itens no Carrinho</h4>
-            {carrinho.map((plano, index) => (
-              <div
-                key={index}
-                className="d-flex justify-content-between align-items-center"
-              >
-                <div>
-                  <strong>{plano.nome}</strong> - R${plano.preco}
-                </div>
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => removerItem(index)}
+            <ul className="list-group mb-3">
+              {carrinho.map((plano, index) => (
+                <li
+                  key={index}
+                  className="list-group-item d-flex justify-content-between align-items-center"
                 >
-                  Remover
-                </button>
-              </div>
-            ))}
-            <hr />
-            <p>
-              <strong>Total: </strong>R${total}
-            </p>
-            <button
-              className="btn btn-success"
-              onClick={finalizarCompra}
-              disabled={loading}
-            >
-              {loading ? "Processando..." : "Ir para o Checkout"}
-            </button>
+                  <div>
+                    <h6 className="my-0">{plano.nome}</h6>
+                    <small className="text-muted">
+                      R${plano.preco.toFixed(2)}
+                    </small>
+                  </div>
+                  <button
+                    className="btn btn-outline-danger btn-sm"
+                    onClick={() => removerItem(index)}
+                  >
+                    ❌
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <div className="d-flex justify-content-between align-items-center">
+              <h5 className="fw-bold">Total: R${total.toFixed(2)}</h5>
+              <button
+                className="btn btn-success btn-lg"
+                onClick={finalizarCompra}
+                disabled={loading}
+              >
+                {loading ? "🔄 Processando..." : "💳 Ir para o Checkout"}
+              </button>
+            </div>
           </div>
         )}
       </div>
     </div>
+    </>
   );
 }
 
