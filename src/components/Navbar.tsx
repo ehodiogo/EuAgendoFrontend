@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { FaShoppingCart } from "react-icons/fa"; 
+import { FaShoppingCart } from "react-icons/fa";
 import { useEffect, useState } from "react";
 
 const Navbar = () => {
@@ -14,6 +14,16 @@ const Navbar = () => {
     const cart = JSON.parse(localStorage.getItem("carrinho") || "[]");
     setCartItemCount(cart.length);
   }, []);
+
+  const handleLogout = () => {
+    // Remove os dados de autenticação
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("last_login_time");
+
+    // Redireciona para a página de login
+    navigate("/login");
+  };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
@@ -87,6 +97,15 @@ const Navbar = () => {
                         {cartItemCount}
                       </span>
                     )}
+                  </button>
+                </li>
+                {/* Botão de logout */}
+                <li className="nav-item ms-2">
+                  <button
+                    className="btn btn-danger px-4 fw-semibold"
+                    onClick={handleLogout}
+                  >
+                    Sair
                   </button>
                 </li>
               </>

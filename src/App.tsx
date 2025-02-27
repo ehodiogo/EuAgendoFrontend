@@ -55,7 +55,7 @@ function App() {
         const diferenca = agora - parseInt(ultimoAcesso);
         const minutos = Math.floor(diferenca / 60000);
 
-        if (minutos > 3) {
+        if (minutos > 1439) {
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
           localStorage.removeItem("ultimo_acesso");

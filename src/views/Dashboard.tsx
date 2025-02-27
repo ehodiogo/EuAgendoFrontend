@@ -51,12 +51,6 @@ function Dashboard() {
     setDropdownAberto(empresaId);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    window.location.href = "/";
-  };
-
   return (
     <div className="bg-light min-vh-100">
       <Navbar />
@@ -78,7 +72,8 @@ function Dashboard() {
                 Ir para Perfil e Pagamentos
               </Link>
               <p className="text-muted small">
-                Gerencie suas informações pessoais, histórico de pagamentos e planos ativos.
+                Gerencie suas informações pessoais, histórico de pagamentos e
+                planos ativos.
               </p>
             </div>
 
@@ -87,7 +82,8 @@ function Dashboard() {
                 Ir para Relatório Financeiro e Estatísticas das Empresas
               </Link>
               <p className="text-muted small">
-                Acompanhe seu rendimento, serviços mais rentaveis e menos rentaveis.
+                Acompanhe seu rendimento, serviços mais rentaveis e menos
+                rentaveis.
               </p>
             </div>
 
@@ -99,7 +95,8 @@ function Dashboard() {
                 Ir para Agendamentos de Hoje das Empresas
               </Link>
               <p className="text-muted small">
-                Verifique os agendamentos que estão agendados para suas empresas hoje.
+                Verifique os agendamentos que estão agendados para suas empresas
+                hoje.
               </p>
             </div>
           </div>
@@ -126,19 +123,18 @@ function Dashboard() {
                   <div className="card shadow-lg mt-2">
                     <div className="card-body">
                       <DashBoardDados empresa_id={empresa.id} />
+                      <Link
+                        to={`/empresas/${empresa.nome}`}
+                        className="btn btn-primary mt-3 w-100"
+                      >
+                        Ver Detalhes da Empresa
+                      </Link>
                     </div>
                   </div>
                 )}
               </div>
             ))}
           </div>
-
-          <button
-            onClick={handleLogout}
-            className="btn btn-danger w-25 mt-4 mb-4 mx-auto"
-          >
-            Sair
-          </button>
         </div>
       </div>
     </div>

@@ -18,6 +18,7 @@ function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // TODO: trocar para a URL da API em prd
       const response = await axios.post("http://localhost:8000/api/login/", {
         email: email,
         password: password,
@@ -26,6 +27,7 @@ function Login() {
 
       localStorage.setItem("access_token", access);
       localStorage.setItem("refresh_token", refresh);
+      localStorage.setItem("ultimo_acesso", new Date().getTime().toString());
 
       navigate("/dashboard");
     } catch (err) {
