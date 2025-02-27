@@ -6,3 +6,11 @@ export interface Servico {
   preco: string;
   funcionarios: number[]; 
 }
+
+export interface ServicoCreate {
+  nome: string;
+  descricao: string;
+  duracao: string;
+  preco: string;
+  funcionarios: number[]; 
+}

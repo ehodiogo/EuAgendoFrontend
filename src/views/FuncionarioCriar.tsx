@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Funcionario } from "../interfaces/Funcionario";
+import { FuncionarioCreate } from "../interfaces/Funcionario";
 
 const FuncionarioForm: React.FC = () => {
-  const [funcionario, setFuncionario] = useState<Omit<Funcionario, "id">>({
-    nome: "",
-    foto: "",
-  });
+  const [funcionario, setFuncionario] = useState<Omit<FuncionarioCreate, "id">>(
+    {
+      nome: "",
+      foto: "",
+    }
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

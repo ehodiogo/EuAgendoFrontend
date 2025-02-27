@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Servico } from "../interfaces/Servico";
+import { ServicoCreate } from "../interfaces/Servico";
 import { Funcionario } from "../interfaces/Funcionario";
 
 const ServicoForm: React.FC = () => {
-  const [servico, setServico] = useState<Servico>({
-    id: 0,
+  const [servico, setServico] = useState<ServicoCreate>({
     nome: "",
     descricao: "",
     duracao: "",

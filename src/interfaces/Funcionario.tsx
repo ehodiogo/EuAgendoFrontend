@@ -3,3 +3,8 @@ export interface Funcionario {
   nome: string;
   foto: string;
 }
+
+export interface FuncionarioCreate {
+  nome: string;
+  foto: string;
+}
