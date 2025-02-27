@@ -31,6 +31,8 @@ const SuccessPage = lazy(() => import("./views/Success"));
 const FailurePage = lazy(() => import("./views/Failure"));
 const PendingPage = lazy(() => import("./views/Pending"));
 
+const ValidarPlano = lazy(() => import("./views/ValidarPlano"));
+
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const isAuthenticated = localStorage.getItem("access_token");
   if (!isAuthenticated) {
@@ -157,6 +159,13 @@ function App() {
         <Route path="/payment/pending" element={
           <ProtectedRoute>
             <PendingPage />
+          </ProtectedRoute>
+        }
+        />
+
+        <Route path="/validar-plano" element={
+          <ProtectedRoute>
+            <ValidarPlano />
           </ProtectedRoute>
         }
         />

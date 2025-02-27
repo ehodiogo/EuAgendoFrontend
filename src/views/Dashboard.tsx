@@ -65,9 +65,6 @@ function Dashboard() {
   const handleShowModal = () => setShowModal(true);
 
   const checkIfPlanExpiresTomorrow = () => {
-    
-    console.log("Remaining time: ", remainingTime);
-
     if (remainingTime) {
       const remainingTimeInSeconds = Number(remainingTime);
       const remainingTimeInHours = remainingTimeInSeconds / 3600;
@@ -79,7 +76,6 @@ function Dashboard() {
     }
 
     return false;
-
   };
 
   useEffect(() => {
@@ -92,8 +88,8 @@ function Dashboard() {
 
       {/* Painel do Usuário */}
       <div className="jogos-container">
-        <div className="card shadow-lg border-0 p-4 mb-4">
-          <h2 className="text-primary mb-4 text-center">
+        <div className="card shadow-lg border-0 p-4 mb-1">
+          <h2 className="text-primary mb-1 text-center">
             📊 Painel do Usuário
           </h2>
           <p className="lead text-muted text-center">
@@ -101,8 +97,9 @@ function Dashboard() {
             e visualizar seus dados.
           </p>
 
-          <div className="d-flex justify-content-center mb-4 p-4 m-1">
-            <div className="text-center me-3">
+          <div className="d-flex justify-content-center mb-1 p-4 m-1 flex-wrap">
+            {/* Primeiro Card */}
+            <div className="text-center me-3 mb-1 w-25">
               <Link to="/perfil" className="btn btn-primary w-100 mb-1">
                 Ir para Perfil e Pagamentos
               </Link>
@@ -112,7 +109,8 @@ function Dashboard() {
               </p>
             </div>
 
-            <div className="text-center me-3">
+            {/* Segundo Card */}
+            <div className="text-center me-3 mb-1 w-25">
               <Link to="/financeiro" className="btn btn-success w-100 mb-1">
                 Ir para Relatório Financeiro e Estatísticas das Empresas
               </Link>
@@ -122,7 +120,8 @@ function Dashboard() {
               </p>
             </div>
 
-            <div className="text-center">
+            {/* Terceiro Card */}
+            <div className="text-center me-3 mb-1 w-25">
               <Link
                 to="/minhas-empresas"
                 className="btn btn-warning w-100 mb-1"
@@ -132,6 +131,18 @@ function Dashboard() {
               <p className="text-muted small">
                 Verifique os agendamentos que estão agendados para suas empresas
                 hoje.
+              </p>
+            </div>
+          </div>
+
+          <div className="d-flex justify-content-center mb-1 p-1 m-1">
+            <div className="text-center w-25">
+              <Link to="/validar-plano" className="btn btn-danger w-100 mb-1">
+                Seu plano ainda não foi ativo?
+              </Link>
+              <p className="text-muted small">
+                Se você adquiriu um plano, mas ele ainda não está ativo, clique
+                aqui para verificar o status.
               </p>
             </div>
           </div>
