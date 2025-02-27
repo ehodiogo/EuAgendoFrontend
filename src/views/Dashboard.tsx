@@ -10,7 +10,6 @@ import {
   Legend,
 } from "chart.js";
 import { useState, useEffect } from "react";
-
 import "bootstrap/dist/css/bootstrap.min.css";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -19,6 +18,7 @@ import { Link } from "react-router-dom";
 import { Empresa } from "../interfaces/Empresa";
 import { useFetch } from "../functions/GetData";
 import DashBoardDados from "../components/DashboardDados";
+import { Modal } from "react-bootstrap";
 
 ChartJS.register(
   CategoryScale,
@@ -41,6 +41,7 @@ function Dashboard() {
     `api/empresas-usuario/?usuario_token=${token}`
   );
   const [dropdownAberto, setDropdownAberto] = useState<number | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   const handleToggleDropdown = async (empresaId: number) => {
     if (dropdownAberto === empresaId) {
@@ -50,6 +51,40 @@ function Dashboard() {
 
     setDropdownAberto(empresaId);
   };
+
+  const isPlanExpired = localStorage.getItem("is_expired_plan");
+  const remainingTime = localStorage.getItem("tempo_restante");
+
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours}h ${minutes}m`;
+  };
+
+  const handleCloseModal = () => setShowModal(false);
+  const handleShowModal = () => setShowModal(true);
+
+  const checkIfPlanExpiresTomorrow = () => {
+    
+    console.log("Remaining time: ", remainingTime);
+
+    if (remainingTime) {
+      const remainingTimeInSeconds = Number(remainingTime);
+      const remainingTimeInHours = remainingTimeInSeconds / 3600;
+      const remainingTimeInDays = remainingTimeInHours / 24;
+
+      if (remainingTimeInDays < 2) {
+        return true;
+      }
+    }
+
+    return false;
+
+  };
+
+  useEffect(() => {
+    handleShowModal();
+  }, []);
 
   return (
     <div className="bg-light min-vh-100">
@@ -82,8 +117,8 @@ function Dashboard() {
                 Ir para Relatório Financeiro e Estatísticas das Empresas
               </Link>
               <p className="text-muted small">
-                Acompanhe seu rendimento, serviços mais rentaveis e menos
-                rentaveis.
+                Acompanhe seu rendimento, serviços mais rentáveis e menos
+                rentáveis.
               </p>
             </div>
 
@@ -137,6 +172,40 @@ function Dashboard() {
           </div>
         </div>
       </div>
+
+      <Modal
+        show={
+          (isPlanExpired === "true" || checkIfPlanExpiresTomorrow()) &&
+          showModal
+        }
+        onHide={handleCloseModal}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title className="fw-bold text-gradient text-center">
+            Status do Plano
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {isPlanExpired === "true" ? (
+            <p className="text-danger fw-bold fs-5 text-center">
+              Seu plano expirou. Renovação necessária! Vencido há:{" "}
+              {formatTime(Math.abs(Number(remainingTime)))}
+            </p>
+          ) : checkIfPlanExpiresTomorrow() ? (
+            <p className="text-warning fw-bold fs-5 text-center">
+              Seu plano vencerá amanhã. Por favor, renove-o em breve.
+            </p>
+          ) : null}
+        </Modal.Body>
+        <Modal.Footer>
+          <Link to="/planos" className="btn btn-success">
+            Renovar Plano
+          </Link>
+          <button className="btn btn-danger" onClick={handleCloseModal}>
+            Fechar
+          </button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

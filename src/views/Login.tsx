@@ -23,12 +23,13 @@ function Login() {
         email: email,
         password: password,
       });
-      const { access, refresh } = response.data;
+      const { access, refresh, is_expired_plan, tempo_restante } = response.data;
 
       localStorage.setItem("access_token", access);
       localStorage.setItem("refresh_token", refresh);
       localStorage.setItem("ultimo_acesso", new Date().getTime().toString());
-
+      localStorage.setItem("is_expired_plan", is_expired_plan);
+      localStorage.setItem("tempo_restante", tempo_restante);
       navigate("/dashboard");
     } catch (err) {
       setError("Credenciais inválidas ou erro ao autenticar.");
