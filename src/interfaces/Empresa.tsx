@@ -26,4 +26,7 @@ export interface Empresa {
   para_almoço: boolean;
   horario_pausa_inicio: string;
   horario_pausa_fim: string;
+
+  assinatura_ativa?: boolean;
+  assinatura_vencimento?: string;
 }

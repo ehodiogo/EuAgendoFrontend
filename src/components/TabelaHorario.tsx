@@ -15,7 +15,7 @@ interface HorariosTabelaProps {
 const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
   const [dataSelecionada, setDataSelecionada] = useState(new Date());
-  const [tempoRestanteNegativo, setTempoRestanteNegativo] = useState(false);
+  const [assinaturaVencida, setAssinaturaVencida] = useState(false);
 
   const empresaInterfaceList = useFetch<Empresa[]>(
     `api/empresa/?q=${empresaNome}`
@@ -25,14 +25,21 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
   );
 
   useEffect(() => {
-    const tempoRestante = localStorage.getItem("tempo_restante");
-    if (tempoRestante) {
-      const tempoRestanteNumber = parseInt(tempoRestante);
-      if (tempoRestanteNumber < 0) {
-        setTempoRestanteNegativo(true);
+    if (empresa) {
+      const tempoRestante = empresa.assinatura_vencimento
+        ? new Date(empresa.assinatura_vencimento)
+        : new Date(); // Converte a string para um objeto Date
+      const hoje = new Date();
+      const diferencaHoras =
+        (hoje.getTime() - tempoRestante.getTime()) / (1000 * 3600); // Diferença em horas
+
+      if (diferencaHoras > 49) {
+        setAssinaturaVencida(true);
+      } else {
+        setAssinaturaVencida(false);
       }
     }
-  }, []);
+  }, [empresa]);
 
   if (!empresa) {
     return (
@@ -62,13 +69,26 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
     const hoje = new Date();
     const amanha = new Date();
     amanha.setDate(hoje.getDate() + 1);
+    const diferencaHoras =
+      (hoje.getTime() -
+        new Date(empresa?.assinatura_vencimento || "").getTime()) /
+      (1000 * 3600);
 
-    if (tempoRestanteNegativo) {
+    if (diferencaHoras < 24) {
       return (
         date.getDate() === hoje.getDate() || date.getDate() === amanha.getDate()
       );
     }
-    return true; 
+
+    if (diferencaHoras >= 24 && diferencaHoras <= 49) {
+      return date.getDate() === hoje.getDate();
+    }
+
+    if (diferencaHoras > 49) {
+      return false;
+    }
+
+    return date >= hoje;
   };
 
   return (
@@ -85,7 +105,7 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
           onChange={(date: Date | null) => date && setDataSelecionada(date)}
           dateFormat="dd/MM/yyyy"
           className="form-control"
-          filterDate={limitarDatasDisponiveis} 
+          filterDate={limitarDatasDisponiveis}
         />
       </div>
 
@@ -97,6 +117,15 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
             <strong>{diaSelecionado.toLowerCase()}</strong>.
           </p>
           <p>Escolha outra data. 📅</p>
+        </div>
+      ) : assinaturaVencida ? (
+        <div className="alert alert-warning text-center">
+          <h4>⚠ A empresa está temporariamente indisponível</h4>
+          <p>
+            A assinatura da empresa está vencida há mais de 49 horas. Por favor,
+            aguarde até que a assinatura seja renovada para poder realizar o
+            agendamento.
+          </p>
         </div>
       ) : (
         <HorariosDoDia

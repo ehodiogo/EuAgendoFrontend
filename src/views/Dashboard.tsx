@@ -86,7 +86,6 @@ function Dashboard() {
     <div className="bg-light min-vh-100">
       <Navbar />
 
-      {/* Painel do Usuário */}
       <div className="jogos-container">
         <div className="card shadow-lg border-0 p-4 mb-1">
           <h2 className="text-primary mb-1 text-center">
@@ -98,7 +97,6 @@ function Dashboard() {
           </p>
 
           <div className="d-flex justify-content-center mb-1 p-4 m-1 flex-wrap">
-            {/* Primeiro Card */}
             <div className="text-center me-3 mb-1 w-25">
               <Link to="/perfil" className="btn btn-primary w-100 mb-1">
                 Ir para Perfil e Pagamentos
@@ -109,7 +107,6 @@ function Dashboard() {
               </p>
             </div>
 
-            {/* Segundo Card */}
             <div className="text-center me-3 mb-1 w-25">
               <Link to="/financeiro" className="btn btn-success w-100 mb-1">
                 Ir para Relatório Financeiro e Estatísticas das Empresas
@@ -120,7 +117,6 @@ function Dashboard() {
               </p>
             </div>
 
-            {/* Terceiro Card */}
             <div className="text-center me-3 mb-1 w-25">
               <Link
                 to="/minhas-empresas"
@@ -198,21 +194,32 @@ function Dashboard() {
         </Modal.Header>
         <Modal.Body>
           {isPlanExpired === "true" ? (
-            <p className="text-danger fw-bold fs-5 text-center">
-              Seu plano expirou. Renovação necessária! Vencido há:{" "}
-              {formatTime(Math.abs(Number(remainingTime)))}
-            </p>
+            <div className="text-center">
+              <p className="text-danger fw-bold fs-5 mb-3">
+                <i className="bi bi-x-circle-fill"></i> Seu plano expirou. Renovação necessária! Vencido há:{" "}
+                <span className="text-dark">{formatTime(Math.abs(Number(remainingTime)))}</span>
+              </p>
+              <p className="text-warning fw-bold fs-5">
+                <i className="bi bi-exclamation-triangle-fill"></i> Não se preocupe! Você ainda pode acessar o painel, mas algumas
+                funcionalidades podem estar limitadas. Renove seu plano para continuar usando a plataforma. 
+                <span className="d-block mt-2">
+                  Agendamentos seguem permitidos para hoje e amanhã, para que você não tenha nenhum prejuízo enquanto não renova seu plano.
+                </span>
+              </p>
+            </div>
           ) : checkIfPlanExpiresTomorrow() ? (
-            <p className="text-warning fw-bold fs-5 text-center">
-              Seu plano vencerá amanhã. Por favor, renove-o em breve.
-            </p>
+            <div className="text-center">
+              <p className="text-warning fw-bold fs-5">
+                <i className="bi bi-clock-fill"></i> Seu plano vencerá amanhã. Por favor, renove-o em breve.
+              </p>
+            </div>
           ) : null}
         </Modal.Body>
-        <Modal.Footer>
-          <Link to="/planos" className="btn btn-success">
+        <Modal.Footer className="d-flex justify-content-between">
+          <Link to="/planos" className="btn btn-success px-4 py-2 rounded-pill shadow-sm">
             Renovar Plano
           </Link>
-          <button className="btn btn-danger" onClick={handleCloseModal}>
+          <button className="btn btn-danger px-4 py-2 rounded-pill shadow-sm" onClick={handleCloseModal}>
             Fechar
           </button>
         </Modal.Footer>
