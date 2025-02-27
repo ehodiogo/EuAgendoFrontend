@@ -27,6 +27,6 @@ export interface Empresa {
   horario_pausa_inicio: string;
   horario_pausa_fim: string;
 
-  assinatura_ativa?: boolean;
-  assinatura_vencimento?: string;
+  assinatura_ativa: boolean;
+  assinatura_vencimento: number;
 }

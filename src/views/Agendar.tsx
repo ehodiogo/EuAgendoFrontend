@@ -110,9 +110,6 @@ const Agendar = () => {
 
       {funcionarioSelecionado ? (
         <section className="container pb-5 text-center">
-          <h2 className="text-primary fw-bold" data-aos="fade-up">
-            Escolha um Horário
-          </h2>
           <HorariosTabela
             funcionario_id={funcionarioSelecionado}
             servicos={empresa.funcionarios.find(

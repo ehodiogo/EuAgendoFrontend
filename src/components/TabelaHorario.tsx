@@ -26,14 +26,9 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
 
   useEffect(() => {
     if (empresa) {
-      const tempoRestante = empresa.assinatura_vencimento
-        ? new Date(empresa.assinatura_vencimento)
-        : new Date(); // Converte a string para um objeto Date
-      const hoje = new Date();
-      const diferencaHoras =
-        (hoje.getTime() - tempoRestante.getTime()) / (1000 * 3600); // Diferença em horas
+      const horasRestantes = empresa.assinatura_vencimento;
 
-      if (diferencaHoras > 49) {
+      if (horasRestantes < -49) {
         setAssinaturaVencida(true);
       } else {
         setAssinaturaVencida(false);
@@ -69,23 +64,24 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
     const hoje = new Date();
     const amanha = new Date();
     amanha.setDate(hoje.getDate() + 1);
-    const diferencaHoras =
-      (hoje.getTime() -
-        new Date(empresa?.assinatura_vencimento || "").getTime()) /
-      (1000 * 3600);
+    const diferencaHoras = empresa.assinatura_vencimento;
 
-    if (diferencaHoras < 24) {
-      return (
-        date.getDate() === hoje.getDate() || date.getDate() === amanha.getDate()
-      );
-    }
+    if (empresa.assinatura_ativa === false) {
+     
 
-    if (diferencaHoras >= 24 && diferencaHoras <= 49) {
-      return date.getDate() === hoje.getDate();
-    }
+      if (diferencaHoras > -24) {
+        return (
+          date.getDate() === hoje.getDate() || date.getDate() === amanha.getDate()
+        );
+      }
 
-    if (diferencaHoras > 49) {
-      return false;
+      if (diferencaHoras < -24 && diferencaHoras > -49) {
+        return date.getDate() === hoje.getDate();
+      }
+
+      if (diferencaHoras < -49) {
+        return false;
+      }
     }
 
     return date >= hoje;
@@ -93,21 +89,25 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
 
   return (
     <div className="container py-4">
-      <h2>Horários Disponíveis</h2>
+      {!assinaturaVencida && (
+        <>
+          <h2>Horários Disponíveis</h2>
 
-      <div className="mb-3">
-        <label htmlFor="data" className="form-label">
-          Escolha a data:
-        </label>
-        <ReactDatePicker
-          selected={dataSelecionada}
-          minDate={new Date()}
-          onChange={(date: Date | null) => date && setDataSelecionada(date)}
-          dateFormat="dd/MM/yyyy"
-          className="form-control"
-          filterDate={limitarDatasDisponiveis}
-        />
-      </div>
+          <div className="mb-3">
+            <label htmlFor="data" className="form-label">
+              Escolha a data:
+            </label>
+            <ReactDatePicker
+              selected={dataSelecionada}
+              minDate={new Date()}
+              onChange={(date: Date | null) => date && setDataSelecionada(date)}
+              dateFormat="dd/MM/yyyy"
+              className="form-control"
+              filterDate={limitarDatasDisponiveis}
+            />
+          </div>
+        </>
+      )}
 
       {empresaFechada ? (
         <div className="alert alert-danger text-center">
