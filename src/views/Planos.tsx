@@ -1,4 +1,14 @@
-import { FaPix, FaCcVisa, FaCcMastercard, FaCcAmazonPay, FaCcApplePay, FaCreditCard, FaCcAmex, FaCcJcb, FaRegCreditCard } from "react-icons/fa6";
+import {
+  FaPix,
+  FaCcVisa,
+  FaCcMastercard,
+  FaCcAmazonPay,
+  FaCcApplePay,
+  FaCreditCard,
+  FaCcAmex,
+  FaCcJcb,
+  FaRegCreditCard,
+} from "react-icons/fa6";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 
@@ -9,7 +19,6 @@ function Planos() {
     nome: string;
     preco: number;
   }
-  // TODO: COLOCAR O QUE CADA PLANO OFERECE
 
   const adicionarAoCarrinho = (plano: Plano) => {
     console.log(`Adicionando ao carrinho: ${plano.nome} - R$${plano.preco}`);
@@ -70,6 +79,49 @@ function Planos() {
             <FaCcAmex size={40} className="text-info" />
             <FaCcJcb size={40} className="text-dark" />
             <FaRegCreditCard size={40} className="text-dark" />
+          </div>
+        </div>
+
+        <div className="mt-5 text-center">
+          <h5 className="text-dark">O que acontece se meu plano vencer?</h5>
+          <p className="text-muted">
+            Veja abaixo o que pode acontecer dependendo de quanto tempo se
+            passar após o vencimento do seu plano:
+          </p>
+
+          <div className="table-responsive mt-3">
+            <table className="table table-bordered table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Tempo após Vencimento</th>
+                  <th>Consequências</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Até 24 horas</td>
+                  <td>
+                    Seus clientes ainda podem agendar para o <span className="text-danger fw-bold">DIA ATUAL OU DIA SEGUINTE</span>.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Entre 24 e 49 horas</td>
+                  <td>
+                    Seus clientes <span className="text-danger fw-bold">SÓ</span> podem agendar para o <span className="text-danger fw-bold">DIA ATUAL</span>.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Mais de 49 horas</td>
+                  <td>
+                    Acesso completo ao serviço fica <span className="text-danger fw-bold">BLOQUEADO</span> até a renovação da
+                    assinatura. Seus clientes <span className="text-danger fw-bold">NÃO</span> podem agendar.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p className="text-muted">
+              <span className="text-danger fw-bold">IMPORTANTE:</span> Para reativar o acesso completo ao nosso serviço, basta renovar o plano.
+            </p>
           </div>
         </div>
       </div>
