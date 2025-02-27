@@ -38,6 +38,20 @@ const roadmapData = [
       "Implementação de relatórios detalhados sobre agendamentos, cancelamentos e desempenho.",
     status: "Pendente",
   },
+  {
+    date: "Julho 2025",
+    title: "Integração com Sistemas de Pagamentos",
+    description:
+      "Integração com sistemas de pagamento para facilitar o pagamento dos agendamentos.",
+    status: "Pendente",
+  },
+  {
+    date: "Agosto 2025",
+    title: "Aplicativo Mobile",
+    description:
+        "Desenvolvimento de um aplicativo mobile para facilitar o agendamento de qualquer lugar.",
+    status: "Pendente",
+  },
 ];
 
 const getStatusColor = (status: string) => {
