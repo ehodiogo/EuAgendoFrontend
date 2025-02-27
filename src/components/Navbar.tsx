@@ -1,11 +1,19 @@
 import { useNavigate } from "react-router-dom";
+import { FaShoppingCart } from "react-icons/fa"; 
+import { useEffect, useState } from "react";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const [cartItemCount, setCartItemCount] = useState(0);
 
   const isAuthenticated =
     localStorage.getItem("access_token") !== null &&
     localStorage.getItem("refresh_token") !== null;
+
+  useEffect(() => {
+    const cart = JSON.parse(localStorage.getItem("carrinho") || "[]");
+    setCartItemCount(cart.length);
+  }, []);
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
@@ -14,7 +22,7 @@ const Navbar = () => {
           <img
             src="eu-agendo-ico.ico"
             alt="Logo"
-            style={{ width: "40px", height: "40px", marginRight: "10px" }} 
+            style={{ width: "40px", height: "40px", marginRight: "10px" }}
           />
           EuAgendo
         </a>
@@ -56,14 +64,32 @@ const Navbar = () => {
               </button>
             </li>
             {isAuthenticated ? (
-              <li className="nav-item">
-                <button
-                  className="btn btn-warning px-4 fw-semibold"
-                  onClick={() => navigate("/dashboard")}
-                >
-                  Dashboard
-                </button>
-              </li>
+              <>
+                <li className="nav-item">
+                  <button
+                    className="btn btn-warning px-4 fw-semibold"
+                    onClick={() => navigate("/dashboard")}
+                  >
+                    Dashboard
+                  </button>
+                </li>
+                <li className="nav-item position-relative">
+                  <button
+                    className="btn btn-light ms-2 position-relative"
+                    onClick={() => navigate("/carrinho")}
+                  >
+                    <FaShoppingCart size={20} className="text-dark" />
+                    {cartItemCount > 0 && (
+                      <span
+                        className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style={{ fontSize: "0.75rem", padding: "4px 6px" }}
+                      >
+                        {cartItemCount}
+                      </span>
+                    )}
+                  </button>
+                </li>
+              </>
             ) : null}
             {!isAuthenticated ? (
               <li className="nav-item">

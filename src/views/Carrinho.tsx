@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Carrinho() {
-  const navigate = useNavigate();
   interface Plano {
     nome: string;
     preco: number;
   }
 
   const [carrinho, setCarrinho] = useState<Plano[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Recupera os itens do carrinho do localStorage
     const itensCarrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
     setCarrinho(itensCarrinho);
   }, []);
@@ -19,15 +18,42 @@ function Carrinho() {
   const total = carrinho.reduce((acc, plano) => acc + plano.preco, 0);
 
   const removerItem = (index: number) => {
-    // Remove o item do carrinho
     const carrinhoAtualizado = carrinho.filter((_, i) => i !== index);
     setCarrinho(carrinhoAtualizado);
     localStorage.setItem("carrinho", JSON.stringify(carrinhoAtualizado));
   };
 
-  const irParaCheckout = () => {
-    // Redireciona para a página de checkout
-    navigate("/checkout");
+  const finalizarCompra = async () => {
+    if (carrinho.length === 0) {
+      alert("Seu carrinho está vazio!");
+      return;
+    }
+
+    const usuario_token = localStorage.getItem("access_token");
+    if (!usuario_token) {
+      alert("Usuário não autenticado!");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/pagamento-plano/",
+        {
+          plano_nome: carrinho[0].nome,
+          usuario_token: usuario_token,
+        }
+      );
+
+      if (response.data.url) {
+        window.location.href = response.data.url; 
+      }
+    } catch (error) {
+      console.error("Erro ao processar o pagamento:", error);
+      alert("Erro ao iniciar pagamento. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,8 +85,12 @@ function Carrinho() {
             <p>
               <strong>Total: </strong>R${total}
             </p>
-            <button className="btn btn-success" onClick={irParaCheckout}>
-              Ir para o Checkout
+            <button
+              className="btn btn-success"
+              onClick={finalizarCompra}
+              disabled={loading}
+            >
+              {loading ? "Processando..." : "Ir para o Checkout"}
             </button>
           </div>
         )}

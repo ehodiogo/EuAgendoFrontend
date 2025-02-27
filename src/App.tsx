@@ -25,8 +25,11 @@ const NotFound = lazy(() => import("./views/404NotFound"));
 const EmpresasUsuario = lazy(() => import("./views/AgendamentosEmpresa"));
 const Profile = lazy(() => import("./views/Perfil"));
 const Carrinho = lazy(() => import("./views/Carrinho"));
-const Checkout = lazy(() => import("./views/Checkout"));
 const Confirmacao = lazy(() => import("./views/Confirmacao"));
+
+const SuccessPage = lazy(() => import("./views/Success"));
+const FailurePage = lazy(() => import("./views/Failure"));
+const PendingPage = lazy(() => import("./views/Pending"));
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const isAuthenticated = localStorage.getItem("access_token");
@@ -82,14 +85,6 @@ function App() {
           }
         />
         <Route
-          path="/checkout"
-          element={
-            <ProtectedRoute>
-              <Checkout />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/confirmacao"
           element={
             <ProtectedRoute>
@@ -112,6 +107,28 @@ function App() {
               <Financeiro />
             </ProtectedRoute>
           }
+        />
+
+        <Route path="/payment/success" element={
+          <ProtectedRoute>
+            <SuccessPage />
+          </ProtectedRoute>
+        }
+        />
+
+        <Route path="/payment/failure" element={
+          <ProtectedRoute>
+            <FailurePage />
+          </ProtectedRoute>
+        }
+
+        />
+
+        <Route path="/payment/pending" element={
+          <ProtectedRoute>
+            <PendingPage />
+          </ProtectedRoute>
+        }
         />
 
         <Route path="/contato" element={<Contato />} />
