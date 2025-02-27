@@ -1,16 +1,27 @@
+import { useState } from "react";
 import { Agendamento } from "../interfaces/Agendamento";
 import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import AgendamentoDados from "../components/AgendamentoDados";
+import { FaTable, FaCalendar } from "react-icons/fa"; 
+import FiltrosAgendamento from "../components/FiltrosAgendamentos";
 
 interface AgendamentosHojeProps {
   empresa: Empresa;
 }
 
 export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
+  const [visualizacao, setVisualizacao] = useState<"tabela" | "quadro">(
+    "tabela"
+  ); // Estado para alternar visualização
   const agendamentosHoje = useFetch<Agendamento[]>(
     `api/agendamentos-hoje/?empresa_id=${empresa.id}`
   );
+
+  const alternarVisualizacao = (tipo: "tabela" | "quadro") => {
+    console.log(`Visualização alterada para: ${tipo}`);
+    setVisualizacao(tipo);
+  };
 
   return (
     <div className="container my-5">
@@ -19,25 +30,55 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
         Confira os agendamentos para hoje na empresa {empresa.nome}.
       </p>
 
+      {/* Botões para alternar a visualização */}
+      <div className="mb-3">
+        <button
+          className="btn btn-outline-primary me-2"
+          onClick={() => alternarVisualizacao("tabela")}
+        >
+          <FaTable className="me-2" />
+          Tabela
+        </button>
+        <button
+          className="btn btn-outline-primary"
+          onClick={() => alternarVisualizacao("quadro")}
+        >
+          <FaCalendar className="me-2" />
+          Quadro de Horários
+        </button>
+      </div>
+
+      {/* Renderiza a visualização de acordo com o estado */}
       {agendamentosHoje.data && agendamentosHoje.data.length > 0 ? (
-        <div className="table-responsive">
-          <table className="table table-striped table-bordered">
-            <thead>
-              <tr>
-                <th>Detalhes dos Agendamentos</th>
-              </tr>
-            </thead>
-            <tbody>
-              {agendamentosHoje.data.map((agendamento: Agendamento) => (
-                <tr key={agendamento.id}>
-                  <td>
-                    <AgendamentoDados agendamento={agendamento} />
-                  </td>
+        visualizacao === "tabela" ? (
+          <div className="table-responsive">
+            <table className="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>Detalhes dos Agendamentos</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                <FiltrosAgendamento />
+                {agendamentosHoje.data.map((agendamento: Agendamento) => (
+                  <tr key={agendamento.id}>
+                    <td>
+                      <AgendamentoDados agendamento={agendamento} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div>
+            {/* Aqui você pode adicionar o quadro de horários, se necessário */}
+            <p className="text-center">
+              Quadro de horários em{" "}
+              <span className="fw-bold text-warning">desenvolvimento</span>.
+            </p>
+          </div>
+        )
       ) : (
         <p>Não há agendamentos para hoje.</p>
       )}

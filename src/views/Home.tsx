@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "../components/Navbar";
-import { FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa";
+import { FaGithub, FaInstagram, FaLinkedin, FaRoad } from "react-icons/fa";
 import { BsFillFileLockFill } from "react-icons/bs";
 
 function Home() {
@@ -152,6 +152,21 @@ function Home() {
         </div>
       </section>
 
+      <section className="py-5 bg-light" data-aos="fade-up">
+        <div className="container text-center">
+          <h2 className="text-primary fw-bold">Lançamentos Futuros</h2>
+
+          <p className="text-muted">Confira o que está por vir no EuAgendo.</p>
+          <button
+            className="btn btn-warning mt-3 px-4 fw-semibold"
+            onClick={() => navigate("/roadmap")} 
+          >
+            Ver Roadmap
+          </button>
+
+        </div>
+      </section>
+
       <footer className="bg-primary text-white text-center py-5">
         <div className="container">
           <p className="mb-0">
@@ -191,6 +206,13 @@ function Home() {
             >
               <FaLinkedin className="me-2" />
               LinkedIn
+            </a>
+            <a
+              href="/roadmap"
+              className="text-white text-decoration-none d-flex align-items-center"
+              >
+                <FaRoad className="me-2" />
+                Roadmap
             </a>
           </div>
         </div>

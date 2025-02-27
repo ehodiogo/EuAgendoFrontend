@@ -26,12 +26,11 @@ const EmpresasUsuario = lazy(() => import("./views/AgendamentosEmpresa"));
 const Profile = lazy(() => import("./views/Perfil"));
 const Carrinho = lazy(() => import("./views/Carrinho"));
 const Confirmacao = lazy(() => import("./views/Confirmacao"));
-
 const SuccessPage = lazy(() => import("./views/Success"));
 const FailurePage = lazy(() => import("./views/Failure"));
 const PendingPage = lazy(() => import("./views/Pending"));
-
 const ValidarPlano = lazy(() => import("./views/ValidarPlano"));
+const Roadmap = lazy(() => import("./views/Roadmap"));
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const isAuthenticated = localStorage.getItem("access_token");
@@ -174,6 +173,7 @@ function App() {
         <Route path="/sobre" element={<Sobre />} />
         <Route path="/planos" element={<Planos />} />
         <Route path="/termos" element={<Termos />} />
+        <Route path="/roadmap" element={<Roadmap />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>
