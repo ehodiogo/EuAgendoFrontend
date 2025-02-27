@@ -32,6 +32,10 @@ const PendingPage = lazy(() => import("./views/Pending"));
 const ValidarPlano = lazy(() => import("./views/ValidarPlano"));
 const Roadmap = lazy(() => import("./views/Roadmap"));
 
+const EmpresaCreate = lazy(() => import("./views/EmpresaCriar"));
+const FuncionarioCreate = lazy(() => import("./views/FuncionarioCriar"));
+const ServicoCreate = lazy(() => import("./views/ServicosCriar"));
+
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const isAuthenticated = localStorage.getItem("access_token");
   if (!isAuthenticated) {
@@ -82,6 +86,33 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Register />} />
         <Route path="/esqueci-senha" element={<ForgotPassword />} />
+
+        <Route 
+          path="/criar-empresa"
+          element={
+            <ProtectedRoute>
+              <EmpresaCreate />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route 
+          path="/criar-funcionario"
+          element={
+            <ProtectedRoute>
+              <FuncionarioCreate />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route 
+          path="/criar-servico"
+          element={
+            <ProtectedRoute>
+              <ServicoCreate />
+            </ProtectedRoute>
+          }
+        />
 
         <Route 
           path="/minhas-empresas"
