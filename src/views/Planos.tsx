@@ -9,6 +9,7 @@ function Planos() {
     nome: string;
     preco: number;
   }
+  // TODO: COLOCAR O QUE CADA PLANO OFERECE
 
   const adicionarAoCarrinho = (plano: Plano) => {
     console.log(`Adicionando ao carrinho: ${plano.nome} - R$${plano.preco}`);
@@ -27,6 +28,7 @@ function Planos() {
 
         <div className="row justify-content-center mt-4">
           {[
+            { nome: "Free Trial", preco: 0, cor: "secondary" },
             { nome: "Plano Básico", preco: 49, cor: "success" },
             { nome: "Plano Profissional", preco: 149, cor: "danger" },
             { nome: "Plano Corporativo", preco: 299, cor: "primary" },
