@@ -141,6 +141,18 @@ function Dashboard() {
                 aqui para verificar o status.
               </p>
             </div>
+
+            <div className="text-center w-25 ms-3">
+              <Link
+                to="/cadastros-usuario"
+                className="btn btn-info w-100 mb-1"
+              >
+                Cadastros de Empresas, Serviços e Funcionários
+              </Link>
+              <p className="text-muted small">
+                Crie, altere e exclua empresas, serviços e funcionários.
+              </p>
+            </div>
           </div>
 
           <p className="lead text-muted text-center">

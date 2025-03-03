@@ -31,6 +31,7 @@ const FailurePage = lazy(() => import("./views/Failure"));
 const PendingPage = lazy(() => import("./views/Pending"));
 const ValidarPlano = lazy(() => import("./views/ValidarPlano"));
 const Roadmap = lazy(() => import("./views/Roadmap"));
+const CadastrosUsuario = lazy(() => import("./views/CadastrosUsuario"));
 
 const EmpresaCreate = lazy(() => import("./views/EmpresaCriar"));
 const FuncionarioCreate = lazy(() => import("./views/FuncionarioCriar"));
@@ -154,11 +155,11 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/historico"
+        <Route 
+          path="/cadastros-usuario"
           element={
             <ProtectedRoute>
-              <h1>Histórico</h1>
+              <CadastrosUsuario />
             </ProtectedRoute>
           }
         />
