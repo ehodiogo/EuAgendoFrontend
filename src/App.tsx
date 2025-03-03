@@ -97,7 +97,7 @@ function App() {
         />
 
         <Route 
-          path="/criar-funcionario"
+          path="/criar-funcionario/:empresa?"
           element={
             <ProtectedRoute>
               <FuncionarioCreate />
@@ -106,7 +106,7 @@ function App() {
         />
 
         <Route 
-          path="/criar-servico"
+          path="/criar-servico/:funcionario?"
           element={
             <ProtectedRoute>
               <ServicoCreate />
