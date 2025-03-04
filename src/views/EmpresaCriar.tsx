@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import InputMask from "react-input-mask";
-import { EmpresaCreate } from "../interfaces/Empresa";
+import { EmpresaCreate, Empresa } from "../interfaces/Empresa";
 import { Link } from "react-router-dom";
+import { useFetch } from "../functions/GetData";
 
 const EmpresaForm: React.FC = () => {
+  const [acaoSelecionada, setAcaoSelecionada] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  
   const [empresa, setEmpresa] = useState<EmpresaCreate>({
     nome: "",
     cnpj: "",
@@ -23,6 +27,14 @@ const EmpresaForm: React.FC = () => {
     horario_pausa_fim: "",
   });
   const [empresaCriada, setEmpresaCriada] = useState(false);
+  const [empresaSelecionada, setEmpresaSelecionada] = useState<number | null>(
+    null
+  );
+  const empresas = useFetch<Empresa[]>(
+    `api/empresas-usuario/?usuario_token=${localStorage.getItem(
+      "access_token"
+    )}`
+  );
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -47,73 +59,84 @@ const EmpresaForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
-    const formData = new FormData();
+    // TODO: Funcionalidade para cada ação selecionada
+    if (acaoSelecionada === "cadastrar") {
+      const formData = new FormData();
 
-    if (empresa.logo) {
-      if (empresa.logo.startsWith("data:image")) {
-        const blob = await fetch(empresa.logo).then((res) => res.blob());
-        formData.append("logo", blob, "logo.png");
-      } else {
-        formData.append("logo", empresa.logo);
+      if (empresa.logo) {
+        if (empresa.logo.startsWith("data:image")) {
+          const blob = await fetch(empresa.logo).then((res) => res.blob());
+          formData.append("logo", blob, "logo.png");
+        } else {
+          formData.append("logo", empresa.logo);
+        }
       }
-    }
 
-    const requiredFields = [
-      "nome",
-      "cnpj",
-      "endereco",
-      "telefone",
-      "email",
-      "horario_abertura_dia_semana",
-      "horario_fechamento_dia_semana",
-    ];
+      const requiredFields = [
+        "nome",
+        "cnpj",
+        "endereco",
+        "telefone",
+        "email",
+        "horario_abertura_dia_semana",
+        "horario_fechamento_dia_semana",
+      ];
 
-    requiredFields.forEach((field) => {
-      formData.append(field, empresa[field as keyof EmpresaCreate] as string || "");
-    });
-
-    formData.append("abre_sabado", empresa.abre_sabado.toString());
-    formData.append("abre_domingo", empresa.abre_domingo.toString());
-    formData.append("para_almoço", empresa.para_almoço.toString());
-
-    formData.append(
-      "horario_abertura_fim_de_semana",
-      empresa.horario_abertura_fim_de_semana || ""
-    );
-    formData.append(
-      "horario_fechamento_fim_de_semana",
-      empresa.horario_fechamento_fim_de_semana || ""
-    );
-
-    formData.append("horario_pausa_inicio", empresa.horario_pausa_inicio || "");
-    formData.append("horario_pausa_fim", empresa.horario_pausa_fim || "");
-
-    const usuario_token = localStorage.getItem("access_token");
-    if (usuario_token) {
-      formData.append("usuario_token", usuario_token);
-    }
-
-    console.log("Form Data:", Object.fromEntries(formData.entries()));
-
-    try {
-      const response = await fetch("http://localhost:8000/api/empresa-create/", {
-        method: "POST",
-        body: formData,
+      requiredFields.forEach((field) => {
+        formData.append(field, empresa[field as keyof EmpresaCreate] as string || "");
       });
 
-      if (!response.ok) {
-        throw new Error("Erro ao cadastrar empresa.");
+      formData.append("abre_sabado", empresa.abre_sabado.toString());
+      formData.append("abre_domingo", empresa.abre_domingo.toString());
+      formData.append("para_almoço", empresa.para_almoço.toString());
+
+      formData.append(
+        "horario_abertura_fim_de_semana",
+        empresa.horario_abertura_fim_de_semana || ""
+      );
+      formData.append(
+        "horario_fechamento_fim_de_semana",
+        empresa.horario_fechamento_fim_de_semana || ""
+      );
+
+      formData.append("horario_pausa_inicio", empresa.horario_pausa_inicio || "");
+      formData.append("horario_pausa_fim", empresa.horario_pausa_fim || "");
+
+      const usuario_token = localStorage.getItem("access_token");
+      if (usuario_token) {
+        formData.append("usuario_token", usuario_token);
       }
 
-      const data = await response.json();
-      console.log("Empresa cadastrada com sucesso:", data);
-      alert("Empresa cadastrada com sucesso!");
-      setEmpresaCriada(true);
-    } catch (error) {
-      console.error("Erro:", error);
-      alert("Falha ao cadastrar empresa.");
+      console.log("Form Data:", Object.fromEntries(formData.entries()));
+
+      try {
+        const response = await fetch("http://localhost:8000/api/empresa-create/", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Erro ao cadastrar empresa.");
+        }
+
+        const data = await response.json();
+        console.log("Empresa cadastrada com sucesso:", data);
+        alert("Empresa cadastrada com sucesso!");
+        setEmpresaCriada(true);
+      } catch (error) {
+        console.error("Erro:", error);
+        alert("Falha ao cadastrar empresa.");
+      } finally {
+        setLoading(false);
+      }
+    } else if (acaoSelecionada === "remover") {
+      // Remover empresa
+    } else if (acaoSelecionada === "editar") {
+      // Editar empresa
     }
+   
   };
 
 
@@ -123,234 +146,633 @@ const EmpresaForm: React.FC = () => {
         className="card shadow-lg p-4 border-0"
         style={{ maxWidth: "600px", margin: "auto", borderRadius: "12px" }}
       >
-        <h2 className="text-center text-primary mb-4">Cadastro de Empresa</h2>
+        <h2 className="text-center text-primary mb-4">Formulário de Ação</h2>
         <form onSubmit={handleSubmit}>
-          {/* Campos obrigatórios */}
           <div className="mb-3">
-            <label className="form-label">Nome</label>
-            <input
-              type="text"
-              name="nome"
-              className="form-control"
-              value={empresa.nome}
-              onChange={handleChange}
+            <label className="form-label">Selecione a Ação</label>
+            <select
+              className="form-select"
+              onChange={(e) => setAcaoSelecionada(e.target.value)}
+              value={acaoSelecionada}
               required
-            />
+            >
+              <option value="">Escolha uma ação</option>
+              <option value="cadastrar">Cadastrar Empresa</option>
+              <option value="remover">Remover Empresa</option>
+              <option value="editar">Editar Empresa</option>
+            </select>
           </div>
 
-          <div className="mb-3">
-            <label className="form-label">CNPJ</label>
-            <InputMask
-              type="text"
-              name="cnpj"
-              className="form-control"
-              value={empresa.cnpj}
-              onChange={handleChange}
-              mask="99.999.999/9999-99"
-              maskChar={null}
-              required
-            />
-          </div>
+          {acaoSelecionada === "cadastrar" && (
+            <>
+              <div
+                className="card shadow-lg p-4 border-0"
+                style={{
+                  maxWidth: "600px",
+                  margin: "auto",
+                  borderRadius: "12px",
+                }}
+              >
+                <h2 className="text-center text-primary mb-4">
+                  Cadastro de Empresa
+                </h2>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Qual o nome da sua empresa?
+                  </label>
+                  <input
+                    type="text"
+                    name="nome"
+                    className="form-control"
+                    value={empresa.nome}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
 
-          <div className="mb-3">
-            <label className="form-label">Endereço</label>
-            <input
-              type="text"
-              name="endereco"
-              className="form-control"
-              value={empresa.endereco}
-              onChange={handleChange}
-              required
-            />
-          </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Qual o CNPJ da sua empresa?
+                  </label>
+                  <InputMask
+                    type="text"
+                    name="cnpj"
+                    className="form-control"
+                    value={empresa.cnpj}
+                    onChange={handleChange}
+                    mask="99.999.999/9999-99"
+                    maskChar={null}
+                    required
+                  />
+                </div>
 
-          <div className="mb-3">
-            <label className="form-label">Telefone</label>
-            <input
-              type="text"
-              name="telefone"
-              className="form-control"
-              value={empresa.telefone}
-              onChange={handleChange}
-              required
-            />
-          </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Qual o endereço da sua empresa?
+                  </label>
+                  <input
+                    type="text"
+                    name="endereco"
+                    className="form-control"
+                    value={empresa.endereco}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
 
-          <div className="mb-3">
-            <label className="form-label">Email</label>
-            <input
-              type="email"
-              name="email"
-              className="form-control"
-              value={empresa.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Qual o telefone da sua empresa?
+                  </label>
+                  <input
+                    type="text"
+                    name="telefone"
+                    className="form-control"
+                    value={empresa.telefone}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
 
-          <div className="mb-3">
-            <label className="form-label">Horário Abertura (Semana)</label>
-            <input
-              type="text"
-              name="horario_abertura_dia_semana"
-              className="form-control"
-              value={empresa.horario_abertura_dia_semana}
-              onChange={handleChange}
-              placeholder="Ex: 08:00"
-              pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
-              required
-            />
-          </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Qual o e-mail da sua empresa?
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    className="form-control"
+                    value={empresa.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
 
-          <div className="mb-3">
-            <label className="form-label">Horário Fechamento (Semana)</label>
-            <input
-              type="text"
-              name="horario_fechamento_dia_semana"
-              className="form-control"
-              value={empresa.horario_fechamento_dia_semana}
-              onChange={handleChange}
-              placeholder="Ex: 18:00"
-              pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
-              required
-            />
-          </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Qual o horário de abertura da sua empresa durante a semana?
+                  </label>
+                  <input
+                    type="text"
+                    name="horario_abertura_dia_semana"
+                    className="form-control"
+                    value={empresa.horario_abertura_dia_semana}
+                    onChange={handleChange}
+                    placeholder="Ex: 08:00"
+                    pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                    required
+                  />
+                </div>
 
-          <div className="mb-3">
-            <label className="form-label">
-              Horário Abertura (Fim de Semana)
-            </label>
-            <input
-              type="text"
-              name="horario_abertura_fim_de_semana"
-              className="form-control"
-              value={empresa.horario_abertura_fim_de_semana}
-              onChange={handleChange}
-              placeholder="Ex: 10:00"
-              pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
-            />
-          </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Qual o horário de fechamento da sua empresa durante a
+                    semana?
+                  </label>
+                  <input
+                    type="text"
+                    name="horario_fechamento_dia_semana"
+                    className="form-control"
+                    value={empresa.horario_fechamento_dia_semana}
+                    onChange={handleChange}
+                    placeholder="Ex: 18:00"
+                    pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                    required
+                  />
+                </div>
 
-          <div className="mb-3">
-            <label className="form-label">
-              Horário Fechamento (Fim de Semana)
-            </label>
-            <input
-              type="text"
-              name="horario_fechamento_fim_de_semana"
-              className="form-control"
-              value={empresa.horario_fechamento_fim_de_semana}
-              onChange={handleChange}
-              placeholder="Ex: 22:00"
-              pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
-            />
-          </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Caso sua empresa abra aos finais de semana, qual o horário
+                    de abertura?
+                  </label>
+                  <input
+                    type="text"
+                    name="horario_abertura_fim_de_semana"
+                    className="form-control"
+                    value={empresa.horario_abertura_fim_de_semana}
+                    onChange={handleChange}
+                    placeholder="Ex: 10:00"
+                    pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                  />
+                </div>
 
-          <div className="mb-3">
-            <label className="form-label">Início da Pausa</label>
-            <input
-              type="text"
-              name="horario_pausa_inicio"
-              className="form-control"
-              value={empresa.horario_pausa_inicio}
-              onChange={handleChange}
-              placeholder="Ex: 12:00"
-              pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
-            />
-          </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Caso sua empresa feche aos finais de semana, qual o horário
+                    de fechamento?
+                  </label>
+                  <input
+                    type="text"
+                    name="horario_fechamento_fim_de_semana"
+                    className="form-control"
+                    value={empresa.horario_fechamento_fim_de_semana}
+                    onChange={handleChange}
+                    placeholder="Ex: 22:00"
+                    pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                  />
+                </div>
 
-          <div className="mb-3">
-            <label className="form-label">Fim da Pausa</label>
-            <input
-              type="text"
-              name="horario_pausa_fim"
-              className="form-control"
-              value={empresa.horario_pausa_fim}
-              onChange={handleChange}
-              placeholder="Ex: 13:00"
-              pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
-            />
-          </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Se houver pausa para intervalo, que horário inicia a pausa?
+                  </label>
+                  <input
+                    type="text"
+                    name="horario_pausa_inicio"
+                    className="form-control"
+                    value={empresa.horario_pausa_inicio}
+                    onChange={handleChange}
+                    placeholder="Ex: 12:00"
+                    pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                  />
+                </div>
 
-          <div className="mb-3">
-            <label className="form-label">Logo da Empresa</label>
-            <input
-              type="file"
-              accept="image/*"
-              className="form-control"
-              onChange={handleFileChange}
-            />
-          </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Se houver pausa para intervalo, que horário termina a pausa?
+                  </label>
+                  <input
+                    type="text"
+                    name="horario_pausa_fim"
+                    className="form-control"
+                    value={empresa.horario_pausa_fim}
+                    onChange={handleChange}
+                    placeholder="Ex: 13:00"
+                    pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                  />
+                </div>
 
-          <div className="mb-3">
-            <label className="form-label">URL do Logo</label>
-            <input
-              type="text"
-              name="logo"
-              className="form-control"
-              value={empresa.logo}
-              onChange={handleChange}
-              placeholder="Ou insira a URL da imagem"
-            />
-          </div>
+                <div className="mb-3">
+                  <label className="form-label">Logo da Empresa</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="form-control"
+                    onChange={handleFileChange}
+                  />
+                </div>
 
-          {empresa.logo && (
-            <div className="text-center mb-3">
-              <img
-                src={empresa.logo}
-                alt="Prévia do logo"
-                className="img-fluid"
-                style={{ maxWidth: "200px", borderRadius: "8px" }}
-              />
-            </div>
+                <div className="mb-3">
+                  <label className="form-label">URL do Logo</label>
+                  <input
+                    type="text"
+                    name="logo"
+                    className="form-control"
+                    value={empresa.logo}
+                    onChange={handleChange}
+                    placeholder="Ou insira a URL da imagem"
+                  />
+                </div>
+
+                {empresa.logo && (
+                  <div className="text-center mb-3">
+                    <img
+                      src={empresa.logo}
+                      alt="Prévia do logo"
+                      className="img-fluid"
+                      style={{ maxWidth: "200px", borderRadius: "8px" }}
+                    />
+                  </div>
+                )}
+
+                <div className="form-check mb-3">
+                  <input
+                    type="checkbox"
+                    name="abre_sabado"
+                    className="form-check-input"
+                    checked={empresa.abre_sabado}
+                    onChange={handleChange}
+                  />
+                  <label className="form-check-label ms-2">
+                    Sua empresa abre no sábado?
+                  </label>
+                </div>
+
+                <div className="form-check mb-3">
+                  <input
+                    type="checkbox"
+                    name="abre_domingo"
+                    className="form-check-input"
+                    checked={empresa.abre_domingo}
+                    onChange={handleChange}
+                  />
+                  <label className="form-check-label ms-2">
+                    Sua empresa abre no domingo?
+                  </label>
+                </div>
+
+                <div className="form-check mb-3">
+                  <input
+                    type="checkbox"
+                    name="para_almoço"
+                    className="form-check-input"
+                    checked={empresa.para_almoço}
+                    onChange={handleChange}
+                  />
+                  <label className="form-check-label ms-2">
+                    Sua empresa tem intervalo no almoço?
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn btn-success w-100 py-2"
+                  style={{ borderRadius: "8px" }}
+                  disabled={loading}
+                >
+                  {loading ? "Cadastrando..." : "Cadastrar Empresa"}
+                </button>
+              </div>
+            </>
           )}
 
-          <div className="form-check mb-3">
-            <input
-              type="checkbox"
-              name="abre_sabado"
-              className="form-check-input"
-              checked={empresa.abre_sabado}
-              onChange={handleChange}
-            />
-            <label className="form-check-label ms-2">Abre Sábado</label>
-          </div>
+          {acaoSelecionada === "editar" && (
+            <>
+              <div
+                className="card shadow-lg p-4 border-0"
+                style={{
+                  maxWidth: "600px",
+                  margin: "auto",
+                  borderRadius: "12px",
+                }}
+              >
+                <h2 className="text-center text-primary mb-4">
+                  Editar Informações da Empresa
+                </h2>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Selecione uma Empresa para Editar
+                  </label>
+                  <select
+                    className="form-select"
+                    onChange={(e) =>
+                      setEmpresaSelecionada(Number(e.target.value))
+                    }
+                    value={empresaSelecionada || ""}
+                    required
+                  >
+                    <option value="">Escolha uma empresa</option>
+                    {empresas.data?.map((empresa) => (
+                      <option key={empresa.id} value={empresa.id}>
+                        {empresa.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-          <div className="form-check mb-3">
-            <input
-              type="checkbox"
-              name="abre_domingo"
-              className="form-check-input"
-              checked={empresa.abre_domingo}
-              onChange={handleChange}
-            />
-            <label className="form-check-label ms-2">Abre Domingo</label>
-          </div>
+                {empresaSelecionada && (
+                  <>
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Qual o nome da sua empresa?
+                      </label>
+                      <input
+                        type="text"
+                        name="nome"
+                        className="form-control"
+                        value={empresa.nome}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
 
-          <div className="form-check mb-3">
-            <input
-              type="checkbox"
-              name="para_almoço"
-              className="form-check-input"
-              checked={empresa.para_almoço}
-              onChange={handleChange}
-            />
-            <label className="form-check-label ms-2">
-              Tem Pausa para Almoço
-            </label>
-          </div>
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Qual o CNPJ da sua empresa?
+                      </label>
+                      <InputMask
+                        type="text"
+                        name="cnpj"
+                        className="form-control"
+                        value={empresa.cnpj}
+                        onChange={handleChange}
+                        mask="99.999.999/9999-99"
+                        maskChar={null}
+                        required
+                      />
+                    </div>
 
-          <button type="submit" className="btn btn-primary w-100">
-            Cadastrar
-          </button>
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Qual o endereço da sua empresa?
+                      </label>
+                      <input
+                        type="text"
+                        name="endereco"
+                        className="form-control"
+                        value={empresa.endereco}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Qual o telefone da sua empresa?
+                      </label>
+                      <input
+                        type="text"
+                        name="telefone"
+                        className="form-control"
+                        value={empresa.telefone}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Qual o e-mail da sua empresa?
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        className="form-control"
+                        value={empresa.email}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Qual o horário de abertura da sua empresa durante a
+                        semana?
+                      </label>
+                      <input
+                        type="text"
+                        name="horario_abertura_dia_semana"
+                        className="form-control"
+                        value={empresa.horario_abertura_dia_semana}
+                        onChange={handleChange}
+                        placeholder="Ex: 08:00"
+                        pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Qual o horário de fechamento da sua empresa durante a
+                        semana?
+                      </label>
+                      <input
+                        type="text"
+                        name="horario_fechamento_dia_semana"
+                        className="form-control"
+                        value={empresa.horario_fechamento_dia_semana}
+                        onChange={handleChange}
+                        placeholder="Ex: 18:00"
+                        pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Caso sua empresa abra aos finais de semana, qual o
+                        horário de abertura?
+                      </label>
+                      <input
+                        type="text"
+                        name="horario_abertura_fim_de_semana"
+                        className="form-control"
+                        value={empresa.horario_abertura_fim_de_semana}
+                        onChange={handleChange}
+                        placeholder="Ex: 10:00"
+                        pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Caso sua empresa feche aos finais de semana, qual o
+                        horário de fechamento?
+                      </label>
+                      <input
+                        type="text"
+                        name="horario_fechamento_fim_de_semana"
+                        className="form-control"
+                        value={empresa.horario_fechamento_fim_de_semana}
+                        onChange={handleChange}
+                        placeholder="Ex: 22:00"
+                        pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Se houver pausa para intervalo, que horário inicia a
+                        pausa?
+                      </label>
+                      <input
+                        type="text"
+                        name="horario_pausa_inicio"
+                        className="form-control"
+                        value={empresa.horario_pausa_inicio}
+                        onChange={handleChange}
+                        placeholder="Ex: 12:00"
+                        pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Se houver pausa para intervalo, que horário termina a
+                        pausa?
+                      </label>
+                      <input
+                        type="text"
+                        name="horario_pausa_fim"
+                        className="form-control"
+                        value={empresa.horario_pausa_fim}
+                        onChange={handleChange}
+                        placeholder="Ex: 13:00"
+                        pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">Logo da Empresa</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="form-control"
+                        onChange={handleFileChange}
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">URL do Logo</label>
+                      <input
+                        type="text"
+                        name="logo"
+                        className="form-control"
+                        value={empresa.logo}
+                        onChange={handleChange}
+                        placeholder="Ou insira a URL da imagem"
+                      />
+                    </div>
+
+                    {empresa.logo && (
+                      <div className="text-center mb-3">
+                        <img
+                          src={empresa.logo}
+                          alt="Prévia do logo"
+                          className="img-fluid"
+                          style={{ maxWidth: "200px", borderRadius: "8px" }}
+                        />
+                      </div>
+                    )}
+
+                    <div className="form-check mb-3">
+                      <input
+                        type="checkbox"
+                        name="abre_sabado"
+                        className="form-check-input"
+                        checked={empresa.abre_sabado}
+                        onChange={handleChange}
+                      />
+                      <label className="form-check-label ms-2">
+                        Sua empresa abre no sábado?
+                      </label>
+                    </div>
+
+                    <div className="form-check mb-3">
+                      <input
+                        type="checkbox"
+                        name="abre_domingo"
+                        className="form-check-input"
+                        checked={empresa.abre_domingo}
+                        onChange={handleChange}
+                      />
+                      <label className="form-check-label ms-2">
+                        Sua empresa abre no domingo?
+                      </label>
+                    </div>
+
+                    <div className="form-check mb-3">
+                      <input
+                        type="checkbox"
+                        name="para_almoço"
+                        className="form-check-input"
+                        checked={empresa.para_almoço}
+                        onChange={handleChange}
+                      />
+                      <label className="form-check-label ms-2">
+                        Sua empresa tem intervalo no almoço?
+                      </label>
+                    </div>
+                    <button
+                      type="submit"
+                      className="btn btn-primary w-100 py-2"
+                      style={{ borderRadius: "8px" }}
+                      disabled={loading}
+                    >
+                      {loading ? "Editando..." : "Editar Empresa"}
+                    </button>
+                  </>
+                )}
+              </div>
+            </>
+          )}
+
+          {acaoSelecionada === "remover" && (
+            <>
+              <div
+                className="card shadow-lg p-4 border-0"
+                style={{
+                  maxWidth: "600px",
+                  margin: "auto",
+                  borderRadius: "12px",
+                }}
+              >
+                <h2 className="text-center text-primary mb-4">
+                  Remoção de Empresa
+                </h2>
+                <div className="mb-3">
+                  <label className="form-label">Selecione uma Empresa para Remover</label>
+                  <select
+                    className="form-select"
+                    onChange={(e) =>
+                      setEmpresaSelecionada(Number(e.target.value))
+                    }
+                    value={empresaSelecionada || ""}
+                    required
+                  >
+                    <option value="">Escolha uma empresa</option>
+                    {empresas.data?.map((empresa) => (
+                      <option key={empresa.id} value={empresa.id}>
+                        {empresa.nome}
+                      </option>
+                    ))}
+                  </select>
+
+                  {empresaSelecionada && (
+                        <button
+                      type="submit"
+                      className="btn btn-danger w-100 py-2 mt-3"
+                      style={{ borderRadius: "8px" }}
+                      disabled={loading}
+                    >
+                      {loading ? "Removendo..." : "Remover Empresa"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </form>
 
         {empresaCriada && (
-          <Link to={`/criar-funcionario/${empresa.nome}`} className="btn btn-secondary w-100 mt-3">
+          <Link
+            to={`/criar-funcionario/${empresa.nome}`}
+            className="btn btn-secondary w-100 mt-3"
+          >
             Criar Funcionarios para a Empresa
           </Link>
         )}
-          
       </div>
     </div>
   );
