@@ -132,9 +132,131 @@ const EmpresaForm: React.FC = () => {
         setLoading(false);
       }
     } else if (acaoSelecionada === "remover") {
-      // Remover empresa
+      
+      const payload = {
+        empresa_id: empresaSelecionada,
+        usuario_token: localStorage.getItem("access_token"),
+      };
+
+      try {
+        const response = await fetch("http://localhost:8000/api/remover-empresa/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error("Erro ao remover empresa.");
+        }
+
+        const data = await response.json();
+        console.log("Empresa removida com sucesso:", data);
+        alert("Empresa removida com sucesso!");
+        setEmpresaSelecionada(null);
+        window.location.reload();
+      } catch (error) {
+        console.error("Erro:", error);
+        alert("Falha ao remover empresa.");
+      } finally {
+        setLoading(false);
+      }
+
     } else if (acaoSelecionada === "editar") {
-      // Editar empresa
+      
+      const formData = new FormData();
+
+      if (empresa.logo) {
+        if (empresa.logo.startsWith("data:image")) {
+          const blob = await fetch(empresa.logo).then((res) => res.blob());
+          formData.append("logo", blob, "logo.png");
+        } else {
+          formData.append("logo", empresa.logo);
+        }
+      }
+
+      const requiredFields = [
+        "nome",
+        "cnpj",
+        "endereco",
+        "telefone",
+        "email",
+        "horario_abertura_dia_semana",
+        "horario_fechamento_dia_semana",
+      ];
+
+      const empresaObj = empresas.data?.find(
+        (empresa) => empresa.id === empresaSelecionada
+      );
+
+      if (!empresaObj) {
+        console.error("Empresa não encontrada.");
+        return;
+      }
+
+      if (!empresaObj) {
+        console.error("Empresa não encontrada.");
+        return;
+      }
+
+      requiredFields.forEach((field) => {
+        formData.append(
+          field,
+          (empresaObj[field as keyof EmpresaCreate] as string) || ""
+        );
+      });
+
+      formData.append("abre_sabado", empresa.abre_sabado.toString());
+      formData.append("abre_domingo", empresa.abre_domingo.toString());
+      formData.append("para_almoço", empresa.para_almoço.toString());
+
+      formData.append(
+        "horario_abertura_fim_de_semana",
+        empresa.horario_abertura_fim_de_semana || ""
+      );
+      formData.append(
+        "horario_fechamento_fim_de_semana",
+        empresa.horario_fechamento_fim_de_semana || ""
+      );
+
+      formData.append("horario_pausa_inicio", empresa.horario_pausa_inicio || "");
+      formData.append("horario_pausa_fim", empresa.horario_pausa_fim || "");
+
+      const usuario_token = localStorage.getItem("access_token");
+      if (usuario_token) {
+        formData.append("usuario_token", usuario_token);
+      }
+      if (!empresaSelecionada) {
+        alert("Selecione uma empresa para editar.");
+        return;
+      }
+      
+      formData.append("empresa_id", empresaSelecionada.toString());
+
+      console.log("Form Data:", Object.fromEntries(formData.entries()));
+
+      try {
+        const response = await fetch("http://localhost:8000/api/editar-empresa/", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Erro ao cadastrar empresa.");
+        }
+
+        const data = await response.json();
+        console.log("Empresa editada com sucesso:", data);
+        alert("Empresa editada com sucesso!");
+        setEmpresaCriada(true);
+        window.location.reload();
+      } catch (error) {
+        console.error("Erro:", error);
+        alert("Falha ao cadastrar empresa.");
+      } finally {
+        setLoading(false);
+      }
     }
    
   };
@@ -471,7 +593,11 @@ const EmpresaForm: React.FC = () => {
                         type="text"
                         name="nome"
                         className="form-control"
-                        value={empresa.nome}
+                        value={
+                          empresas.data?.find(
+                            (empresa) => empresa.id === empresaSelecionada
+                          )?.nome
+                        }
                         onChange={handleChange}
                         required
                       />
@@ -485,7 +611,11 @@ const EmpresaForm: React.FC = () => {
                         type="text"
                         name="cnpj"
                         className="form-control"
-                        value={empresa.cnpj}
+                        value={
+                          empresas.data?.find(
+                            (empresa) => empresa.id === empresaSelecionada
+                          )?.cnpj
+                        }
                         onChange={handleChange}
                         mask="99.999.999/9999-99"
                         maskChar={null}
@@ -501,7 +631,11 @@ const EmpresaForm: React.FC = () => {
                         type="text"
                         name="endereco"
                         className="form-control"
-                        value={empresa.endereco}
+                        value={
+                          empresas.data?.find(
+                            (empresa) => empresa.id === empresaSelecionada
+                          )?.endereco
+                        }
                         onChange={handleChange}
                         required
                       />
@@ -515,7 +649,11 @@ const EmpresaForm: React.FC = () => {
                         type="text"
                         name="telefone"
                         className="form-control"
-                        value={empresa.telefone}
+                        value={
+                          empresas.data?.find(
+                            (empresa) => empresa.id === empresaSelecionada
+                          )?.telefone
+                        }
                         onChange={handleChange}
                         required
                       />
@@ -529,7 +667,11 @@ const EmpresaForm: React.FC = () => {
                         type="email"
                         name="email"
                         className="form-control"
-                        value={empresa.email}
+                        value={
+                          empresas.data?.find(
+                            (empresa) => empresa.id === empresaSelecionada
+                          )?.email
+                        }
                         onChange={handleChange}
                         required
                       />
@@ -544,7 +686,10 @@ const EmpresaForm: React.FC = () => {
                         type="text"
                         name="horario_abertura_dia_semana"
                         className="form-control"
-                        value={empresa.horario_abertura_dia_semana}
+                        value={empresas.data
+                          ?.find((empresa) => empresa.id === empresaSelecionada)
+                          ?.horario_abertura_dia_semana?.toString()
+                          .slice(0, 5)}
                         onChange={handleChange}
                         placeholder="Ex: 08:00"
                         pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
@@ -561,7 +706,10 @@ const EmpresaForm: React.FC = () => {
                         type="text"
                         name="horario_fechamento_dia_semana"
                         className="form-control"
-                        value={empresa.horario_fechamento_dia_semana}
+                        value={empresas.data
+                          ?.find((empresa) => empresa.id === empresaSelecionada)
+                          ?.horario_fechamento_dia_semana?.toString()
+                          .slice(0, 5)}
                         onChange={handleChange}
                         placeholder="Ex: 18:00"
                         pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
@@ -578,7 +726,10 @@ const EmpresaForm: React.FC = () => {
                         type="text"
                         name="horario_abertura_fim_de_semana"
                         className="form-control"
-                        value={empresa.horario_abertura_fim_de_semana}
+                        value={empresas.data
+                          ?.find((empresa) => empresa.id === empresaSelecionada)
+                          ?.horario_abertura_fim_de_semana?.toString()
+                          .slice(0, 5)}
                         onChange={handleChange}
                         placeholder="Ex: 10:00"
                         pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
@@ -594,7 +745,10 @@ const EmpresaForm: React.FC = () => {
                         type="text"
                         name="horario_fechamento_fim_de_semana"
                         className="form-control"
-                        value={empresa.horario_fechamento_fim_de_semana}
+                        value={empresas.data
+                          ?.find((empresa) => empresa.id === empresaSelecionada)
+                          ?.horario_fechamento_fim_de_semana?.toString()
+                          .slice(0, 5)}
                         onChange={handleChange}
                         placeholder="Ex: 22:00"
                         pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
@@ -610,7 +764,10 @@ const EmpresaForm: React.FC = () => {
                         type="text"
                         name="horario_pausa_inicio"
                         className="form-control"
-                        value={empresa.horario_pausa_inicio}
+                        value={empresas.data
+                          ?.find((empresa) => empresa.id === empresaSelecionada)
+                          ?.horario_pausa_inicio?.toString()
+                          .slice(0, 5)}
                         onChange={handleChange}
                         placeholder="Ex: 12:00"
                         pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
@@ -626,7 +783,10 @@ const EmpresaForm: React.FC = () => {
                         type="text"
                         name="horario_pausa_fim"
                         className="form-control"
-                        value={empresa.horario_pausa_fim}
+                        value={empresas.data
+                          ?.find((empresa) => empresa.id === empresaSelecionada)
+                          ?.horario_pausa_fim?.toString()
+                          .slice(0, 5)}
                         onChange={handleChange}
                         placeholder="Ex: 13:00"
                         pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
@@ -640,6 +800,11 @@ const EmpresaForm: React.FC = () => {
                         accept="image/*"
                         className="form-control"
                         onChange={handleFileChange}
+                        value={
+                          empresas.data?.find(
+                            (empresa) => empresa.id === empresaSelecionada
+                          )?.logo
+                        }
                       />
                     </div>
 
@@ -649,7 +814,11 @@ const EmpresaForm: React.FC = () => {
                         type="text"
                         name="logo"
                         className="form-control"
-                        value={empresa.logo}
+                        value={
+                          empresas.data?.find(
+                            (empresa) => empresa.id === empresaSelecionada
+                          )?.logo
+                        }
                         onChange={handleChange}
                         placeholder="Ou insira a URL da imagem"
                       />
@@ -658,7 +827,11 @@ const EmpresaForm: React.FC = () => {
                     {empresa.logo && (
                       <div className="text-center mb-3">
                         <img
-                          src={empresa.logo}
+                          src={
+                            empresas.data?.find(
+                              (empresa) => empresa.id === empresaSelecionada
+                            )?.logo
+                          }
                           alt="Prévia do logo"
                           className="img-fluid"
                           style={{ maxWidth: "200px", borderRadius: "8px" }}
@@ -671,7 +844,11 @@ const EmpresaForm: React.FC = () => {
                         type="checkbox"
                         name="abre_sabado"
                         className="form-check-input"
-                        checked={empresa.abre_sabado}
+                        checked={
+                          empresas.data?.find(
+                            (empresa) => empresa.id === empresaSelecionada
+                          )?.abre_sabado
+                        }
                         onChange={handleChange}
                       />
                       <label className="form-check-label ms-2">
@@ -684,7 +861,11 @@ const EmpresaForm: React.FC = () => {
                         type="checkbox"
                         name="abre_domingo"
                         className="form-check-input"
-                        checked={empresa.abre_domingo}
+                        checked={
+                          empresas.data?.find(
+                            (empresa) => empresa.id === empresaSelecionada
+                          )?.abre_domingo
+                        }
                         onChange={handleChange}
                       />
                       <label className="form-check-label ms-2">
@@ -697,7 +878,11 @@ const EmpresaForm: React.FC = () => {
                         type="checkbox"
                         name="para_almoço"
                         className="form-check-input"
-                        checked={empresa.para_almoço}
+                        checked={
+                          empresas.data?.find(
+                            (empresa) => empresa.id === empresaSelecionada
+                          )?.para_almoço || false
+                        }
                         onChange={handleChange}
                       />
                       <label className="form-check-label ms-2">
@@ -731,8 +916,17 @@ const EmpresaForm: React.FC = () => {
                 <h2 className="text-center text-primary mb-4">
                   Remoção de Empresa
                 </h2>
-                <div className="mb-3">
-                  <label className="form-label">Selecione uma Empresa para Remover</label>
+                <span className="text-danger text-center">
+                  ATENÇÃO: Esta ação é irreversível!
+                </span>
+                <span className="text-danger text-center">
+                  Todos os funcionários e dados da empresa serão removidos.
+                </span>
+                <br />
+                <div className="mb-3 text-center">
+                  <label className="form-label text-center fw-bold">
+                    Selecione uma Empresa para Remover
+                  </label>
                   <select
                     className="form-select"
                     onChange={(e) =>
@@ -750,7 +944,7 @@ const EmpresaForm: React.FC = () => {
                   </select>
 
                   {empresaSelecionada && (
-                        <button
+                    <button
                       type="submit"
                       className="btn btn-danger w-100 py-2 mt-3"
                       style={{ borderRadius: "8px" }}

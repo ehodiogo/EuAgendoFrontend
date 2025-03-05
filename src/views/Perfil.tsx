@@ -235,34 +235,45 @@ const Profile = () => {
           <p className="text-muted">Válido até: {usage.data?.expira_em}</p>
         </div>
 
-        <div className="card shadow-lg p-4 mt-4 border-warning">
-          <h4 className="text-warning text-center mb-4">
-            Limite de Empresas Criadas
-          </h4>
-          <div className="progress">
-            <div
-              className={`progress-bar ${getProgressBarColor(
-                calculateProgress(
-                  usage.data?.quantia_empresas_criadas || 0,
-                  usage.data?.limite_empresas || 0
-                )
-              )}`}
-              role="progressbar"
-              style={{
-                width: `${calculateProgress(
-                  usage.data?.quantia_empresas_criadas || 0,
-                  usage.data?.limite_empresas || 0
-                )}%`,
-              }}
-              aria-valuenow={usage.data?.quantia_empresas_criadas}
-              aria-valuemin={0}
-              aria-valuemax={5}
-            >
-              {usage.data?.quantia_empresas_criadas}/
-              {usage.data?.limite_empresas} Empresas Criadas
+        {(usage.data?.quantia_empresas_criadas && usage.data?.quantia_empresas_criadas > 0) && (
+          <div className="card shadow-lg p-4 mt-4 border-warning">
+            <h4 className="text-warning text-center mb-4">
+              Limite de Empresas Criadas
+            </h4>
+            <div className="progress">
+              <div
+                className={`progress-bar ${getProgressBarColor(
+                  calculateProgress(
+                    usage.data?.quantia_empresas_criadas || 0,
+                    usage.data?.limite_empresas || 0
+                  )
+                )}`}
+                role="progressbar"
+                style={{
+                  width: `${calculateProgress(
+                    usage.data?.quantia_empresas_criadas || 0,
+                    usage.data?.limite_empresas || 0
+                  )}%`,
+                }}
+                aria-valuenow={usage.data?.quantia_empresas_criadas}
+                aria-valuemin={0}
+                aria-valuemax={5}
+              >
+                {usage.data?.quantia_empresas_criadas || 0}/
+                {usage.data?.limite_empresas || 0} Empresas Criadas
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {usage.data?.quantia_empresas_criadas === 0 && (
+          <div className="card shadow-lg p-4 mt-4 border-warning">
+            <h4 className="text-warning text-center mb-4">
+              Limite de Empresas Criadas
+            </h4>
+            <p className="text-center">Nenhuma empresa criada.</p>
+            </div>
+        )}
 
         {usage.data?.funcionarios_por_empresa.map((item, index) => (
           <div key={index} className="card shadow-lg p-4 mt-4 border-success">
@@ -298,6 +309,15 @@ const Profile = () => {
             </p>
           </div>
         ))}
+
+        {usage.data?.funcionarios_por_empresa.length === 0 && (
+          <div className="card shadow-lg p-4 mt-4 border-success">
+            <h4 className="text-success text-center mb-4">
+              Limite de Funcionários por Empresa
+            </h4>
+            <p className="text-center">Nenhuma empresa criada para possuir funcionários.</p>
+            </div>
+        )}
 
         <div className="card shadow-lg p-4 mt-4 border-info">
           <h4 className="text-info text-center mb-4">
