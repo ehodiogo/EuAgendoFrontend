@@ -309,9 +309,9 @@ const EmpresaForm: React.FC = () => {
         <h2 className="text-center text-primary mb-4">Formulário de Ação</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className="form-label">Selecione a Ação</label>
+            <label className="form-label text-center">Selecione a Ação</label>
             <select
-              className="form-select"
+              className="form-select text-center"
               onChange={(e) => setAcaoSelecionada(e.target.value)}
               value={acaoSelecionada}
               required

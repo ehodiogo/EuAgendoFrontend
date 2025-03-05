@@ -358,9 +358,9 @@ const ServicoForm: React.FC = () => {
         <h2 className="text-center text-primary mb-4">Formulário de Ação</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className="form-label">Selecione a Ação</label>
+            <label className="form-label text-center">Selecione a Ação</label>
             <select
-              className="form-select"
+              className="form-select text-center"
               onChange={(e) => setAcaoSelecionada(e.target.value)}
               value={acaoSelecionada}
               required
@@ -709,7 +709,7 @@ const ServicoForm: React.FC = () => {
                           }
                         />
                       </div>
-                      
+
                       <button
                         type="submit"
                         className="btn btn-primary w-100 py-2"
@@ -718,7 +718,7 @@ const ServicoForm: React.FC = () => {
                       >
                         {loading ? "Editando..." : "Editar Serviço da Empresa"}
                       </button>
-                  </>
+                    </>
                   )}
                 </>
               )}
@@ -841,8 +841,10 @@ const ServicoForm: React.FC = () => {
                       <label className="form-label">Funcionários</label>
                       <div className="d-flex flex-wrap gap-2">
                         {funcionarios.map(
-                          ({ id, nome, foto_url, servicos }) => (
-                            servicos.some((servico) => servico.id === servicoSelecionado?.id) && (
+                          ({ id, nome, foto_url, servicos }) =>
+                            servicos.some(
+                              (servico) => servico.id === servicoSelecionado?.id
+                            ) && (
                               <div
                                 key={id}
                                 className="d-flex align-items-center gap-2 border p-2 rounded"
@@ -873,8 +875,6 @@ const ServicoForm: React.FC = () => {
                                 </div>
                               </div>
                             )
-
-                          )
                         )}
                       </div>
 

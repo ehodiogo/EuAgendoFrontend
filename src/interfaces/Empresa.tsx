@@ -1,3 +1,5 @@
+import { Funcionario } from "./Funcionario";
+
 interface Servico {
   nome: string;
   preco: number;
@@ -29,6 +31,8 @@ export interface Empresa {
 
   assinatura_ativa: boolean;
   assinatura_vencimento: number;
+
+  funcionarios?: Funcionario[];
 }
 
 export interface EmpresaCreate {
