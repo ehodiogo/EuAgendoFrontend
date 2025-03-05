@@ -5,7 +5,6 @@ import { Empresa } from "../interfaces/Empresa";
 import { useFetch } from "../functions/GetData";
 
 const FuncionarioForm: React.FC = () => {
-  const [acaoSelecionada, setAcaoSelecionada] = useState("");
   const [nome, setNome] = useState("");
   const [fotoUrl, setFotoUrl] = useState("");
   const [fotoArquivo, setFotoArquivo] = useState<File | null>(null);
@@ -28,6 +27,33 @@ const FuncionarioForm: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
+
+    let possui_limite = false;
+
+    try  {
+      const response = await fetch("http://localhost:8000/api/possui-limite/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          usuario_token: token,
+          acao_realizada: "criar_funcionario",
+        })
+      });
+
+      const data = await response.json();
+      possui_limite = data.possui_limite;
+    } catch (error) {
+      console.error("Erro ao verificar limite:", error);
+      alert("Ocorreu um erro ao verificar seu limite de funcionários.");
+    }
+
+    if (!possui_limite) {
+      alert("Você atingiu o limite de funcionários cadastrados.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const formData = new FormData();
@@ -116,186 +142,157 @@ const FuncionarioForm: React.FC = () => {
     <div className="container mt-5">
       <div
         className="card shadow-lg p-4 border-0"
-        style={{ maxWidth: "600px", margin: "auto", borderRadius: "12px" }}
+        style={{ maxWidth: "500px", margin: "auto", borderRadius: "12px" }}
       >
-        <h2 className="text-center text-primary mb-4">Formulário de Ação</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label className="form-label">Selecione a Ação</label>
-              <select
-                className="form-select"
-                onChange={(e) => setAcaoSelecionada(e.target.value)}
-                value={acaoSelecionada}
-                required
-              >
-                <option value="">Escolha uma ação</option>
-                <option value="cadastrar">Cadastrar Funcionário</option>
-                <option value="remover">Remover Funcionário</option>
-                <option value="editar">Editar Funcionário</option>
-                <option value="adicionar-funcionarios">Adicionar Funcionários a Empresa</option>
-                <option value="remover-funcionarios">Remover Funcionários da Empresa</option>
-              </select>
+        <h2 className="text-center text-primary mb-4">
+          Cadastro de Funcionário
+        </h2>
+        {message && (
+          <div className="alert alert-info text-center">{message}</div>
+        )}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label className="form-label">Nome</label>
+            <input
+              type="text"
+              className="form-control"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Foto</label>
+            <div className="form-check">
+              <input
+                type="radio"
+                className="form-check-input"
+                id="urlOption"
+                name="fotoOption"
+                checked={!useFile}
+                onChange={() => setUseFile(false)}
+              />
+              <label className="form-check-label" htmlFor="urlOption">
+                Usar URL
+              </label>
             </div>
+            <div className="form-check">
+              <input
+                type="radio"
+                className="form-check-input"
+                id="fileOption"
+                name="fotoOption"
+                checked={useFile}
+                onChange={() => setUseFile(true)}
+              />
+              <label className="form-check-label" htmlFor="fileOption">
+                Upload de arquivo
+              </label>
+            </div>
+          </div>
 
-            {acaoSelecionada === "cadastrar" && (
-              <>
-                <div
-                  className="card shadow-lg p-4 border-0"
-                  style={{ maxWidth: "500px", margin: "auto", borderRadius: "12px" }}
-                >
-                  <h2 className="text-center text-primary mb-4">
-                    Cadastro de Funcionário
-                  </h2>
-                  {message && (
-                    <div className="alert alert-info text-center">{message}</div>
-                  )}
-                  <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                      <label className="form-label">Nome</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={nome}
-                        onChange={(e) => setNome(e.target.value)}
-                        required
-                      />
-                    </div>
+          {!useFile ? (
+            <div className="mb-3">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Insira a URL da imagem"
+                value={fotoUrl}
+                onChange={(e) => setFotoUrl(e.target.value)}
+                required={!useFile}
+              />
+            </div>
+          ) : (
+            <div className="mb-3">
+              <input
+                type="file"
+                className="form-control"
+                accept="image/*"
+                onChange={(e) =>
+                  setFotoArquivo(e.target.files ? e.target.files[0] : null)
+                }
+                required={useFile}
+              />
+            </div>
+          )}
 
-                    <div className="mb-3">
-                      <label className="form-label">Foto</label>
-                      <div className="form-check">
-                        <input
-                          type="radio"
-                          className="form-check-input"
-                          id="urlOption"
-                          name="fotoOption"
-                          checked={!useFile}
-                          onChange={() => setUseFile(false)}
-                        />
-                        <label className="form-check-label" htmlFor="urlOption">
-                          Usar URL
-                        </label>
-                      </div>
-                      <div className="form-check">
-                        <input
-                          type="radio"
-                          className="form-check-input"
-                          id="fileOption"
-                          name="fotoOption"
-                          checked={useFile}
-                          onChange={() => setUseFile(true)}
-                        />
-                        <label className="form-check-label" htmlFor="fileOption">
-                          Upload de arquivo
-                        </label>
-                      </div>
-                    </div>
-
-                    {!useFile ? (
-                      <div className="mb-3">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Insira a URL da imagem"
-                          value={fotoUrl}
-                          onChange={(e) => setFotoUrl(e.target.value)}
-                          required={!useFile}
-                        />
-                      </div>
-                    ) : (
-                      <div className="mb-3">
-                        <input
-                          type="file"
-                          className="form-control"
-                          accept="image/*"
-                          onChange={(e) =>
-                            setFotoArquivo(e.target.files ? e.target.files[0] : null)
-                          }
-                          required={useFile}
-                        />
-                      </div>
-                    )}
-
-                    <button
-                      type="submit"
-                      className="btn btn-primary w-100 py-2"
-                      style={{ borderRadius: "8px" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Cadastrando..." : "Cadastrar Funcionário"}
-                    </button>
-                  </form>
-                </div>
-
-                {funcionariosCadastrados.length > 0 && (
-                  <div className="mt-5 text-center">
-                    <h3>Funcionários cadastrados</h3>
-                    <p className="text-muted mb-4">
-                      Selecione os funcionários para cadastrar em uma empresa
-                    </p>
-                    <ul className="list-group">
-                      {funcionariosCadastrados.map((func) => (
-                        <li
-                          key={func.id}
-                          className="list-group-item d-flex justify-content-between align-items-center"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedFuncionarios.includes(func)}
-                            onChange={() => toggleSelectFuncionario(func)}
-                          />
-                          {func.nome}
-                          {func.foto && (
-                            <img
-                              src={func.foto}
-                              alt={func.nome}
-                              style={{
-                                width: "50px",
-                                height: "50px",
-                                borderRadius: "50%",
-                              }}
-                            />
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-
-                    {selectedFuncionarios.length > 0 && (
-                      <div className="mt-4">
-                        <h3>Suas empresas cadastrados</h3>
-                        <p className="text-muted mb-4">
-                          Selecione a empresa em que você deseja cadastrar os funcionários
-                        </p>
-                        <ul className="list-group">
-                          {empresas.data?.map((empresa) => (
-                            <li
-                              key={empresa.id}
-                              className="list-group-item d-flex justify-content-between align-items-center"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={selectedEmpresa === empresa}
-                                onChange={() => setSelectedEmpresa(empresa)}
-                              />
-                              {empresa.nome}
-                            </li>
-                          ))}
-                        </ul>
-                        <button
-                          className="btn btn-success mt-3"
-                          onClick={adicionarFuncionariosAEmpresa}
-                        >
-                          Cadastrar Funcionários na Empresa selecionada
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
-          </form>
-        </div>
+          <button
+            type="submit"
+            className="btn btn-primary w-100 py-2"
+            style={{ borderRadius: "8px" }}
+            disabled={loading}
+          >
+            {loading ? "Cadastrando..." : "Cadastrar Funcionário"}
+          </button>
+        </form>
       </div>
+
+      {funcionariosCadastrados.length > 0 && (
+        <div className="mt-5 text-center">
+          <h3>Funcionários cadastrados</h3>
+          <p className="text-muted mb-4">
+            Selecione os funcionários para cadastrar em uma empresa
+          </p>
+          <ul className="list-group">
+            {funcionariosCadastrados.map((func) => (
+              <li
+                key={func.id}
+                className="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedFuncionarios.includes(func)}
+                  onChange={() => toggleSelectFuncionario(func)}
+                />
+                {func.nome}
+                {func.foto && (
+                  <img
+                    src={func.foto}
+                    alt={func.nome}
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      borderRadius: "50%",
+                    }}
+                  />
+                )}
+              </li>
+            ))}
+          </ul>
+
+          {selectedFuncionarios.length > 0 && (
+            <div className="mt-4">
+              <h3>Suas empresas cadastrados</h3>
+              <p className="text-muted mb-4">
+                Selecione a empresa em que você deseja cadastrar os funcionários
+              </p>
+              <ul className="list-group">
+                {empresas.data?.map((empresa) => (
+                  <li
+                    key={empresa.id}
+                    className="list-group-item d-flex justify-content-between align-items-center"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedEmpresa === empresa}
+                      onChange={() => setSelectedEmpresa(empresa)}
+                    />
+                    {empresa.nome}
+                  </li>
+                ))}
+              </ul>
+              <button
+                className="btn btn-success mt-3"
+                onClick={adicionarFuncionariosAEmpresa}
+              >
+                Cadastrar Funcionários na Empresa selecionada
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 

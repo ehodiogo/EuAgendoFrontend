@@ -63,73 +63,111 @@ const EmpresaForm: React.FC = () => {
 
     // TODO: Funcionalidade para cada ação selecionada
     if (acaoSelecionada === "cadastrar") {
-      const formData = new FormData();
 
-      if (empresa.logo) {
-        if (empresa.logo.startsWith("data:image")) {
-          const blob = await fetch(empresa.logo).then((res) => res.blob());
-          formData.append("logo", blob, "logo.png");
-        } else {
-          formData.append("logo", empresa.logo);
-        }
+      const payload_limite = {
+        usuario_token: localStorage.getItem("access_token"),
+        acao_realizada: "criar_empresa",
       }
 
-      const requiredFields = [
-        "nome",
-        "cnpj",
-        "endereco",
-        "telefone",
-        "email",
-        "horario_abertura_dia_semana",
-        "horario_fechamento_dia_semana",
-      ];
-
-      requiredFields.forEach((field) => {
-        formData.append(field, empresa[field as keyof EmpresaCreate] as string || "");
-      });
-
-      formData.append("abre_sabado", empresa.abre_sabado.toString());
-      formData.append("abre_domingo", empresa.abre_domingo.toString());
-      formData.append("para_almoço", empresa.para_almoço.toString());
-
-      formData.append(
-        "horario_abertura_fim_de_semana",
-        empresa.horario_abertura_fim_de_semana || ""
-      );
-      formData.append(
-        "horario_fechamento_fim_de_semana",
-        empresa.horario_fechamento_fim_de_semana || ""
-      );
-
-      formData.append("horario_pausa_inicio", empresa.horario_pausa_inicio || "");
-      formData.append("horario_pausa_fim", empresa.horario_pausa_fim || "");
-
-      const usuario_token = localStorage.getItem("access_token");
-      if (usuario_token) {
-        formData.append("usuario_token", usuario_token);
-      }
-
-      console.log("Form Data:", Object.fromEntries(formData.entries()));
+      let possui_limite = false;
 
       try {
-        const response = await fetch("http://localhost:8000/api/empresa-create/", {
+        const response = await fetch("http://localhost:8000/api/possui-limite/", {
           method: "POST",
-          body: formData,
-        });
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload_limite),
+        })
 
         if (!response.ok) {
-          throw new Error("Erro ao cadastrar empresa.");
+          throw new Error("Erro ao verificar limite de empresas.");
         }
 
         const data = await response.json();
-        console.log("Empresa cadastrada com sucesso:", data);
-        alert("Empresa cadastrada com sucesso!");
-        setEmpresaCriada(true);
+        possui_limite = data.possui_limite;
+        
+        console.log("Possui limite:", possui_limite);
+
       } catch (error) {
         console.error("Erro:", error);
-        alert("Falha ao cadastrar empresa.");
-      } finally {
+        alert("Falha ao verificar limite de empresas."); //TODO: Melhorar esteticamente essas mensagens de alert
+      }
+
+      if (!possui_limite) {
+        alert("Você atingiu o limite de empresas cadastradas.");
         setLoading(false);
+        return;
+      } else {
+
+        const formData = new FormData();
+
+        if (empresa.logo) {
+          if (empresa.logo.startsWith("data:image")) {
+            const blob = await fetch(empresa.logo).then((res) => res.blob());
+            formData.append("logo", blob, "logo.png");
+          } else {
+            formData.append("logo", empresa.logo);
+          }
+        }
+
+        const requiredFields = [
+          "nome",
+          "cnpj",
+          "endereco",
+          "telefone",
+          "email",
+          "horario_abertura_dia_semana",
+          "horario_fechamento_dia_semana",
+        ];
+
+        requiredFields.forEach((field) => {
+          formData.append(field, empresa[field as keyof EmpresaCreate] as string || "");
+        });
+
+        formData.append("abre_sabado", empresa.abre_sabado.toString());
+        formData.append("abre_domingo", empresa.abre_domingo.toString());
+        formData.append("para_almoço", empresa.para_almoço.toString());
+
+        formData.append(
+          "horario_abertura_fim_de_semana",
+          empresa.horario_abertura_fim_de_semana || ""
+        );
+        formData.append(
+          "horario_fechamento_fim_de_semana",
+          empresa.horario_fechamento_fim_de_semana || ""
+        );
+
+        formData.append("horario_pausa_inicio", empresa.horario_pausa_inicio || "");
+        formData.append("horario_pausa_fim", empresa.horario_pausa_fim || "");
+
+        const usuario_token = localStorage.getItem("access_token");
+        if (usuario_token) {
+          formData.append("usuario_token", usuario_token);
+        }
+
+        console.log("Form Data:", Object.fromEntries(formData.entries()));
+
+        try {
+          const response = await fetch("http://localhost:8000/api/empresa-create/", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error("Erro ao cadastrar empresa.");
+          }
+
+          const data = await response.json();
+          console.log("Empresa cadastrada com sucesso:", data);
+          alert("Empresa cadastrada com sucesso!");
+          setEmpresaCriada(true);
+        } catch (error) {
+          console.error("Erro:", error);
+          alert("Falha ao cadastrar empresa.");
+        } finally {
+          setLoading(false);
+        }
       }
     } else if (acaoSelecionada === "remover") {
       
