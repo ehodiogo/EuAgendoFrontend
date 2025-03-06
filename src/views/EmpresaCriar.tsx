@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import InputMask from "react-input-mask";
 import { EmpresaCreate, Empresa } from "../interfaces/Empresa";
 import { Link } from "react-router-dom";
@@ -7,7 +7,10 @@ import { useFetch } from "../functions/GetData";
 const EmpresaForm: React.FC = () => {
   const [acaoSelecionada, setAcaoSelecionada] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  
+  const [abreSabado, setAbreSabado] = useState(false);
+  const [abreDomingo, setAbreDomingo] = useState(false);
+  const [temPausa, setTemPausa] = useState(false);
+
   const [empresa, setEmpresa] = useState<EmpresaCreate>({
     nome: "",
     cnpj: "",
@@ -36,6 +39,14 @@ const EmpresaForm: React.FC = () => {
     )}`
   );
 
+  useEffect(() => {
+
+    setAbreDomingo(false);
+    setAbreSabado(false);
+    setTemPausa(false);
+  
+  }, [empresaSelecionada, acaoSelecionada]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -44,6 +55,18 @@ const EmpresaForm: React.FC = () => {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+
+    if (name === "abre_sabado") {
+      setAbreSabado(checked);
+    }
+
+    if (name === "abre_domingo") {
+      setAbreDomingo(checked);
+    }
+
+    if (name === "para_almoço") {
+      setTemPausa(checked);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +84,6 @@ const EmpresaForm: React.FC = () => {
     e.preventDefault();
     setLoading(true);
 
-    // TODO: Funcionalidade para cada ação selecionada
     if (acaoSelecionada === "cadastrar") {
 
       const payload_limite = {
@@ -454,6 +476,8 @@ const EmpresaForm: React.FC = () => {
                     onChange={handleChange}
                     placeholder="Ex: 10:00"
                     pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                    required={abreSabado || abreDomingo}
+                    disabled={!abreSabado && !abreDomingo}
                   />
                 </div>
 
@@ -470,6 +494,8 @@ const EmpresaForm: React.FC = () => {
                     onChange={handleChange}
                     placeholder="Ex: 22:00"
                     pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                    required={abreSabado || abreDomingo}
+                    disabled={!abreSabado && !abreDomingo}
                   />
                 </div>
 
@@ -485,6 +511,8 @@ const EmpresaForm: React.FC = () => {
                     onChange={handleChange}
                     placeholder="Ex: 12:00"
                     pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                    required={temPausa}
+                    disabled={!temPausa}
                   />
                 </div>
 
@@ -500,6 +528,8 @@ const EmpresaForm: React.FC = () => {
                     onChange={handleChange}
                     placeholder="Ex: 13:00"
                     pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                    required={temPausa}
+                    disabled={!temPausa}
                   />
                 </div>
 
@@ -771,6 +801,8 @@ const EmpresaForm: React.FC = () => {
                         onChange={handleChange}
                         placeholder="Ex: 10:00"
                         pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                        required={abreSabado || abreDomingo}
+                        disabled={!abreSabado && !abreDomingo}
                       />
                     </div>
 
@@ -790,6 +822,8 @@ const EmpresaForm: React.FC = () => {
                         onChange={handleChange}
                         placeholder="Ex: 22:00"
                         pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                        required={abreSabado || abreDomingo}
+                        disabled={!abreSabado && !abreDomingo}
                       />
                     </div>
 
@@ -809,6 +843,8 @@ const EmpresaForm: React.FC = () => {
                         onChange={handleChange}
                         placeholder="Ex: 12:00"
                         pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                        required={temPausa}
+                        disabled={!temPausa}
                       />
                     </div>
 
@@ -828,6 +864,8 @@ const EmpresaForm: React.FC = () => {
                         onChange={handleChange}
                         placeholder="Ex: 13:00"
                         pattern="([01]?[0-9]|2[0-3]):([0-5][0-9])"
+                        required={temPausa}
+                        disabled={!temPausa}
                       />
                     </div>
 
@@ -882,11 +920,9 @@ const EmpresaForm: React.FC = () => {
                         type="checkbox"
                         name="abre_sabado"
                         className="form-check-input"
-                        checked={
-                          empresas.data?.find(
-                            (empresa) => empresa.id === empresaSelecionada
-                          )?.abre_sabado
-                        }
+                        value={empresas.data
+                          ?.find((empresa) => empresa.id === empresaSelecionada)
+                          ?.abre_sabado?.toString()}
                         onChange={handleChange}
                       />
                       <label className="form-check-label ms-2">
@@ -899,11 +935,9 @@ const EmpresaForm: React.FC = () => {
                         type="checkbox"
                         name="abre_domingo"
                         className="form-check-input"
-                        checked={
-                          empresas.data?.find(
-                            (empresa) => empresa.id === empresaSelecionada
-                          )?.abre_domingo
-                        }
+                        value={empresas.data
+                          ?.find((empresa) => empresa.id === empresaSelecionada)
+                          ?.abre_domingo.toString()}
                         onChange={handleChange}
                       />
                       <label className="form-check-label ms-2">
@@ -916,11 +950,9 @@ const EmpresaForm: React.FC = () => {
                         type="checkbox"
                         name="para_almoço"
                         className="form-check-input"
-                        checked={
-                          empresas.data?.find(
-                            (empresa) => empresa.id === empresaSelecionada
-                          )?.para_almoço || false
-                        }
+                        value={empresas.data
+                          ?.find((empresa) => empresa.id === empresaSelecionada)
+                          ?.para_almoço.toString()}
                         onChange={handleChange}
                       />
                       <label className="form-check-label ms-2">
