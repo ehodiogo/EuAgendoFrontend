@@ -3,6 +3,7 @@ import axios from "axios";
 import { Funcionario } from "../interfaces/Funcionario";
 import { Empresa } from "../interfaces/Empresa";
 import { useFetch } from "../functions/GetData";
+import Navbar from "../components/Navbar";
 
 const FuncionarioForm: React.FC = () => {
   const [nome, setNome] = useState("");
@@ -225,299 +226,169 @@ const FuncionarioForm: React.FC = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <div
-        className="card shadow-lg p-4 border-0"
-        style={{ maxWidth: "600px", margin: "auto", borderRadius: "12px" }}
-      >
-        <h2 className="text-center text-primary mb-4">Formulário de Ação</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label text-center">Selecione a Ação</label>
-            <select
-              className="form-select text-center"
-              onChange={(e) => setAcaoSelecionada(e.target.value)}
-              value={acaoSelecionada}
-              required
-            >
-              <option value="">Escolha uma ação</option>
-              <option value="cadastrar">Cadastrar Funcionário</option>
-              <option value="remover">Remover Funcionário</option>
-              <option value="editar">Editar Funcionário</option>
-            </select>
-          </div>
-
-          {acaoSelecionada === "cadastrar" && (
-            <>
-              <div
-                className="card shadow-lg p-4 border-0"
-                style={{
-                  maxWidth: "600px",
-                  margin: "auto",
-                  borderRadius: "12px",
-                }}
+    <>
+      <Navbar />
+      <div className="container mt-5">
+        <div
+          className="card shadow-lg p-4 border-0"
+          style={{ maxWidth: "600px", margin: "auto", borderRadius: "12px" }}
+        >
+          <h2 className="text-center text-primary mb-4">
+            Ações que você pode realizar nos seus Funcionários
+          </h2>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <select
+                className="form-select text-center"
+                onChange={(e) => setAcaoSelecionada(e.target.value)}
+                value={acaoSelecionada}
+                required
               >
-                <h2 className="text-center text-primary mb-4">
-                  Cadastro de Funcionário
-                </h2>
-                {message && (
-                  <div className="alert alert-info text-center">{message}</div>
-                )}
-                <div className="mb-3">
-                  <label className="form-label">Nome</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
-                    required
-                  />
-                </div>
+                <option value="">Escolha uma ação</option>
+                <option value="cadastrar">Cadastrar Funcionário</option>
+                <option value="remover">Remover Funcionário</option>
+                <option value="editar">Editar Funcionário</option>
+              </select>
+            </div>
 
-                <div className="mb-3">
-                  <label className="form-label">Foto</label>
-                  <div className="form-check">
-                    <input
-                      type="radio"
-                      className="form-check-input"
-                      id="urlOption"
-                      name="fotoOption"
-                      checked={!useFile}
-                      onChange={() => setUseFile(false)}
-                    />
-                    <label className="form-check-label" htmlFor="urlOption">
-                      Usar URL
-                    </label>
-                  </div>
-                  <div className="form-check">
-                    <input
-                      type="radio"
-                      className="form-check-input"
-                      id="fileOption"
-                      name="fotoOption"
-                      checked={useFile}
-                      onChange={() => setUseFile(true)}
-                    />
-                    <label className="form-check-label" htmlFor="fileOption">
-                      Upload de arquivo
-                    </label>
-                  </div>
-                </div>
-
-                {!useFile ? (
+            {acaoSelecionada === "cadastrar" && (
+              <>
+                <div
+                  className="card shadow-lg p-4 border-0"
+                  style={{
+                    maxWidth: "600px",
+                    margin: "auto",
+                    borderRadius: "12px",
+                  }}
+                >
+                  <h2 className="text-center text-primary mb-4">
+                    Cadastro de Funcionário
+                  </h2>
+                  {message && (
+                    <div className="alert alert-info text-center">
+                      {message}
+                    </div>
+                  )}
                   <div className="mb-3">
+                    <label className="form-label">Nome</label>
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="Insira a URL da imagem"
-                      value={fotoUrl}
-                      onChange={(e) => setFotoUrl(e.target.value)}
-                      required={!useFile}
+                      value={nome}
+                      onChange={(e) => setNome(e.target.value)}
+                      required
                     />
                   </div>
-                ) : (
+
                   <div className="mb-3">
-                    <input
-                      type="file"
-                      className="form-control"
-                      accept="image/*"
-                      onChange={(e) =>
-                        setFotoArquivo(
-                          e.target.files ? e.target.files[0] : null
-                        )
-                      }
-                      required={useFile}
-                    />
+                    <label className="form-label">Foto</label>
+                    <div className="form-check">
+                      <input
+                        type="radio"
+                        className="form-check-input"
+                        id="urlOption"
+                        name="fotoOption"
+                        checked={!useFile}
+                        onChange={() => setUseFile(false)}
+                      />
+                      <label className="form-check-label" htmlFor="urlOption">
+                        Usar URL
+                      </label>
+                    </div>
+                    <div className="form-check">
+                      <input
+                        type="radio"
+                        className="form-check-input"
+                        id="fileOption"
+                        name="fotoOption"
+                        checked={useFile}
+                        onChange={() => setUseFile(true)}
+                      />
+                      <label className="form-check-label" htmlFor="fileOption">
+                        Upload de arquivo
+                      </label>
+                    </div>
                   </div>
-                )}
 
-                <button
-                  type="submit"
-                  className="btn btn-primary w-100 py-2"
-                  style={{ borderRadius: "8px" }}
-                  disabled={loading}
-                >
-                  {loading ? "Cadastrando..." : "Cadastrar Funcionário"}
-                </button>
-              </div>
-
-              {funcionariosCadastrados.length > 0 && (
-                <div className="mt-5 text-center">
-                  <h3>Funcionários cadastrados</h3>
-                  <p className="text-muted mb-4">
-                    Selecione os funcionários para cadastrar em uma empresa
-                  </p>
-                  <ul className="list-group">
-                    {funcionariosCadastrados.map((func) => (
-                      <li
-                        key={func.id}
-                        className="list-group-item d-flex justify-content-between align-items-center"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedFuncionarios.includes(func)}
-                          onChange={() => toggleSelectFuncionario(func)}
-                        />
-                        {func.nome}
-                        {func.foto && (
-                          <img
-                            src={func.foto}
-                            alt={func.nome}
-                            style={{
-                              width: "50px",
-                              height: "50px",
-                              borderRadius: "50%",
-                            }}
-                          />
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-
-                  {selectedFuncionarios.length > 0 && (
-                    <div className="mt-4">
-                      <h3>Suas empresas cadastrados</h3>
-                      <p className="text-muted mb-4">
-                        Selecione a empresa em que você deseja cadastrar os
-                        funcionários
-                      </p>
-                      <ul className="list-group">
-                        {empresas.data?.map((empresa) => (
-                          <li
-                            key={empresa.id}
-                            className="list-group-item d-flex justify-content-between align-items-center"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedEmpresa === empresa}
-                              onChange={() => setSelectedEmpresa(empresa)}
-                            />
-                            {empresa.nome}
-                          </li>
-                        ))}
-                      </ul>
-                      <button
-                        className="btn btn-success mt-3"
-                        onClick={adicionarFuncionariosAEmpresa}
-                      >
-                        Cadastrar Funcionários na Empresa selecionada
-                      </button>
+                  {!useFile ? (
+                    <div className="mb-3">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Insira a URL da imagem"
+                        value={fotoUrl}
+                        onChange={(e) => setFotoUrl(e.target.value)}
+                        required={!useFile}
+                      />
+                    </div>
+                  ) : (
+                    <div className="mb-3">
+                      <input
+                        type="file"
+                        className="form-control"
+                        accept="image/*"
+                        onChange={(e) =>
+                          setFotoArquivo(
+                            e.target.files ? e.target.files[0] : null
+                          )
+                        }
+                        required={useFile}
+                      />
                     </div>
                   )}
-                </div>
-              )}
-            </>
-          )}
 
-          {acaoSelecionada === "editar" && (
-            <>
-              <div
-                className="card shadow-lg p-4 border-0"
-                style={{
-                  maxWidth: "600px",
-                  margin: "auto",
-                  borderRadius: "12px",
-                }}
-              >
-                <h2 className="text-center text-primary mb-4">
-                  Edição de Funcionário
-                </h2>
-                {message && (
-                  <div className="alert alert-info text-center">{message}</div>
-                )}
-
-                <p className="text-muted mb-4">
-                  Selecione o funcionário que deseja editar
-                </p>
-                <ul className="list-group">
-                  {seusFuncionarios.data?.map((func) => (
-                    <li
-                      key={func.id}
-                      className="list-group-item d-flex justify-content-between align-items-center"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={
-                          selectedFuncionarios.length === 1 &&
-                          selectedFuncionarios[0].id === func.id
-                        }
-                        onChange={() => toggleSelectFuncionario(func)}
-                      />
-                      {func.nome}
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="form-check mt-3">
-                  <input
-                    type="radio"
-                    className="form-check-input"
-                    id="alterar-nome-foto"
-                    checked={acaoEmpresa === "editar_nome_foto"}
-                    onChange={() => setAcaoEmpresa("editar_nome_foto")}
-                  />
-                  <label
-                    className="form-check-label"
-                    htmlFor="alterar-nome-foto"
+                  <button
+                    type="submit"
+                    className="btn btn-primary w-100 py-2"
+                    style={{ borderRadius: "8px" }}
+                    disabled={loading}
                   >
-                    Alterar Nome ou Foto do Funcionário
-                  </label>
+                    {loading ? "Cadastrando..." : "Cadastrar Funcionário"}
+                  </button>
                 </div>
 
-                <div className="form-check mt-3">
-                  <input
-                    type="radio"
-                    className="form-check-input"
-                    id="inserir-em-empresa"
-                    checked={acaoEmpresa === "inserir"}
-                    onChange={() => setAcaoEmpresa("inserir")}
-                  />
-                  <label
-                    className="form-check-label"
-                    htmlFor="inserir-em-empresa"
-                  >
-                    Inserir em uma empresa
-                  </label>
-                </div>
-
-                <div className="form-check mt-2">
-                  <input
-                    type="radio"
-                    className="form-check-input"
-                    id="remover-de-empresa"
-                    checked={acaoEmpresa === "remover"}
-                    onChange={() => setAcaoEmpresa("remover")}
-                  />
-                  <label
-                    className="form-check-label"
-                    htmlFor="remover-de-empresa"
-                  >
-                    Remover de uma empresa
-                  </label>
-                </div>
-
-                {selectedFuncionarios.length > 0 && acaoEmpresa && (
-                  <div className="mt-4">
+                {funcionariosCadastrados.length > 0 && (
+                  <div className="mt-5 text-center">
+                    <h3>Funcionários cadastrados</h3>
                     <p className="text-muted mb-4">
-                      {acaoEmpresa === "inserir"
-                        ? "Selecione a Empresa para Adicionar o Funcionário"
-                        : acaoEmpresa === "remover"
-                        ? "Selecione a Empresa para Remover o Funcionário"
-                        : "Editar Nome ou Foto do Funcionário"}
+                      Selecione os funcionários para cadastrar em uma empresa
                     </p>
                     <ul className="list-group">
-                      {acaoEmpresa === "inserir" &&
-                        empresas?.data
-                          ?.filter(
-                            (empresa) =>
-                              !empresa.funcionarios?.some((func) =>
-                                selectedFuncionarios.some(
-                                  (selectedFunc) =>
-                                    selectedFunc.nome === func.nome
-                                )
-                              )
-                          )
-                          .map((empresa) => (
+                      {funcionariosCadastrados.map((func) => (
+                        <li
+                          key={func.id}
+                          className="list-group-item d-flex justify-content-between align-items-center"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedFuncionarios.includes(func)}
+                            onChange={() => toggleSelectFuncionario(func)}
+                          />
+                          {func.nome}
+                          {func.foto && (
+                            <img
+                              src={func.foto}
+                              alt={func.nome}
+                              style={{
+                                width: "50px",
+                                height: "50px",
+                                borderRadius: "50%",
+                              }}
+                            />
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {selectedFuncionarios.length > 0 && (
+                      <div className="mt-4">
+                        <h3>Suas empresas cadastrados</h3>
+                        <p className="text-muted mb-4">
+                          Selecione a empresa em que você deseja cadastrar os
+                          funcionários
+                        </p>
+                        <ul className="list-group">
+                          {empresas.data?.map((empresa) => (
                             <li
                               key={empresa.id}
                               className="list-group-item d-flex justify-content-between align-items-center"
@@ -530,139 +401,193 @@ const FuncionarioForm: React.FC = () => {
                               {empresa.nome}
                             </li>
                           ))}
+                        </ul>
+                        <button
+                          className="btn btn-success mt-3"
+                          onClick={adicionarFuncionariosAEmpresa}
+                        >
+                          Cadastrar Funcionários na Empresa selecionada
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
 
-                      {acaoEmpresa === "remover" &&
-                        empresas?.data
-                          ?.filter((empresa) =>
-                            empresa.funcionarios?.some((func) =>
-                              selectedFuncionarios.some(
-                                (selectedFunc) =>
-                                  selectedFunc.nome === func.nome
-                              )
+            {acaoSelecionada === "editar" && (
+              <>
+                <div
+                  className="card shadow-lg p-4 border-0"
+                  style={{
+                    maxWidth: "600px",
+                    margin: "auto",
+                    borderRadius: "12px",
+                  }}
+                >
+                  <h2 className="text-center text-primary mb-4">
+                    Edição de Funcionário
+                  </h2>
+                  {message && (
+                    <div className="alert alert-info text-center">
+                      {message}
+                    </div>
+                  )}
+
+                  <p className="text-muted mb-4">
+                    Selecione o funcionário que deseja editar
+                  </p>
+                  <ul className="list-group">
+                    {seusFuncionarios.data?.map((func) => (
+                      <li
+                        key={func.id}
+                        className="list-group-item d-flex justify-content-between align-items-center"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={
+                            selectedFuncionarios.length === 1 &&
+                            selectedFuncionarios[0].id === func.id
+                          }
+                          onChange={() => toggleSelectFuncionario(func)}
+                        />
+                        {func.nome}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="form-check mt-3">
+                    <input
+                      type="radio"
+                      className="form-check-input"
+                      id="alterar-nome-foto"
+                      checked={acaoEmpresa === "editar_nome_foto"}
+                      onChange={() => setAcaoEmpresa("editar_nome_foto")}
+                    />
+                    <label
+                      className="form-check-label"
+                      htmlFor="alterar-nome-foto"
+                    >
+                      Alterar Nome ou Foto do Funcionário
+                    </label>
+                  </div>
+
+                  <div className="form-check mt-3">
+                    <input
+                      type="radio"
+                      className="form-check-input"
+                      id="inserir-em-empresa"
+                      checked={acaoEmpresa === "inserir"}
+                      onChange={() => setAcaoEmpresa("inserir")}
+                    />
+                    <label
+                      className="form-check-label"
+                      htmlFor="inserir-em-empresa"
+                    >
+                      Inserir em uma empresa
+                    </label>
+                  </div>
+
+                  <div className="form-check mt-2">
+                    <input
+                      type="radio"
+                      className="form-check-input"
+                      id="remover-de-empresa"
+                      checked={acaoEmpresa === "remover"}
+                      onChange={() => setAcaoEmpresa("remover")}
+                    />
+                    <label
+                      className="form-check-label"
+                      htmlFor="remover-de-empresa"
+                    >
+                      Remover de uma empresa
+                    </label>
+                  </div>
+
+                  {selectedFuncionarios.length > 0 && acaoEmpresa && (
+                    <div className="mt-4">
+                      <p className="text-muted mb-4">
+                        {acaoEmpresa === "inserir"
+                          ? "Selecione a Empresa para Adicionar o Funcionário"
+                          : acaoEmpresa === "remover"
+                          ? "Selecione a Empresa para Remover o Funcionário"
+                          : "Editar Nome ou Foto do Funcionário"}
+                      </p>
+                      <ul className="list-group">
+                        {acaoEmpresa === "inserir" &&
+                          empresas?.data
+                            ?.filter(
+                              (empresa) =>
+                                !empresa.funcionarios?.some((func) =>
+                                  selectedFuncionarios.some(
+                                    (selectedFunc) =>
+                                      selectedFunc.nome === func.nome
+                                  )
+                                )
                             )
-                          )
-                          .map(
-                            (empresa) => (
-                              (
-                                <li
-                                  key={empresa.id}
-                                  className="list-group-item d-flex justify-content-between align-items-center"
-                                >
-                                  <input
-                                    type="checkbox"
-                                    checked={selectedEmpresa === empresa}
-                                    onChange={() => setSelectedEmpresa(empresa)}
-                                  />
-                                  {empresa.nome}
-                                </li>
-                              )
-                            )
-                          )}
-                    </ul>
-
-                    {acaoEmpresa === "editar_nome_foto" &&
-                      selectedFuncionarios.length === 1 && (
-                        <div className="p-4 border rounded shadow-sm">
-                          <h5>Editar Nome ou Foto de Funcionários</h5>
-
-                          {selectedFuncionarios.map((func, index) => (
-                            <div key={func.id} className="mb-4">
-                              <h6>Funcionário: {func.nome}</h6>
-
-                              {/* Campo para alterar o nome */}
-                              <div className="mb-3">
-                                <label className="form-label">Novo Nome</label>
+                            .map((empresa) => (
+                              <li
+                                key={empresa.id}
+                                className="list-group-item d-flex justify-content-between align-items-center"
+                              >
                                 <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Novo Nome"
-                                  value={func.nome}
-                                  onChange={(e) => {
-                                    const updatedFuncionarios = [
-                                      ...selectedFuncionarios,
-                                    ];
-                                    updatedFuncionarios[index].nome =
-                                      e.target.value;
-                                    setSelectedFuncionarios(
-                                      updatedFuncionarios
-                                    );
-                                  }}
+                                  type="checkbox"
+                                  checked={selectedEmpresa === empresa}
+                                  onChange={() => setSelectedEmpresa(empresa)}
                                 />
-                              </div>
+                                {empresa.nome}
+                              </li>
+                            ))}
 
-                              {/* Opções para alterar a foto */}
-                              <div className="mb-3">
-                                <label className="form-label">Nova Foto</label>
-                                <div className="form-check">
-                                  <input
-                                    type="radio"
-                                    className="form-check-input"
-                                    id={`urlOption-${func.id}`}
-                                    name={`fotoOption-${func.id}`}
-                                    checked={!useFiles[index]}
-                                    onChange={() => {
-                                      const updatedFuncionarios = [
-                                        ...selectedFuncionarios,
-                                      ];
-                                      updatedFuncionarios[index].foto = "";
-                                      setSelectedFuncionarios(
-                                        updatedFuncionarios
-                                      );
-                                      // Atualiza o estado useFiles para false
-                                      const updatedUseFiles = [...useFiles];
-                                      updatedUseFiles[index] = false;
-                                      setUseFiles(updatedUseFiles);
-                                    }}
-                                  />
-                                  <label
-                                    className="form-check-label"
-                                    htmlFor={`urlOption-${func.id}`}
-                                  >
-                                    Usar URL
-                                  </label>
-                                </div>
-                                <div className="form-check">
-                                  <input
-                                    type="radio"
-                                    className="form-check-input"
-                                    id={`fileOption-${func.id}`}
-                                    name={`fotoOption-${func.id}`}
-                                    checked={useFiles[index]}
-                                    onChange={() => {
-                                      const updatedFuncionarios = [
-                                        ...selectedFuncionarios,
-                                      ];
-                                      updatedFuncionarios[index].foto = "";
-                                      setSelectedFuncionarios(
-                                        updatedFuncionarios
-                                      );
-                                      // Atualiza o estado useFiles para true
-                                      const updatedUseFiles = [...useFiles];
-                                      updatedUseFiles[index] = true;
-                                      setUseFiles(updatedUseFiles);
-                                    }}
-                                  />
-                                  <label
-                                    className="form-check-label"
-                                    htmlFor={`fileOption-${func.id}`}
-                                  >
-                                    Upload de arquivo
-                                  </label>
-                                </div>
-                              </div>
+                        {acaoEmpresa === "remover" &&
+                          empresas?.data
+                            ?.filter((empresa) =>
+                              empresa.funcionarios?.some((func) =>
+                                selectedFuncionarios.some(
+                                  (selectedFunc) =>
+                                    selectedFunc.nome === func.nome
+                                )
+                              )
+                            )
+                            .map((empresa) => (
+                              <li
+                                key={empresa.id}
+                                className="list-group-item d-flex justify-content-between align-items-center"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedEmpresa === empresa}
+                                  onChange={() => setSelectedEmpresa(empresa)}
+                                />
+                                {empresa.nome}
+                              </li>
+                            ))}
+                      </ul>
 
-                              {!useFiles[index] ? (
+                      {acaoEmpresa === "editar_nome_foto" &&
+                        selectedFuncionarios.length === 1 && (
+                          <div className="p-4 border rounded shadow-sm">
+                            <h5>Editar Nome ou Foto de Funcionários</h5>
+
+                            {selectedFuncionarios.map((func, index) => (
+                              <div key={func.id} className="mb-4">
+                                <h6>Funcionário: {func.nome}</h6>
+
+                                {/* Campo para alterar o nome */}
                                 <div className="mb-3">
+                                  <label className="form-label">
+                                    Novo Nome
+                                  </label>
                                   <input
                                     type="text"
                                     className="form-control"
-                                    placeholder="Insira a URL da nova imagem"
-                                    value={func.foto || ""}
+                                    placeholder="Novo Nome"
+                                    value={func.nome}
                                     onChange={(e) => {
                                       const updatedFuncionarios = [
                                         ...selectedFuncionarios,
                                       ];
-                                      updatedFuncionarios[index].foto =
+                                      updatedFuncionarios[index].nome =
                                         e.target.value;
                                       setSelectedFuncionarios(
                                         updatedFuncionarios
@@ -670,98 +595,182 @@ const FuncionarioForm: React.FC = () => {
                                     }}
                                   />
                                 </div>
-                              ) : (
+
+                                {/* Opções para alterar a foto */}
                                 <div className="mb-3">
-                                  <input
-                                    type="file"
-                                    className="form-control"
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                      const updatedFuncionarios = [
-                                        ...selectedFuncionarios,
-                                      ];
-                                      updatedFuncionarios[index].foto = e.target
-                                        .files
-                                        ? e.target.files[0].name
-                                        : "";
-                                      setSelectedFuncionarios(
-                                        updatedFuncionarios
-                                      );
-                                    }}
-                                  />
+                                  <label className="form-label">
+                                    Nova Foto
+                                  </label>
+                                  <div className="form-check">
+                                    <input
+                                      type="radio"
+                                      className="form-check-input"
+                                      id={`urlOption-${func.id}`}
+                                      name={`fotoOption-${func.id}`}
+                                      checked={!useFiles[index]}
+                                      onChange={() => {
+                                        const updatedFuncionarios = [
+                                          ...selectedFuncionarios,
+                                        ];
+                                        updatedFuncionarios[index].foto = "";
+                                        setSelectedFuncionarios(
+                                          updatedFuncionarios
+                                        );
+                                        // Atualiza o estado useFiles para false
+                                        const updatedUseFiles = [...useFiles];
+                                        updatedUseFiles[index] = false;
+                                        setUseFiles(updatedUseFiles);
+                                      }}
+                                    />
+                                    <label
+                                      className="form-check-label"
+                                      htmlFor={`urlOption-${func.id}`}
+                                    >
+                                      Usar URL
+                                    </label>
+                                  </div>
+                                  <div className="form-check">
+                                    <input
+                                      type="radio"
+                                      className="form-check-input"
+                                      id={`fileOption-${func.id}`}
+                                      name={`fotoOption-${func.id}`}
+                                      checked={useFiles[index]}
+                                      onChange={() => {
+                                        const updatedFuncionarios = [
+                                          ...selectedFuncionarios,
+                                        ];
+                                        updatedFuncionarios[index].foto = "";
+                                        setSelectedFuncionarios(
+                                          updatedFuncionarios
+                                        );
+                                        // Atualiza o estado useFiles para true
+                                        const updatedUseFiles = [...useFiles];
+                                        updatedUseFiles[index] = true;
+                                        setUseFiles(updatedUseFiles);
+                                      }}
+                                    />
+                                    <label
+                                      className="form-check-label"
+                                      htmlFor={`fileOption-${func.id}`}
+                                    >
+                                      Upload de arquivo
+                                    </label>
+                                  </div>
                                 </div>
-                              )}
 
-                              <button
-                                type="button"
-                                className="btn btn-primary w-100 text-center align-items-center"
-                                onClick={handleSubmit}
-                              >
-                                Salvar Alterações do Funcionário
-                              </button>
-                            </div>
-                          ))}
-                        </div>
+                                {!useFiles[index] ? (
+                                  <div className="mb-3">
+                                    <input
+                                      type="text"
+                                      className="form-control"
+                                      placeholder="Insira a URL da nova imagem"
+                                      value={func.foto || ""}
+                                      onChange={(e) => {
+                                        const updatedFuncionarios = [
+                                          ...selectedFuncionarios,
+                                        ];
+                                        updatedFuncionarios[index].foto =
+                                          e.target.value;
+                                        setSelectedFuncionarios(
+                                          updatedFuncionarios
+                                        );
+                                      }}
+                                    />
+                                  </div>
+                                ) : (
+                                  <div className="mb-3">
+                                    <input
+                                      type="file"
+                                      className="form-control"
+                                      accept="image/*"
+                                      onChange={(e) => {
+                                        const updatedFuncionarios = [
+                                          ...selectedFuncionarios,
+                                        ];
+                                        updatedFuncionarios[index].foto = e
+                                          .target.files
+                                          ? e.target.files[0].name
+                                          : "";
+                                        setSelectedFuncionarios(
+                                          updatedFuncionarios
+                                        );
+                                      }}
+                                    />
+                                  </div>
+                                )}
+
+                                <button
+                                  type="button"
+                                  className="btn btn-primary w-100 text-center align-items-center"
+                                  onClick={handleSubmit}
+                                >
+                                  Salvar Alterações do Funcionário
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                      {(acaoEmpresa === "inserir" ||
+                        acaoEmpresa === "remover") && (
+                        <button
+                          className="btn btn-success mt-3 w-100"
+                          onClick={
+                            acaoEmpresa === "inserir"
+                              ? adicionarFuncionariosAEmpresa
+                              : removerFuncionariosDaEmpresa
+                          }
+                        >
+                          {acaoEmpresa === "inserir"
+                            ? "Adicionar Funcionários à Empresa"
+                            : "Remover Funcionários da Empresa"}
+                        </button>
                       )}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
 
-                    {(acaoEmpresa === "inserir" ||
-                      acaoEmpresa === "remover") && (
-                      <button
-                        className="btn btn-success mt-3 w-100"
-                        onClick={
-                          acaoEmpresa === "inserir"
-                            ? adicionarFuncionariosAEmpresa
-                            : removerFuncionariosDaEmpresa
-                        }
-                      >
-                        {acaoEmpresa === "inserir"
-                          ? "Adicionar Funcionários à Empresa"
-                          : "Remover Funcionários da Empresa"}
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            </>
-          )}
+            {acaoSelecionada === "remover" && (
+              <>
+                <h3>Remover Funcionário</h3>
+                <p className="text-muted mb-4">
+                  Selecione o funcionário que deseja remover
+                </p>
+                <ul className="list-group">
+                  {seusFuncionarios.data?.map((func) => (
+                    <li
+                      key={func.id}
+                      className="list-group-item d-flex justify-content-between align-items-center"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedFuncionarios.includes(func)}
+                        onChange={() => toggleSelectFuncionario(func)}
+                      />
+                      {func.nome}
+                    </li>
+                  ))}
+                </ul>
 
-          {acaoSelecionada === "remover" && (
-            <>
-              <h3>Remover Funcionário</h3>
-              <p className="text-muted mb-4">
-                Selecione o funcionário que deseja remover
-              </p>
-              <ul className="list-group">
-                {seusFuncionarios.data?.map((func) => (
-                  <li
-                    key={func.id}
-                    className="list-group-item d-flex justify-content-between align-items-center"
+                {selectedFuncionarios.length > 0 && (
+                  <button
+                    type="submit"
+                    className="btn btn-danger w-100 py-2 mt-4"
+                    style={{ borderRadius: "8px" }}
+                    disabled={loading}
                   >
-                    <input
-                      type="checkbox"
-                      checked={selectedFuncionarios.includes(func)}
-                      onChange={() => toggleSelectFuncionario(func)}
-                    />
-                    {func.nome}
-                  </li>
-                ))}
-              </ul>
-
-              {selectedFuncionarios.length > 0 && (
-                <button
-                  type="submit"
-                  className="btn btn-danger w-100 py-2 mt-4"
-                  style={{ borderRadius: "8px" }}
-                  disabled={loading}
-                >
-                  {loading ? "Removendo..." : "Remover Funcionários"}
-                </button>
-              )}
-            </>
-          )}
-        </form>
+                    {loading ? "Removendo..." : "Remover Funcionários"}
+                  </button>
+                )}
+              </>
+            )}
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

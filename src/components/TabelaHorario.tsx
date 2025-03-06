@@ -127,7 +127,7 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
             agendamento.
           </p>
         </div>
-      ) : (
+      ) : servicos.length > 0 ? (
         <HorariosDoDia
           key={dataSelecionadaString}
           empresa={empresa}
@@ -135,6 +135,11 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
           funcionario_id={funcionario_id}
           servicos={servicos}
         />
+      ) : (
+        <div className="alert alert-info text-center">
+          <h4>⚠ Nenhum serviço disponível</h4>
+          <p>Este funcionário não tem serviços cadastrados na empresa ainda.</p>
+        </div>
       )}
     </div>
   );

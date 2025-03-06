@@ -3,6 +3,7 @@ import InputMask from "react-input-mask";
 import { EmpresaCreate, Empresa } from "../interfaces/Empresa";
 import { Link } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
+import Navbar from "../components/Navbar";
 
 const EmpresaForm: React.FC = () => {
   const [acaoSelecionada, setAcaoSelecionada] = useState<string>("");
@@ -323,15 +324,16 @@ const EmpresaForm: React.FC = () => {
 
 
   return (
+    <>
+    <Navbar />
     <div className="container mt-5">
       <div
         className="card shadow-lg p-4 border-0"
         style={{ maxWidth: "600px", margin: "auto", borderRadius: "12px" }}
       >
-        <h2 className="text-center text-primary mb-4">Formulário de Ação</h2>
+        <h2 className="text-center text-primary mb-4">Ações que você pode realizar nas suas Empresas</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className="form-label text-center">Selecione a Ação</label>
             <select
               className="form-select text-center"
               onChange={(e) => setAcaoSelecionada(e.target.value)}
@@ -1031,7 +1033,7 @@ const EmpresaForm: React.FC = () => {
 
         {empresaCriada && (
           <Link
-            to={`/criar-funcionario/${empresa.nome}`}
+            to={`/criar-funcionario`}
             className="btn btn-secondary w-100 mt-3"
           >
             Criar Funcionarios para a Empresa
@@ -1039,6 +1041,7 @@ const EmpresaForm: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

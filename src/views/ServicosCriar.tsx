@@ -5,6 +5,7 @@ import axios from "axios";
 import { Empresa } from "../interfaces/Empresa";
 import { useFetch } from "../functions/GetData";
 import { Servico } from "../interfaces/Servico";
+import Navbar from "../components/Navbar";
 
 const ServicoForm: React.FC = () => {
   const [acaoSelecionada, setAcaoSelecionada] = useState<string>("");
@@ -350,179 +351,476 @@ const ServicoForm: React.FC = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <div
-        className="card shadow-lg p-4 border-0"
-        style={{ maxWidth: "600px", margin: "auto", borderRadius: "12px" }}
-      >
-        <h2 className="text-center text-primary mb-4">Formulário de Ação</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label text-center">Selecione a Ação</label>
-            <select
-              className="form-select text-center"
-              onChange={(e) => setAcaoSelecionada(e.target.value)}
-              value={acaoSelecionada}
-              required
-            >
-              <option value="">Escolha uma ação</option>
-              <option value="cadastrar">Cadastrar Serviço</option>
-              <option value="adicionar">
-                Adicionar Serviço a Funcionários
-              </option>
-              <option value="remover-funcionarios">
-                Remover Serviço de Funcionários
-              </option>
-              <option value="remover">Remover Serviço</option>
-              <option value="editar">Editar Serviço</option>
-            </select>
-          </div>
-
-          {acaoSelecionada === "cadastrar" && (
-            <>
-              <div className="mb-3">
-                <label className="form-label">Nome</label>
-                <input
-                  type="text"
-                  name="nome"
-                  className="form-control"
-                  value={servico.nome}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Descrição</label>
-                <textarea
-                  name="descricao"
-                  className="form-control"
-                  value={servico.descricao}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Duração</label>
-                <input
-                  type="text"
-                  name="duracao"
-                  className="form-control"
-                  value={servico.duracao}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Preço</label>
-                <input
-                  type="text"
-                  name="preco"
-                  className="form-control"
-                  value={servico.preco}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Selecione uma Empresa</label>
-                <select
-                  className="form-select"
-                  onChange={(e) =>
-                    setEmpresaSelecionada(Number(e.target.value))
-                  }
-                  value={empresaSelecionada || ""}
-                  required
-                >
-                  <option value="">Escolha uma empresa</option>
-                  {empresas.data?.map((empresa) => (
-                    <option key={empresa.id} value={empresa.id}>
-                      {empresa.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Funcionários</label>
-                <div className="d-flex flex-wrap gap-2">
-                  {funcionarios.map(({ id, nome, foto_url, servicos }) => (
-                    <div
-                      key={id}
-                      className="d-flex align-items-center gap-2 border p-2 rounded"
-                    >
-                      <img
-                        src={foto_url}
-                        alt={nome}
-                        className="rounded-circle"
-                        width="40"
-                        height="40"
-                      />
-                      <span>{nome}</span>
-                      <input
-                        type="checkbox"
-                        checked={servico.funcionarios.includes(id)}
-                        onChange={() => handleFuncionarioChange(id)}
-                      />
-                      <div className="text-muted">
-                        <strong>Serviços Associados:</strong>
-                        <ul>
-                          {servicos.map((servico) => (
-                            <li key={servico.id}>
-                              {servico.nome} - {servico.preco} -{" "}
-                              {servico.duracao} minutos
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="btn btn-primary w-100 py-2"
-                style={{ borderRadius: "8px" }}
-                disabled={loading}
+    <>
+      <Navbar />
+      <div className="container mt-5">
+        <div
+          className="card shadow-lg p-4 border-0"
+          style={{ maxWidth: "600px", margin: "auto", borderRadius: "12px" }}
+        >
+          <h2 className="text-center text-primary mb-4">
+            Ações que você pode realizar nos seus Serviços
+          </h2>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <select
+                className="form-select text-center"
+                onChange={(e) => setAcaoSelecionada(e.target.value)}
+                value={acaoSelecionada}
+                required
               >
-                {loading ? "Cadastrando..." : "Cadastrar Serviço"}
-              </button>
-            </>
-          )}
+                <option value="">Escolha uma ação</option>
+                <option value="cadastrar">Cadastrar Serviço</option>
+                <option value="adicionar">
+                  Adicionar Serviço a Funcionários
+                </option>
+                <option value="remover-funcionarios">
+                  Remover Serviço de Funcionários
+                </option>
+                <option value="remover">Remover Serviço</option>
+                <option value="editar">Editar Serviço</option>
+              </select>
+            </div>
 
-          {acaoSelecionada === "adicionar" && (
-            <>
-              <div className="mb-3">
-                <label className="form-label">Escolha uma Empresa</label>
-                <select
-                  className="form-select"
-                  onChange={(e) => {
-                    const empresaId = Number(e.target.value);
-                    setEmpresaSelecionada(empresaId);
-                    setServicoSelecionado(undefined);
-                  }}
-                  value={empresaSelecionada || ""}
-                  required
+            {acaoSelecionada === "cadastrar" && (
+              <>
+                <div className="mb-3">
+                  <label className="form-label">Nome</label>
+                  <input
+                    type="text"
+                    name="nome"
+                    className="form-control"
+                    value={servico.nome}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Descrição</label>
+                  <textarea
+                    name="descricao"
+                    className="form-control"
+                    value={servico.descricao}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Duração</label>
+                  <input
+                    type="text"
+                    name="duracao"
+                    className="form-control"
+                    value={servico.duracao}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Preço</label>
+                  <input
+                    type="text"
+                    name="preco"
+                    className="form-control"
+                    value={servico.preco}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Selecione uma Empresa</label>
+                  <select
+                    className="form-select"
+                    onChange={(e) =>
+                      setEmpresaSelecionada(Number(e.target.value))
+                    }
+                    value={empresaSelecionada || ""}
+                    required
+                  >
+                    <option value="">Escolha uma empresa</option>
+                    {empresas.data?.map((empresa) => (
+                      <option key={empresa.id} value={empresa.id}>
+                        {empresa.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Funcionários</label>
+                  <div className="d-flex flex-wrap gap-2">
+                    {funcionarios.map(({ id, nome, foto_url, servicos }) => (
+                      <div
+                        key={id}
+                        className="d-flex align-items-center gap-2 border p-2 rounded"
+                      >
+                        <img
+                          src={foto_url}
+                          alt={nome}
+                          className="rounded-circle"
+                          width="40"
+                          height="40"
+                        />
+                        <span>{nome}</span>
+                        <input
+                          type="checkbox"
+                          checked={servico.funcionarios.includes(id)}
+                          onChange={() => handleFuncionarioChange(id)}
+                        />
+                        <div className="text-muted">
+                          <strong>Serviços Associados:</strong>
+                          <ul>
+                            {servicos.map((servico) => (
+                              <li key={servico.id}>
+                                {servico.nome} - {servico.preco} -{" "}
+                                {servico.duracao} minutos
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn btn-primary w-100 py-2"
+                  style={{ borderRadius: "8px" }}
+                  disabled={loading}
                 >
-                  <option value="">Escolha uma empresa</option>
-                  {empresas.data?.map((empresa) => (
-                    <option key={empresa.id} value={empresa.id}>
-                      {empresa.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  {loading ? "Cadastrando..." : "Cadastrar Serviço"}
+                </button>
+              </>
+            )}
 
-              {empresaSelecionada &&
-                (console.log("Empresa selecionada", empresaSelecionada),
-                console.log("Serviços da empresa", servicosEmpresa),
-                (
+            {acaoSelecionada === "adicionar" && (
+              <>
+                <div className="mb-3">
+                  <label className="form-label">Escolha uma Empresa</label>
+                  <select
+                    className="form-select"
+                    onChange={(e) => {
+                      const empresaId = Number(e.target.value);
+                      setEmpresaSelecionada(empresaId);
+                      setServicoSelecionado(undefined);
+                    }}
+                    value={empresaSelecionada || ""}
+                    required
+                  >
+                    <option value="">Escolha uma empresa</option>
+                    {empresas.data?.map((empresa) => (
+                      <option key={empresa.id} value={empresa.id}>
+                        {empresa.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {empresaSelecionada &&
+                  (console.log("Empresa selecionada", empresaSelecionada),
+                  console.log("Serviços da empresa", servicosEmpresa),
+                  (
+                    <>
+                      <div className="mb-3">
+                        <label className="form-label">Escolha um Serviço</label>
+                        <select
+                          className="form-select"
+                          onChange={(e) => {
+                            const servicoId = Number(e.target.value);
+                            setServicoSelecionado(
+                              servicosEmpresa.find(
+                                (servico) => servico.id === servicoId
+                              )
+                            );
+                          }}
+                          value={servicoSelecionado?.id || ""}
+                          required
+                        >
+                          <option value="">Escolha um serviço</option>
+                          {servicosEmpresa.map((servico) => (
+                            <option key={servico.id} value={servico.id}>
+                              {servico.nome} - {servico.preco} -{" "}
+                              {servico.duracao} min
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {servicoSelecionado && (
+                        <div className="mb-3">
+                          <label className="form-label">Funcionários</label>
+                          <div className="d-flex flex-wrap gap-2">
+                            {funcionarios.map(
+                              ({ id, nome, foto_url, servicos }) => (
+                                <div
+                                  key={id}
+                                  className="d-flex align-items-center gap-2 border p-2 rounded"
+                                >
+                                  <img
+                                    src={foto_url}
+                                    alt={nome}
+                                    className="rounded-circle"
+                                    width="40"
+                                    height="40"
+                                  />
+                                  <span>{nome}</span>
+                                  <input
+                                    type="checkbox"
+                                    checked={servico.funcionarios.includes(id)}
+                                    onChange={() => handleFuncionarioChange(id)}
+                                  />
+                                  <div className="text-muted">
+                                    <strong>Serviços Associados:</strong>
+                                    <ul>
+                                      {servicos.map((servico) => (
+                                        <li key={servico.id}>
+                                          {servico.nome} - {servico.preco} -{" "}
+                                          {servico.duracao} minutos
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                </div>
+                              )
+                            )}
+                          </div>
+
+                          <button
+                            type="submit"
+                            className="btn btn-primary w-100 py-2 mt-3"
+                            style={{ borderRadius: "8px" }}
+                            disabled={loading}
+                          >
+                            {loading
+                              ? "Adicionando..."
+                              : "Adicionar Serviço aos Funcionários"}
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ))}
+              </>
+            )}
+
+            {acaoSelecionada === "editar" && (
+              <>
+                <div className="mb-3">
+                  <label className="form-label">Selecione uma Empresa</label>
+                  <select
+                    className="form-select"
+                    onChange={(e) =>
+                      setEmpresaSelecionada(Number(e.target.value))
+                    }
+                    value={empresaSelecionada || ""}
+                    required
+                  >
+                    <option value="">Escolha uma empresa</option>
+                    {empresas.data?.map((empresa) => (
+                      <option key={empresa.id} value={empresa.id}>
+                        {empresa.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {empresaSelecionada && (
                   <>
                     <div className="mb-3">
-                      <label className="form-label">Escolha um Serviço</label>
+                      <label className="form-label">Selecione um Serviço</label>
+                      <select
+                        className="form-select"
+                        onChange={(e) => {
+                          const servicoId = Number(e.target.value);
+                          setServicoSelecionado(
+                            servicosEmpresa.find(
+                              (servico) => servico.id === servicoId
+                            )
+                          );
+                        }}
+                        value={servicoSelecionado?.id || ""}
+                        required
+                      >
+                        <option value="">Escolha um serviço</option>
+                        {servicosEmpresa.map((servico) => (
+                          <option key={servico.id} value={servico.id}>
+                            {servico.nome} - {servico.preco} - {servico.duracao}{" "}
+                            min
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {servicoSelecionado && (
+                      <>
+                        <div className="mb-3">
+                          <label className="form-label">Nome</label>
+
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={servicoSelecionado.nome}
+                            onChange={(e) =>
+                              setServicoSelecionado({
+                                ...servicoSelecionado,
+                                nome: e.target.value,
+                              })
+                            }
+                          />
+
+                          <label className="form-label">Descrição</label>
+
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={servicoSelecionado.descricao}
+                            onChange={(e) =>
+                              setServicoSelecionado({
+                                ...servicoSelecionado,
+                                descricao: e.target.value,
+                              })
+                            }
+                          />
+
+                          <label className="form-label">Duração</label>
+
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={servicoSelecionado.duracao}
+                            onChange={(e) =>
+                              setServicoSelecionado({
+                                ...servicoSelecionado,
+                                duracao: e.target.value,
+                              })
+                            }
+                          />
+
+                          <label className="form-label">Preço</label>
+
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={servicoSelecionado.preco}
+                            onChange={(e) =>
+                              setServicoSelecionado({
+                                ...servicoSelecionado,
+                                preco: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="btn btn-primary w-100 py-2"
+                          style={{ borderRadius: "8px" }}
+                          disabled={loading}
+                        >
+                          {loading
+                            ? "Editando..."
+                            : "Editar Serviço da Empresa"}
+                        </button>
+                      </>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+
+            {acaoSelecionada === "remover" && (
+              <>
+                <div className="mb-3">
+                  <label className="form-label">Selecione uma Empresa</label>
+                  <select
+                    className="form-select"
+                    onChange={(e) =>
+                      setEmpresaSelecionada(Number(e.target.value))
+                    }
+                    value={empresaSelecionada || ""}
+                    required
+                  >
+                    <option value="">Escolha uma empresa</option>
+                    {empresas.data?.map((empresa) => (
+                      <option key={empresa.id} value={empresa.id}>
+                        {empresa.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {empresaSelecionada && (
+                  <>
+                    <div className="mb-3">
+                      <label className="form-label">Selecione um Serviço</label>
+                      <select
+                        className="form-select"
+                        onChange={(e) => {
+                          const servicoId = Number(e.target.value);
+                          setServicoSelecionado(
+                            servicosEmpresa.find(
+                              (servico) => servico.id === servicoId
+                            )
+                          );
+                        }}
+                        value={servicoSelecionado?.id || ""}
+                        required
+                      >
+                        <option value="">Escolha um serviço</option>
+                        {servicosEmpresa.map((servico) => (
+                          <option key={servico.id} value={servico.id}>
+                            {servico.nome} - {servico.preco} - {servico.duracao}{" "}
+                            min
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {servicoSelecionado && (
+                      <button
+                        type="submit"
+                        className="btn btn-primary w-100 py-2"
+                        style={{ borderRadius: "8px" }}
+                        disabled={loading}
+                      >
+                        {loading
+                          ? "Removendo..."
+                          : "Remover Serviço da Empresa"}
+                      </button>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+
+            {acaoSelecionada === "remover-funcionarios" && (
+              <>
+                <div className="mb-3">
+                  <label className="form-label">Selecione uma Empresa</label>
+                  <select
+                    className="form-select"
+                    onChange={(e) =>
+                      setEmpresaSelecionada(Number(e.target.value))
+                    }
+                    value={empresaSelecionada || ""}
+                    required
+                  >
+                    <option value="">Escolha uma empresa</option>
+                    {empresas.data?.map((empresa) => (
+                      <option key={empresa.id} value={empresa.id}>
+                        {empresa.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {empresaSelecionada && (
+                  <>
+                    <div className="mb-3">
+                      <label className="form-label">Selecione um Serviço</label>
                       <select
                         className="form-select"
                         onChange={(e) => {
@@ -551,37 +849,41 @@ const ServicoForm: React.FC = () => {
                         <label className="form-label">Funcionários</label>
                         <div className="d-flex flex-wrap gap-2">
                           {funcionarios.map(
-                            ({ id, nome, foto_url, servicos }) => (
-                              <div
-                                key={id}
-                                className="d-flex align-items-center gap-2 border p-2 rounded"
-                              >
-                                <img
-                                  src={foto_url}
-                                  alt={nome}
-                                  className="rounded-circle"
-                                  width="40"
-                                  height="40"
-                                />
-                                <span>{nome}</span>
-                                <input
-                                  type="checkbox"
-                                  checked={servico.funcionarios.includes(id)}
-                                  onChange={() => handleFuncionarioChange(id)}
-                                />
-                                <div className="text-muted">
-                                  <strong>Serviços Associados:</strong>
-                                  <ul>
-                                    {servicos.map((servico) => (
-                                      <li key={servico.id}>
-                                        {servico.nome} - {servico.preco} -{" "}
-                                        {servico.duracao} minutos
-                                      </li>
-                                    ))}
-                                  </ul>
+                            ({ id, nome, foto_url, servicos }) =>
+                              servicos.some(
+                                (servico) =>
+                                  servico.id === servicoSelecionado?.id
+                              ) && (
+                                <div
+                                  key={id}
+                                  className="d-flex align-items-center gap-2 border p-2 rounded"
+                                >
+                                  <img
+                                    src={foto_url}
+                                    alt={nome}
+                                    className="rounded-circle"
+                                    width="40"
+                                    height="40"
+                                  />
+                                  <span>{nome}</span>
+                                  <input
+                                    type="checkbox"
+                                    checked={servico.funcionarios.includes(id)}
+                                    onChange={() => handleFuncionarioChange(id)}
+                                  />
+                                  <div className="text-muted">
+                                    <strong>Serviços Associados:</strong>
+                                    <ul>
+                                      {servicos.map((servico) => (
+                                        <li key={servico.id}>
+                                          {servico.nome} - {servico.preco} -{" "}
+                                          {servico.duracao} minutos
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
                                 </div>
-                              </div>
-                            )
+                              )
                           )}
                         </div>
 
@@ -592,311 +894,19 @@ const ServicoForm: React.FC = () => {
                           disabled={loading}
                         >
                           {loading
-                            ? "Adicionando..."
-                            : "Adicionar Serviço aos Funcionários"}
+                            ? "Removendo..."
+                            : "Remover Serviço dos Funcionários"}
                         </button>
                       </div>
                     )}
                   </>
-                ))}
-            </>
-          )}
-
-          {acaoSelecionada === "editar" && (
-            <>
-              <div className="mb-3">
-                <label className="form-label">Selecione uma Empresa</label>
-                <select
-                  className="form-select"
-                  onChange={(e) =>
-                    setEmpresaSelecionada(Number(e.target.value))
-                  }
-                  value={empresaSelecionada || ""}
-                  required
-                >
-                  <option value="">Escolha uma empresa</option>
-                  {empresas.data?.map((empresa) => (
-                    <option key={empresa.id} value={empresa.id}>
-                      {empresa.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {empresaSelecionada && (
-                <>
-                  <div className="mb-3">
-                    <label className="form-label">Selecione um Serviço</label>
-                    <select
-                      className="form-select"
-                      onChange={(e) => {
-                        const servicoId = Number(e.target.value);
-                        setServicoSelecionado(
-                          servicosEmpresa.find(
-                            (servico) => servico.id === servicoId
-                          )
-                        );
-                      }}
-                      value={servicoSelecionado?.id || ""}
-                      required
-                    >
-                      <option value="">Escolha um serviço</option>
-                      {servicosEmpresa.map((servico) => (
-                        <option key={servico.id} value={servico.id}>
-                          {servico.nome} - {servico.preco} - {servico.duracao}{" "}
-                          min
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {servicoSelecionado && (
-                    <>
-                      <div className="mb-3">
-                        <label className="form-label">Nome</label>
-
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={servicoSelecionado.nome}
-                          onChange={(e) =>
-                            setServicoSelecionado({
-                              ...servicoSelecionado,
-                              nome: e.target.value,
-                            })
-                          }
-                        />
-
-                        <label className="form-label">Descrição</label>
-
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={servicoSelecionado.descricao}
-                          onChange={(e) =>
-                            setServicoSelecionado({
-                              ...servicoSelecionado,
-                              descricao: e.target.value,
-                            })
-                          }
-                        />
-
-                        <label className="form-label">Duração</label>
-
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={servicoSelecionado.duracao}
-                          onChange={(e) =>
-                            setServicoSelecionado({
-                              ...servicoSelecionado,
-                              duracao: e.target.value,
-                            })
-                          }
-                        />
-
-                        <label className="form-label">Preço</label>
-
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={servicoSelecionado.preco}
-                          onChange={(e) =>
-                            setServicoSelecionado({
-                              ...servicoSelecionado,
-                              preco: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-
-                      <button
-                        type="submit"
-                        className="btn btn-primary w-100 py-2"
-                        style={{ borderRadius: "8px" }}
-                        disabled={loading}
-                      >
-                        {loading ? "Editando..." : "Editar Serviço da Empresa"}
-                      </button>
-                    </>
-                  )}
-                </>
-              )}
-            </>
-          )}
-
-          {acaoSelecionada === "remover" && (
-            <>
-              <div className="mb-3">
-                <label className="form-label">Selecione uma Empresa</label>
-                <select
-                  className="form-select"
-                  onChange={(e) =>
-                    setEmpresaSelecionada(Number(e.target.value))
-                  }
-                  value={empresaSelecionada || ""}
-                  required
-                >
-                  <option value="">Escolha uma empresa</option>
-                  {empresas.data?.map((empresa) => (
-                    <option key={empresa.id} value={empresa.id}>
-                      {empresa.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {empresaSelecionada && (
-                <>
-                  <div className="mb-3">
-                    <label className="form-label">Selecione um Serviço</label>
-                    <select
-                      className="form-select"
-                      onChange={(e) => {
-                        const servicoId = Number(e.target.value);
-                        setServicoSelecionado(
-                          servicosEmpresa.find(
-                            (servico) => servico.id === servicoId
-                          )
-                        );
-                      }}
-                      value={servicoSelecionado?.id || ""}
-                      required
-                    >
-                      <option value="">Escolha um serviço</option>
-                      {servicosEmpresa.map((servico) => (
-                        <option key={servico.id} value={servico.id}>
-                          {servico.nome} - {servico.preco} - {servico.duracao}{" "}
-                          min
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {servicoSelecionado && (
-                    <button
-                      type="submit"
-                      className="btn btn-primary w-100 py-2"
-                      style={{ borderRadius: "8px" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Removendo..." : "Remover Serviço da Empresa"}
-                    </button>
-                  )}
-                </>
-              )}
-            </>
-          )}
-
-          {acaoSelecionada === "remover-funcionarios" && (
-            <>
-              <div className="mb-3">
-                <label className="form-label">Selecione uma Empresa</label>
-                <select
-                  className="form-select"
-                  onChange={(e) =>
-                    setEmpresaSelecionada(Number(e.target.value))
-                  }
-                  value={empresaSelecionada || ""}
-                  required
-                >
-                  <option value="">Escolha uma empresa</option>
-                  {empresas.data?.map((empresa) => (
-                    <option key={empresa.id} value={empresa.id}>
-                      {empresa.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {empresaSelecionada && (
-                <>
-                  <div className="mb-3">
-                    <label className="form-label">Selecione um Serviço</label>
-                    <select
-                      className="form-select"
-                      onChange={(e) => {
-                        const servicoId = Number(e.target.value);
-                        setServicoSelecionado(
-                          servicosEmpresa.find(
-                            (servico) => servico.id === servicoId
-                          )
-                        );
-                      }}
-                      value={servicoSelecionado?.id || ""}
-                      required
-                    >
-                      <option value="">Escolha um serviço</option>
-                      {servicosEmpresa.map((servico) => (
-                        <option key={servico.id} value={servico.id}>
-                          {servico.nome} - {servico.preco} - {servico.duracao}{" "}
-                          min
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {servicoSelecionado && (
-                    <div className="mb-3">
-                      <label className="form-label">Funcionários</label>
-                      <div className="d-flex flex-wrap gap-2">
-                        {funcionarios.map(
-                          ({ id, nome, foto_url, servicos }) =>
-                            servicos.some(
-                              (servico) => servico.id === servicoSelecionado?.id
-                            ) && (
-                              <div
-                                key={id}
-                                className="d-flex align-items-center gap-2 border p-2 rounded"
-                              >
-                                <img
-                                  src={foto_url}
-                                  alt={nome}
-                                  className="rounded-circle"
-                                  width="40"
-                                  height="40"
-                                />
-                                <span>{nome}</span>
-                                <input
-                                  type="checkbox"
-                                  checked={servico.funcionarios.includes(id)}
-                                  onChange={() => handleFuncionarioChange(id)}
-                                />
-                                <div className="text-muted">
-                                  <strong>Serviços Associados:</strong>
-                                  <ul>
-                                    {servicos.map((servico) => (
-                                      <li key={servico.id}>
-                                        {servico.nome} - {servico.preco} -{" "}
-                                        {servico.duracao} minutos
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              </div>
-                            )
-                        )}
-                      </div>
-
-                      <button
-                        type="submit"
-                        className="btn btn-primary w-100 py-2 mt-3"
-                        style={{ borderRadius: "8px" }}
-                        disabled={loading}
-                      >
-                        {loading
-                          ? "Removendo..."
-                          : "Remover Serviço dos Funcionários"}
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
-            </>
-          )}
-        </form>
+                )}
+              </>
+            )}
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
