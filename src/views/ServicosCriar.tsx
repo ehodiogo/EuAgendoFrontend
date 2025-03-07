@@ -115,6 +115,8 @@ const ServicoForm: React.FC = () => {
     });
   };
 
+  const empresaSelecionadaObjeto = empresas.data?.find((empresa) => empresa.id === empresaSelecionada);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -449,42 +451,63 @@ const ServicoForm: React.FC = () => {
                   </select>
                 </div>
 
-                <div className="mb-3">
-                  <label className="form-label">Funcionários</label>
-                  <div className="d-flex flex-wrap gap-2">
-                    {funcionarios.map(({ id, nome, foto_url, servicos }) => (
-                      <div
-                        key={id}
-                        className="d-flex align-items-center gap-2 border p-2 rounded"
-                      >
-                        <img
-                          src={foto_url}
-                          alt={nome}
-                          className="rounded-circle"
-                          width="40"
-                          height="40"
-                        />
-                        <span>{nome}</span>
-                        <input
-                          type="checkbox"
-                          checked={servico.funcionarios.includes(id)}
-                          onChange={() => handleFuncionarioChange(id)}
-                        />
-                        <div className="text-muted">
-                          <strong>Serviços Associados:</strong>
-                          <ul>
-                            {servicos.map((servico) => (
-                              <li key={servico.id}>
-                                {servico.nome} - {servico.preco} -{" "}
-                                {servico.duracao} minutos
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    ))}
+                {empresaSelecionada && (
+                  <div className="mb-3">
+                    <label className="form-label">Funcionários</label>
+                    <div className="d-flex flex-wrap gap-2">
+                      {funcionarios &&
+                        funcionarios.map(({ id, nome, foto_url, servicos }) => {
+                          const funcionarioSelecionado =
+                            empresaSelecionadaObjeto?.funcionarios?.some(
+                              (funcionario) => funcionario.nome === nome
+                            );
+
+                          if (!funcionarioSelecionado) return null; 
+
+                          console.log(
+                            "Funcionarios da empresa selecionada: ",
+                            empresaSelecionadaObjeto?.funcionarios?.filter(
+                              (funcionario) => funcionario.nome === nome
+                            )
+                          );
+
+                          return (
+                            <div
+                              key={id}
+                              className="d-flex align-items-center gap-2 border p-2 rounded"
+                            >
+                              <img
+                                src={foto_url}
+                                alt={nome}
+                                className="rounded-circle"
+                                width="40"
+                                height="40"
+                              />
+                              <span>{nome}</span>
+                              <input
+                                type="checkbox"
+                                checked={servico.funcionarios.includes(id)}
+                                onChange={() => handleFuncionarioChange(id)}
+                              />
+                              {servicos && (
+                                <div className="text-muted">
+                                  <strong>Serviços Associados:</strong>
+                                  <ul>
+                                    {servicos.map((servico) => (
+                                      <li key={servico.id}>
+                                        {servico.nome} - {servico.preco}{" "}
+                                        {servico.duracao} minutos
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <button
                   type="submit"
@@ -520,42 +543,44 @@ const ServicoForm: React.FC = () => {
                   </select>
                 </div>
 
-                {empresaSelecionada &&
-                  (console.log("Empresa selecionada", empresaSelecionada),
-                  console.log("Serviços da empresa", servicosEmpresa),
-                  (
-                    <>
-                      <div className="mb-3">
-                        <label className="form-label">Escolha um Serviço</label>
-                        <select
-                          className="form-select"
-                          onChange={(e) => {
-                            const servicoId = Number(e.target.value);
-                            setServicoSelecionado(
-                              servicosEmpresa.find(
-                                (servico) => servico.id === servicoId
-                              )
-                            );
-                          }}
-                          value={servicoSelecionado?.id || ""}
-                          required
-                        >
-                          <option value="">Escolha um serviço</option>
-                          {servicosEmpresa.map((servico) => (
-                            <option key={servico.id} value={servico.id}>
-                              {servico.nome} - {servico.preco} -{" "}
-                              {servico.duracao} min
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                {empresaSelecionada && (
+                  <>
+                    <div className="mb-3">
+                      <label className="form-label">Escolha um Serviço</label>
+                      <select
+                        className="form-select"
+                        onChange={(e) => {
+                          const servicoId = Number(e.target.value);
+                          setServicoSelecionado(
+                            servicosEmpresa.find(
+                              (servico) => servico.id === servicoId
+                            )
+                          );
+                        }}
+                        value={servicoSelecionado?.id || ""}
+                        required
+                      >
+                        <option value="">Escolha um serviço</option>
+                        {servicosEmpresa.map((servico) => (
+                          <option key={servico.id} value={servico.id}>
+                            {servico.nome} - {servico.preco} - {servico.duracao}{" "}
+                            min
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                      {servicoSelecionado && (
-                        <div className="mb-3">
-                          <label className="form-label">Funcionários</label>
-                          <div className="d-flex flex-wrap gap-2">
-                            {funcionarios.map(
-                              ({ id, nome, foto_url, servicos }) => (
+                    {servicoSelecionado && (
+                      <div className="mb-3">
+                        <label className="form-label">Funcionários</label>
+                        <div className="d-flex flex-wrap gap-2">
+                          {funcionarios &&
+                            funcionarios
+                              .filter(
+                                ({ id }) =>
+                                  !servicoSelecionado.funcionarios.includes(id)
+                              ) 
+                              .map(({ id, nome, foto_url, servicos }) => (
                                 <div
                                   key={id}
                                   className="d-flex align-items-center gap-2 border p-2 rounded"
@@ -570,39 +595,39 @@ const ServicoForm: React.FC = () => {
                                   <span>{nome}</span>
                                   <input
                                     type="checkbox"
-                                    checked={servico.funcionarios.includes(id)}
                                     onChange={() => handleFuncionarioChange(id)}
                                   />
                                   <div className="text-muted">
                                     <strong>Serviços Associados:</strong>
                                     <ul>
-                                      {servicos.map((servico) => (
-                                        <li key={servico.id}>
-                                          {servico.nome} - {servico.preco} -{" "}
-                                          {servico.duracao} minutos
-                                        </li>
-                                      ))}
+                                      {servicos &&
+                                        servicos.length > 0 &&
+                                        servicos.map((servico) => (
+                                          <li key={servico.id}>
+                                            {servico.nome} - {servico.preco}{" "}
+                                            {servico.duracao} minutos
+                                          </li>
+                                        ))}
                                     </ul>
                                   </div>
                                 </div>
-                              )
-                            )}
-                          </div>
-
-                          <button
-                            type="submit"
-                            className="btn btn-primary w-100 py-2 mt-3"
-                            style={{ borderRadius: "8px" }}
-                            disabled={loading}
-                          >
-                            {loading
-                              ? "Adicionando..."
-                              : "Adicionar Serviço aos Funcionários"}
-                          </button>
+                              ))}
                         </div>
-                      )}
-                    </>
-                  ))}
+
+                        <button
+                          type="submit"
+                          className="btn btn-primary w-100 py-2 mt-3"
+                          style={{ borderRadius: "8px" }}
+                          disabled={loading}
+                        >
+                          {loading
+                            ? "Adicionando..."
+                            : "Adicionar Serviço aos Funcionários"}
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
               </>
             )}
 
@@ -848,12 +873,12 @@ const ServicoForm: React.FC = () => {
                       <div className="mb-3">
                         <label className="form-label">Funcionários</label>
                         <div className="d-flex flex-wrap gap-2">
-                          {funcionarios.map(
-                            ({ id, nome, foto_url, servicos }) =>
-                              servicos.some(
-                                (servico) =>
-                                  servico.id === servicoSelecionado?.id
-                              ) && (
+                          {funcionarios &&
+                            funcionarios
+                              .filter(({ id }) =>
+                                servicoSelecionado.funcionarios.includes(id)
+                              )
+                              .map(({ id, nome, foto_url, servicos }) => (
                                 <div
                                   key={id}
                                   className="d-flex align-items-center gap-2 border p-2 rounded"
@@ -868,23 +893,23 @@ const ServicoForm: React.FC = () => {
                                   <span>{nome}</span>
                                   <input
                                     type="checkbox"
-                                    checked={servico.funcionarios.includes(id)}
-                                    onChange={() => handleFuncionarioChange(id)}
+                                    onChange={() => handleFuncionarioChange(id)} 
                                   />
                                   <div className="text-muted">
                                     <strong>Serviços Associados:</strong>
                                     <ul>
-                                      {servicos.map((servico) => (
-                                        <li key={servico.id}>
-                                          {servico.nome} - {servico.preco} -{" "}
-                                          {servico.duracao} minutos
-                                        </li>
-                                      ))}
+                                      {servicos &&
+                                        servicos.length > 0 &&
+                                        servicos.map((servico) => (
+                                          <li key={servico.id}>
+                                            {servico.nome} - {servico.preco}{" "}
+                                            {servico.duracao} minutos
+                                          </li>
+                                        ))}
                                     </ul>
                                   </div>
                                 </div>
-                              )
-                          )}
+                              ))}
                         </div>
 
                         <button
