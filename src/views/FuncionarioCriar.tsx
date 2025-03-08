@@ -119,8 +119,12 @@ const FuncionarioForm: React.FC = () => {
       };
 
       try {
-        await axios.post("http://localhost:8000/api/editar-funcionario/", payload);
+        await axios.post(
+          "http://localhost:8000/api/editar-funcionario/",
+          payload
+        );
         alert("Funcionário editado com sucesso!");
+        window.location.reload(); // MELHORAR ISSO
       } catch (error) {
         console.error("Erro ao editar funcionário:", error);
         alert("Ocorreu um erro ao editar funcionário.");
@@ -150,7 +154,7 @@ const FuncionarioForm: React.FC = () => {
       setFuncionariosCadastrados((prev) =>
         prev.filter((func) => !selectedFuncionarios.includes(func))
       );
-      window.location.reload();
+      window.location.reload(); // MELHORAR ISSO
     }
   };
 

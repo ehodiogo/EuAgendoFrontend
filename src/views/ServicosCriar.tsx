@@ -169,6 +169,7 @@ const ServicoForm: React.FC = () => {
             preco: "",
             funcionarios: [],
           });
+          window.location.reload(); // MELHORAR ISSO
         }
       } catch (error) {
         console.error("Erro:", error);
@@ -252,7 +253,7 @@ const ServicoForm: React.FC = () => {
             preco: "",
             funcionarios: [],
           });
-          window.location.reload();
+          window.location.reload(); // MELHORAR ISSO
         }
       } catch (error) {
         console.error("Erro:", error);
@@ -295,7 +296,7 @@ const ServicoForm: React.FC = () => {
             preco: "",
             funcionarios: [],
           });
-          window.location.reload();
+          window.location.reload(); // MELHORAR ISSO
         }
       } catch (error) {
         console.error("Erro:", error);
@@ -341,7 +342,7 @@ const ServicoForm: React.FC = () => {
             preco: "",
             funcionarios: [],
           });
-          window.location.reload();
+          window.location.reload(); // MELHORAR ISSO
         }
       } catch (error) {
         console.error("Erro:", error);

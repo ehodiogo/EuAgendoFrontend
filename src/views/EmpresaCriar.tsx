@@ -110,8 +110,6 @@ const EmpresaForm: React.FC = () => {
         const data = await response.json();
         possui_limite = data.possui_limite;
         
-        console.log("Possui limite:", possui_limite);
-
       } catch (error) {
         console.error("Erro:", error);
         alert("Falha ao verificar limite de empresas."); //TODO: Melhorar esteticamente essas mensagens de alert
@@ -169,8 +167,6 @@ const EmpresaForm: React.FC = () => {
           formData.append("usuario_token", usuario_token);
         }
 
-        console.log("Form Data:", Object.fromEntries(formData.entries()));
-
         try {
           const response = await fetch("http://localhost:8000/api/empresa-create/", {
             method: "POST",
@@ -185,6 +181,7 @@ const EmpresaForm: React.FC = () => {
           console.log("Empresa cadastrada com sucesso:", data);
           alert("Empresa cadastrada com sucesso!");
           setEmpresaCriada(true);
+          window.location.reload(); // MELHORAR ISSO
         } catch (error) {
           console.error("Erro:", error);
           alert("Falha ao cadastrar empresa.");
@@ -200,13 +197,16 @@ const EmpresaForm: React.FC = () => {
       };
 
       try {
-        const response = await fetch("http://localhost:8000/api/remover-empresa/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
+        const response = await fetch(
+          "http://localhost:8000/api/remover-empresa/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Erro ao remover empresa.");
@@ -216,7 +216,7 @@ const EmpresaForm: React.FC = () => {
         console.log("Empresa removida com sucesso:", data);
         alert("Empresa removida com sucesso!");
         setEmpresaSelecionada(null);
-        window.location.reload();
+        window.location.reload(); // MELHORAR ISSO
       } catch (error) {
         console.error("Erro:", error);
         alert("Falha ao remover empresa.");
@@ -295,13 +295,14 @@ const EmpresaForm: React.FC = () => {
       
       formData.append("empresa_id", empresaSelecionada.toString());
 
-      console.log("Form Data:", Object.fromEntries(formData.entries()));
-
       try {
-        const response = await fetch("http://localhost:8000/api/editar-empresa/", {
-          method: "POST",
-          body: formData,
-        });
+        const response = await fetch(
+          "http://localhost:8000/api/editar-empresa/",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Erro ao cadastrar empresa.");
@@ -311,7 +312,7 @@ const EmpresaForm: React.FC = () => {
         console.log("Empresa editada com sucesso:", data);
         alert("Empresa editada com sucesso!");
         setEmpresaCriada(true);
-        window.location.reload();
+        window.location.reload(); // MELHORAR ISSO
       } catch (error) {
         console.error("Erro:", error);
         alert("Falha ao cadastrar empresa.");
