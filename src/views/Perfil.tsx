@@ -36,7 +36,11 @@ const Profile = () => {
   const handleSave = async () => {
     if (!userData || !token) return;
     try {
-      const response = await fetch("http://localhost:8000/api/user/", {
+      const url = window.location.origin.includes("localhost:5173")
+        ? "http://localhost:8000"
+        : "https://backend-production-7438.up.railway.app";
+
+      const response = await fetch(url + "/api/user/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -67,8 +71,13 @@ const Profile = () => {
     }
 
     try {
+
+      const url = window.location.origin.includes("localhost:5173")
+        ? "http://localhost:8000"
+        : "https://backend-production-7438.up.railway.app";
+
       const response = await fetch(
-        "http://localhost:8000/api/change-password/",
+        url + "/api/change-password/",
         {
           method: "POST",
           headers: {

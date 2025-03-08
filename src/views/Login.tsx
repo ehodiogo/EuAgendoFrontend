@@ -18,8 +18,11 @@ function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // TODO: trocar para a URL da API em prd
-      const response = await axios.post("http://localhost:8000/api/login/", {
+      const url = window.location.origin.includes("localhost:5173")
+        ? "http://localhost:8000"
+        : "https://backend-production-7438.up.railway.app";
+  
+      const response = await axios.post(url + "/api/login/", {
         email: email,
         password: password,
       });

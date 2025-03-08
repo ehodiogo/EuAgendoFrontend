@@ -156,8 +156,13 @@ const diaSelecionado = [
     };
 
     try {
+
+      const url = window.location.origin.includes("localhost:5173")
+        ? "http://localhost:8000"
+        : "https://backend-production-7438.up.railway.app";
+
       const response = await fetch(
-        "http://localhost:8000/api/agendamento/create",
+        url + "/api/agendamento/create",
         {
           method: "POST",
           headers: {

@@ -22,8 +22,12 @@ function ForgotPassword() {
     setSuccess(false);
 
     try {
+      const url = window.location.origin.includes("localhost:5173")
+        ? "http://localhost:8000"
+        : "https://backend-production-7438.up.railway.app";
+
       const response = await axios.post(
-        "http://localhost:8000/api/password-recovery/",
+        url + "/api/password-recovery/",
         {
           email: email,
         }

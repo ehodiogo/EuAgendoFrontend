@@ -45,8 +45,13 @@ const ServicoForm: React.FC = () => {
           empresa_id: empresaSelecionada,
           usuario_token: usuarioToken,
         };
+
+        const url = window.location.origin.includes("localhost:5173")
+          ? "http://localhost:8000"
+          : "https://backend-production-7438.up.railway.app";
+
         const { data } = await axios.get(
-          `http://localhost:8000/api/funcionarios-criados/`,
+          `${url}/api/funcionarios-criados/`,
           {
             params: payload,
           }
@@ -75,8 +80,13 @@ const ServicoForm: React.FC = () => {
           empresa_id: empresaSelecionada,
           usuario_token: usuarioToken,
         };
+
+        const url = window.location.origin.includes("localhost:5173")
+          ? "http://localhost:8000"
+          : "https://backend-production-7438.up.railway.app";
+
         const { data } = await axios.get(
-          `http://localhost:8000/api/servicos-criados-usuario-empresa/`,
+          `${url}/api/servicos-criados-usuario-empresa/`,
           {
             params: payload,
           }
@@ -149,8 +159,12 @@ const ServicoForm: React.FC = () => {
       };
 
       try {
+        const url = window.location.origin.includes("localhost:5173")
+          ? "http://localhost:8000"
+          : "https://backend-production-7438.up.railway.app";
+
         const response = await axios.post(
-          "http://localhost:8000/api/adicionar-servicos-funcionario/",
+          url + "/api/adicionar-servicos-funcionario/",
           payload,
           {
             headers: {
@@ -192,8 +206,12 @@ const ServicoForm: React.FC = () => {
       };
 
       try {
+        const url = window.location.origin.includes("localhost:5173")
+          ? "http://localhost:8000"
+          : "https://backend-production-7438.up.railway.app";
+          
         const response = await axios.post(
-          "http://localhost:8000/api/adicionar-servico-funcionarios/",
+          url + "/api/adicionar-servico-funcionarios/",
           payload,
           {
             headers: {
@@ -233,8 +251,12 @@ const ServicoForm: React.FC = () => {
       };
 
       try {
+        const url = window.location.origin.includes("localhost:5173")
+          ? "http://localhost:8000"
+          : "https://backend-production-7438.up.railway.app";
+
         const response = await axios.post(
-          "http://localhost:8000/api/remover-servico-empresa/",
+          url + "/api/remover-servico-empresa/",
           payload,
           {
             headers: {
@@ -276,8 +298,12 @@ const ServicoForm: React.FC = () => {
       };
 
       try {
+        const url = window.location.origin.includes("localhost:5173")
+          ? "http://localhost:8000"
+          : "https://backend-production-7438.up.railway.app";
+
         const response = await axios.post(
-          "http://localhost:8000/api/remover-servicos-funcionario/",
+          url + "/api/remover-servicos-funcionario/",
           payload,
           {
             headers: {
@@ -322,8 +348,12 @@ const ServicoForm: React.FC = () => {
       };
 
       try {
+        const url = window.location.origin.includes("localhost:5173")
+          ? "http://localhost:8000"
+          : "https://backend-production-7438.up.railway.app";
+
         const response = await axios.post(
-          "http://localhost:8000/api/editar-servico/",
+          url + "/api/editar-servico/",
           payload,
           {
             headers: {

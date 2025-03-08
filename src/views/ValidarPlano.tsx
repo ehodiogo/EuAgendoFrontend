@@ -23,8 +23,12 @@ const ValidarPlano = () => {
 
     setLoading(true);
     try {
+      const url = window.location.origin.includes("localhost:5173")
+        ? "http://localhost:8000"
+        : "https://backend-production-7438.up.railway.app";
+
       const response = await axios.post(
-        "http://localhost:8000/api/payment-success/", // Aqui a URL pode ser ajustada para seu endpoint real
+        url + "/api/payment-success/",
         {
           usuario_token: usuario_token,
         }

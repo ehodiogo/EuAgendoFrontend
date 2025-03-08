@@ -95,7 +95,12 @@ const EmpresaForm: React.FC = () => {
       let possui_limite = false;
 
       try {
-        const response = await fetch("http://localhost:8000/api/possui-limite/", {
+
+        const url = window.location.origin.includes("localhost:5173")
+          ? "http://localhost:8000"
+          : "https://backend-production-7438.up.railway.app";
+
+        const response = await fetch(url + "/api/possui-limite/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -168,7 +173,11 @@ const EmpresaForm: React.FC = () => {
         }
 
         try {
-          const response = await fetch("http://localhost:8000/api/empresa-create/", {
+          const url = window.location.origin.includes("localhost:5173")
+            ? "http://localhost:8000"
+            : "https://backend-production-7438.up.railway.app";
+
+          const response = await fetch(url + "/api/empresa-create/", {
             method: "POST",
             body: formData,
           });
@@ -197,8 +206,12 @@ const EmpresaForm: React.FC = () => {
       };
 
       try {
+        const url = window.location.origin.includes("localhost:5173")
+          ? "http://localhost:8000"
+          : "https://backend-production-7438.up.railway.app";
+
         const response = await fetch(
-          "http://localhost:8000/api/remover-empresa/",
+          url + "/api/remover-empresa/",
           {
             method: "POST",
             headers: {
@@ -296,8 +309,12 @@ const EmpresaForm: React.FC = () => {
       formData.append("empresa_id", empresaSelecionada.toString());
 
       try {
+        const url = window.location.origin.includes("localhost:5173")
+          ? "http://localhost:8000"
+          : "https://backend-production-7438.up.railway.app";
+
         const response = await fetch(
-          "http://localhost:8000/api/editar-empresa/",
+          url + "/api/editar-empresa/",
           {
             method: "POST",
             body: formData,

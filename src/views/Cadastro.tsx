@@ -19,7 +19,11 @@ function Register() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8000/api/register/", {
+      const url = window.location.origin.includes("localhost:5173")
+        ? "http://localhost:8000"
+        : "https://backend-production-7438.up.railway.app";
+        
+      const response = await axios.post(url + "/api/register/", {
         username: email,
         first_name: name,
         email: email,

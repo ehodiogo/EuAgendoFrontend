@@ -34,8 +34,13 @@ const PendingPage = () => {
 
     setLoading(true);
     try {
+
+      const url = window.location.origin.includes("localhost:5173")
+        ? "http://localhost:8000"
+        : "https://backend-production-7438.up.railway.app";
+
       const response = await axios.post(
-        "http://localhost:8000/api/payment-success/",
+        url + "/api/payment-success/",
         {
           plano_nome: carrinho[0].nome,
           usuario_token: usuario_token,

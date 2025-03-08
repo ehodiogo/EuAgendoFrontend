@@ -40,8 +40,12 @@ const FuncionarioForm: React.FC = () => {
       let possui_limite = false;
 
       try {
+        const url = window.location.origin.includes("localhost:5173")
+          ? "http://localhost:8000"
+          : "https://backend-production-7438.up.railway.app";
+
         const response = await fetch(
-          "http://localhost:8000/api/possui-limite/",
+          url + "/api/possui-limite/",
           {
             method: "POST",
             headers: {
@@ -82,8 +86,12 @@ const FuncionarioForm: React.FC = () => {
           formData.append("usuario_token", usuario_token);
         }
 
+        const url = window.location.origin.includes("localhost:5173")
+          ? "http://localhost:8000"
+          : "https://backend-production-7438.up.railway.app";
+
         const res = await axios.post(
-          "http://localhost:8000/api/funcionario-create/",
+          url + "/api/funcionario-create/",
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -119,8 +127,12 @@ const FuncionarioForm: React.FC = () => {
       };
 
       try {
+        const url = window.location.origin.includes("localhost:5173")
+          ? "http://localhost:8000"
+          : "https://backend-production-7438.up.railway.app";
+
         await axios.post(
-          "http://localhost:8000/api/editar-funcionario/",
+          url + "/api/editar-funcionario/",
           payload
         );
         alert("Funcionário editado com sucesso!");
@@ -139,8 +151,12 @@ const FuncionarioForm: React.FC = () => {
       };
 
       try {
+        const url = window.location.origin.includes("localhost:5173")
+          ? "http://localhost:8000"
+          : "https://backend-production-7438.up.railway.app";
+
         await axios.post(
-          "http://localhost:8000/api/remover-funcionarios/",
+          url + "/api/remover-funcionarios/",
           payload
         );
         alert("Funcionários excluídos com sucesso!");
@@ -172,8 +188,13 @@ const FuncionarioForm: React.FC = () => {
     const usuario_token = localStorage.getItem("access_token");
 
     try {
+
+      const url = window.location.origin.includes("localhost:5173")
+        ? "http://localhost:8000"
+        : "https://backend-production-7438.up.railway.app";
+
       await axios.post(
-        "http://localhost:8000/api/adicionar-funcionarios-empresa/",
+        url + "/api/adicionar-funcionarios-empresa/",
         {
           empresa_nome: selectedEmpresa.nome,
           funcionarios: selectedFuncionarios.map((func) => func.id),
@@ -202,8 +223,13 @@ const FuncionarioForm: React.FC = () => {
     const usuario_token = localStorage.getItem("access_token");
 
     try {
+
+      const url = window.location.origin.includes("localhost:5173")
+        ? "http://localhost:8000"
+        : "https://backend-production-7438.up.railway.app";
+
       await axios.post(
-        "http://localhost:8000/api/remover-funcionarios-empresa/",
+        url + "/api/remover-funcionarios-empresa/",
         {
           empresa_id: selectedEmpresa.id,
           funcionarios_ids: selectedFuncionarios.map((func) => func.id),
