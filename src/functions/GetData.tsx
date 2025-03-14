@@ -4,7 +4,7 @@ const baseUrl =
   window.location.hostname === "localhost" ||
   window.location.hostname === "127.0.0.1"
     ? "http://127.0.0.1:8000/"
-    : "https://spotthemapbackend-production.up.railway.app/";
+    : "https://backend-production-7438.up.railway.app/";
 // TODO: TROCAR URL DE PRD 
 
 type FetchOptions = {
