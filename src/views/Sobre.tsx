@@ -45,7 +45,7 @@ function Sobre() {
             <div className="col-md-4">
               <div className="card shadow-sm">
                 <img
-                  src="https://via.placeholder.com/200"
+                  src="https://eu-agendo.s3.us-east-1.amazonaws.com/imagens/Foto+Campe%C3%A3o+CodeRace24.jpg"
                   className="card-img-top"
                   alt="Equipe Mestre"
                 />
