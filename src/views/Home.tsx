@@ -1,3 +1,4 @@
+"use client";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect } from "react";
@@ -159,11 +160,10 @@ function Home() {
           <p className="text-muted">Confira o que está por vir no EuAgendo.</p>
           <button
             className="btn btn-warning mt-3 px-4 fw-semibold"
-            onClick={() => navigate("/roadmap")} 
+            onClick={() => navigate("/roadmap")}
           >
             Ver Roadmap
           </button>
-
         </div>
       </section>
 
@@ -210,9 +210,9 @@ function Home() {
             <a
               href="/roadmap"
               className="text-white text-decoration-none d-flex align-items-center"
-              >
-                <FaRoad className="me-2" />
-                Roadmap
+            >
+              <FaRoad className="me-2" />
+              Roadmap
             </a>
           </div>
         </div>

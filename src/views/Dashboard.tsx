@@ -1,3 +1,4 @@
+"use client";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -143,10 +144,7 @@ function Dashboard() {
             </div>
 
             <div className="text-center w-25 ms-3">
-              <Link
-                to="/cadastros-usuario"
-                className="btn btn-info w-100 mb-1"
-              >
+              <Link to="/cadastros-usuario" className="btn btn-info w-100 mb-1">
                 Cadastros de Empresas, Serviços e Funcionários
               </Link>
               <p className="text-muted small">
@@ -208,30 +206,43 @@ function Dashboard() {
           {isPlanExpired === "true" ? (
             <div className="text-center">
               <p className="text-danger fw-bold fs-5 mb-3">
-                <i className="bi bi-x-circle-fill"></i> Seu plano expirou. Renovação necessária! Vencido há:{" "}
-                <span className="text-dark">{formatTime(Math.abs(Number(remainingTime)))}</span>
+                <i className="bi bi-x-circle-fill"></i> Seu plano expirou.
+                Renovação necessária! Vencido há:{" "}
+                <span className="text-dark">
+                  {formatTime(Math.abs(Number(remainingTime)))}
+                </span>
               </p>
               <p className="text-warning fw-bold fs-5">
-                <i className="bi bi-exclamation-triangle-fill"></i> Não se preocupe! Você ainda pode acessar o painel, mas algumas
-                funcionalidades podem estar limitadas. Renove seu plano para continuar usando a plataforma. 
+                <i className="bi bi-exclamation-triangle-fill"></i> Não se
+                preocupe! Você ainda pode acessar o painel, mas algumas
+                funcionalidades podem estar limitadas. Renove seu plano para
+                continuar usando a plataforma.
                 <span className="d-block mt-2">
-                  Agendamentos seguem permitidos para hoje e amanhã, para que você não tenha nenhum prejuízo enquanto não renova seu plano.
+                  Agendamentos seguem permitidos para hoje e amanhã, para que
+                  você não tenha nenhum prejuízo enquanto não renova seu plano.
                 </span>
               </p>
             </div>
           ) : checkIfPlanExpiresTomorrow() ? (
             <div className="text-center">
               <p className="text-warning fw-bold fs-5">
-                <i className="bi bi-clock-fill"></i> Seu plano vencerá amanhã. Por favor, renove-o em breve.
+                <i className="bi bi-clock-fill"></i> Seu plano vencerá amanhã.
+                Por favor, renove-o em breve.
               </p>
             </div>
           ) : null}
         </Modal.Body>
         <Modal.Footer className="d-flex justify-content-between">
-          <Link to="/planos" className="btn btn-success px-4 py-2 rounded-pill shadow-sm">
+          <Link
+            to="/planos"
+            className="btn btn-success px-4 py-2 rounded-pill shadow-sm"
+          >
             Renovar Plano
           </Link>
-          <button className="btn btn-danger px-4 py-2 rounded-pill shadow-sm" onClick={handleCloseModal}>
+          <button
+            className="btn btn-danger px-4 py-2 rounded-pill shadow-sm"
+            onClick={handleCloseModal}
+          >
             Fechar
           </button>
         </Modal.Footer>

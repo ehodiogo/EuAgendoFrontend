@@ -1,9 +1,5 @@
-import {
-  Routes,
-  Route,
-  Navigate,
-  useNavigate,
-} from "react-router-dom";
+"use client";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { lazy, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -46,18 +42,15 @@ function ProtectedRoute({ children }: { children: JSX.Element }) {
 }
 
 function App() {
-
   const navigate = useNavigate();
 
   useEffect(() => {
-
     const verificaTempoConexao = () => {
       const token = localStorage.getItem("access_token");
       const ultimoAcesso = localStorage.getItem("ultimo_acesso");
       const agora = new Date().getTime();
 
       if (ultimoAcesso && token) {
-
         const diferenca = agora - parseInt(ultimoAcesso);
         const minutos = Math.floor(diferenca / 60000);
 
@@ -69,146 +62,151 @@ function App() {
           navigate("/login");
         }
       }
-
     };
 
     verificaTempoConexao();
-  }
-  , [navigate]);
+  }, [navigate]);
 
   return (
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/empresas" element={<EmpresasSearch />} />
-        <Route path="/empresas/:empresa" element={<EmpresaDetails />} />
-        <Route path="/agendar/:empresa" element={<Agendar />} />
-        <Route path="/agendamentos" element={<h1>Agendamentos</h1>} />
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/empresas" element={<EmpresasSearch />} />
+      <Route path="/empresas/:empresa" element={<EmpresaDetails />} />
+      <Route path="/agendar/:empresa" element={<Agendar />} />
+      <Route path="/agendamentos" element={<h1>Agendamentos</h1>} />
 
-        <Route path="/login" element={<Login />} />
-        <Route path="/cadastro" element={<Register />} />
-        <Route path="/esqueci-senha" element={<ForgotPassword />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/cadastro" element={<Register />} />
+      <Route path="/esqueci-senha" element={<ForgotPassword />} />
 
-        <Route 
-          path="/criar-empresa"
-          element={
-            <ProtectedRoute>
-              <EmpresaCreate />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/criar-empresa"
+        element={
+          <ProtectedRoute>
+            <EmpresaCreate />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route 
-          path="/criar-funcionario/:empresa?"
-          element={
-            <ProtectedRoute>
-              <FuncionarioCreate />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/criar-funcionario/:empresa?"
+        element={
+          <ProtectedRoute>
+            <FuncionarioCreate />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route 
-          path="/criar-servico/:funcionario?"
-          element={
-            <ProtectedRoute>
-              <ServicoCreate />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/criar-servico/:funcionario?"
+        element={
+          <ProtectedRoute>
+            <ServicoCreate />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route 
-          path="/minhas-empresas"
-          element={
-            <ProtectedRoute>
-              <EmpresasUsuario />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/perfil"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/carrinho"
-          element={
-            <ProtectedRoute>
-              <Carrinho />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/confirmacao"
-          element={
-            <ProtectedRoute>
-              <Confirmacao />
-            </ProtectedRoute>
-          }
-        />
-        <Route 
-          path="/cadastros-usuario"
-          element={
-            <ProtectedRoute>
-              <CadastrosUsuario />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/financeiro"
-          element={
-            <ProtectedRoute>
-              <Financeiro />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/minhas-empresas"
+        element={
+          <ProtectedRoute>
+            <EmpresasUsuario />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/perfil"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/carrinho"
+        element={
+          <ProtectedRoute>
+            <Carrinho />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/confirmacao"
+        element={
+          <ProtectedRoute>
+            <Confirmacao />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cadastros-usuario"
+        element={
+          <ProtectedRoute>
+            <CadastrosUsuario />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/financeiro"
+        element={
+          <ProtectedRoute>
+            <Financeiro />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route path="/payment/success" element={
+      <Route
+        path="/payment/success"
+        element={
           <ProtectedRoute>
             <SuccessPage />
           </ProtectedRoute>
         }
-        />
+      />
 
-        <Route path="/payment/failure" element={
+      <Route
+        path="/payment/failure"
+        element={
           <ProtectedRoute>
             <FailurePage />
           </ProtectedRoute>
         }
+      />
 
-        />
-
-        <Route path="/payment/pending" element={
+      <Route
+        path="/payment/pending"
+        element={
           <ProtectedRoute>
             <PendingPage />
           </ProtectedRoute>
         }
-        />
+      />
 
-        <Route path="/validar-plano" element={
+      <Route
+        path="/validar-plano"
+        element={
           <ProtectedRoute>
             <ValidarPlano />
           </ProtectedRoute>
         }
-        />
+      />
 
-        <Route path="/contato" element={<Contato />} />
-        <Route path="/sobre" element={<Sobre />} />
-        <Route path="/planos" element={<Planos />} />
-        <Route path="/termos" element={<Termos />} />
-        <Route path="/roadmap" element={<Roadmap />} />
+      <Route path="/contato" element={<Contato />} />
+      <Route path="/sobre" element={<Sobre />} />
+      <Route path="/planos" element={<Planos />} />
+      <Route path="/termos" element={<Termos />} />
+      <Route path="/roadmap" element={<Roadmap />} />
 
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 
