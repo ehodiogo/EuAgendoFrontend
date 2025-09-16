@@ -3,7 +3,7 @@ import { Agendamento } from "../interfaces/Agendamento";
 import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import AgendamentoDados from "../components/AgendamentoDados";
-import { FaTable, FaCalendar } from "react-icons/fa"; 
+import { FaTable, FaCalendar } from "react-icons/fa";
 import FiltrosAgendamento from "../components/FiltrosAgendamentos";
 
 interface AgendamentosHojeProps {
@@ -13,7 +13,7 @@ interface AgendamentosHojeProps {
 export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
   const [visualizacao, setVisualizacao] = useState<"tabela" | "quadro">(
     "tabela"
-  ); // Estado para alternar visualização
+  );
   const agendamentosHoje = useFetch<Agendamento[]>(
     `api/agendamentos-hoje/?empresa_id=${empresa.id}`
   );
@@ -30,7 +30,6 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
         Confira os agendamentos para hoje na empresa {empresa.nome}.
       </p>
 
-      {/* Botões para alternar a visualização */}
       <div className="mb-3">
         <button
           className="btn btn-outline-primary me-2"
@@ -48,10 +47,13 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
         </button>
       </div>
 
-      {/* Renderiza a visualização de acordo com o estado */}
       {agendamentosHoje.data && agendamentosHoje.data.length > 0 ? (
         visualizacao === "tabela" ? (
           <div className="table-responsive">
+            <div className="mb-3">
+              <FiltrosAgendamento />
+            </div>
+
             <table className="table table-striped table-bordered">
               <thead>
                 <tr>
@@ -59,7 +61,6 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
                 </tr>
               </thead>
               <tbody>
-                <FiltrosAgendamento />
                 {agendamentosHoje.data.map((agendamento: Agendamento) => (
                   <tr key={agendamento.id}>
                     <td>
@@ -72,7 +73,6 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
           </div>
         ) : (
           <div>
-            {/* Aqui você pode adicionar o quadro de horários, se necessário */}
             <p className="text-center">
               Quadro de horários em{" "}
               <span className="fw-bold text-warning">desenvolvimento</span>.

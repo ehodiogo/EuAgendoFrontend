@@ -27,6 +27,8 @@ const ValidarPlano = () => {
         ? "http://localhost:8000"
         : "https://backend-production-7438.up.railway.app";
 
+      console.log("URL: " + url);
+
       const response = await axios.post(
         url + "/api/payment-success/",
         {

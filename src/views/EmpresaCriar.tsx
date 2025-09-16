@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import InputMask from "react-input-mask";
+import {InputMask} from "@react-input/mask";
 import { EmpresaCreate, Empresa } from "../interfaces/Empresa";
 import { Link } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
@@ -210,6 +210,8 @@ const EmpresaForm: React.FC = () => {
           ? "http://localhost:8000"
           : "https://backend-production-7438.up.railway.app";
 
+        console.log("URL", url);
+
         const response = await fetch(
           url + "/api/remover-empresa/",
           {
@@ -397,13 +399,12 @@ const EmpresaForm: React.FC = () => {
                     Qual o CNPJ da sua empresa?
                   </label>
                   <InputMask
-                    type="text"
-                    name="cnpj"
-                    className="form-control"
+                    mask="99.999.999/9999-99"
                     value={empresa.cnpj}
                     onChange={handleChange}
-                    mask="99.999.999/9999-99"
-                    maskChar={null}
+                    placeholder="__.___-___"
+                    name="cnpj"
+                    className="form-control"
                     required
                   />
                 </div>
@@ -706,7 +707,7 @@ const EmpresaForm: React.FC = () => {
                         }
                         onChange={handleChange}
                         mask="99.999.999/9999-99"
-                        maskChar={null}
+                        placeholder="__.___-___"
                         required
                       />
                     </div>
