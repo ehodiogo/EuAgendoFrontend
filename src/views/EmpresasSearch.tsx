@@ -287,6 +287,7 @@ function EmpresasSearch() {
                       <h6 className="text-primary">Serviços:</h6>
                       <ul className="list-unstyled">
                         {empresa.servicos && empresa.servicos.length > 0 ? (
+                            console.log("Empresa servicos", empresa.servicos),
                           empresa.servicos.map((servico, i) => (
                             <li key={i} className="text-muted">
                               • {servico.nome}

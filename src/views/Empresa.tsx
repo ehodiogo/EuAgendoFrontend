@@ -148,8 +148,9 @@ function EmpresaDetails() {
           transition: all 0.3s ease;
         }
         .btn-success {
-          background-color: var(--success-green);
-          border-color: var(--success-green);
+          background-color: var(--success-green) !important;
+          border-color: var(--success-green) !important;
+          color: #fff !important;
         }
         .btn-primary {
           background-color: var(--primary-blue);
