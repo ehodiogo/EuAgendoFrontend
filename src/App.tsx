@@ -2,6 +2,7 @@
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { lazy, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const Home = lazy(() => import("./views/Home"));
 const EmpresasSearch = lazy(() => import("./views/EmpresasSearch"));
