@@ -318,8 +318,8 @@ function Home() {
                 icon: <FaUser size={24} />,
               },
             ].map((item, index) => (
-              <div key={index} className="col-md-4">
-                <div className="custom-card benefit-card">
+              <div key={index} className="col-md-4 d-flex mb-4">
+                <div className="custom-card benefit-card d-flex flex-column h-100">
                   <div className="benefit-icon">{item.icon}</div>
                   <h3>{item.title}</h3>
                   <p>{item.desc}</p>
@@ -350,7 +350,7 @@ function Home() {
                   stars: "⭐⭐⭐⭐⭐",
                 },
               ].map((item, index) => (
-                <div key={index} className="col-md-4 mb-4">
+                <div key={index} className="col-md-4 d-flex mb-4">
                   <div className="custom-card review-card d-flex flex-column h-100 p-4">
                     <div className="avatar">
                       <FaUser />
@@ -371,25 +371,25 @@ function Home() {
             {[
               {
                 title: "Básico",
-                price: "R$ 29,90/mês",
+                price: "R$ 49/mês",
                 desc: "Ideal para pequenos negócios",
-                features: ["Até 50 agendamentos/mês", "Lembretes automáticos", "Suporte via e-mail"],
+                features: ["1 empresa", "15 funcionários por empresa"],
               },
               {
                 title: "Profissional",
-                price: "R$ 79,90/mês",
+                price: "R$ 149/mês",
                 desc: "Perfeito para negócios em crescimento",
-                features: ["Agendamentos ilimitados", "Relatórios avançados", "Suporte prioritário"],
+                features: ["5 empresas", "25 funcionários por empresa"],
               },
               {
                 title: "Corporativo",
-                price: "Personalizado",
+                price: "R$ 299/mês",
                 desc: "Para grandes empresas",
-                features: ["Integrações personalizadas", "Gerente de conta dedicado", "API access"],
+                features: ["20 empresas", "1000 funcionários por empresa"],
               },
             ].map((plano, index) => (
-              <div key={index} className="col-md-4">
-                <div className="custom-card plan-card">
+              <div key={index} className="col-md-4 d-flex mb-4">
+                <div className="custom-card plan-card d-flex flex-column h-100">
                   <h3>{plano.title}</h3>
                   <div className="plan-price">{plano.price}</div>
                   <p className="text-muted">{plano.desc}</p>
