@@ -283,8 +283,8 @@ function Home() {
             </div>
             <div className="ms-lg-5 mt-4 mt-lg-0">
               <img
-                src={"eu-agendo.png"}
-                alt="Imagem do EuAgendo"
+                src={"vem-agendar.png"}
+                alt="Imagem do VemAgendar"
                 className="img-fluid"
               />
             </div>
@@ -292,9 +292,9 @@ function Home() {
         </header>
 
         <section className="custom-section container text-center" data-aos="fade-up">
-          <h2 className="fw-bold">O que é o EuAgendo?</h2>
+          <h2 className="fw-bold">O que é o VemAgendar?</h2>
           <p className="text-muted mx-auto">
-            O EuAgendo é uma plataforma inteligente que simplifica o agendamento de compromissos para empresas e clientes. Nossa ferramenta permite um gerenciamento eficiente, envio de lembretes automáticos e maior organização.
+            O VemAgendar é uma plataforma inteligente que simplifica o agendamento de compromissos para empresas e clientes. Nossa ferramenta permite um gerenciamento eficiente, envio de lembretes automáticos e maior organização.
           </p>
         </section>
 
@@ -336,7 +336,7 @@ function Home() {
               {[
                 {
                   name: "Mariana R.",
-                  review: "O EuAgendo revolucionou meu negócio! Nunca foi tão fácil organizar meus clientes.",
+                  review: "O VemAgendar revolucionou meu negócio! Nunca foi tão fácil organizar meus clientes.",
                   stars: "⭐⭐⭐⭐⭐",
                 },
                 {
@@ -413,7 +413,7 @@ function Home() {
         <section className="custom-section roadmap-section" data-aos="fade-up">
           <div className="container text-center">
             <h2 className="fw-bold">Lançamentos Futuros</h2>
-            <p className="text-muted">Descubra as próximas inovações do EuAgendo.</p>
+            <p className="text-muted">Descubra as próximas inovações do VemAgendar.</p>
             <div className="row justify-content-center">
               <div className="col-md-8">
                 <div className="roadmap-card">
@@ -437,7 +437,7 @@ function Home() {
 
         <footer className="custom-footer text-white text-center py-5">
           <div className="container">
-            <p className="mb-0">&copy; 2025 EuAgendo. Todos os direitos reservados.</p>
+            <p className="mb-0">&copy; 2025 VemAgendar. Todos os direitos reservados.</p>
             <div className="d-flex justify-content-center social-links mt-3">
               <a
                 href="/termos"

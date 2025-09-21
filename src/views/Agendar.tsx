@@ -351,7 +351,7 @@ const Agendar = () => {
                 )}
               </section>
               <footer className="agendar-footer">
-                <p>&copy; 2025 EuAgendo. Todos os direitos reservados.</p>
+                <p>&copy; 2025 VemAgendar. Todos os direitos reservados.</p>
               </footer>
             </>
           )}

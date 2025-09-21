@@ -157,9 +157,9 @@ function Sobre() {
 
         <div className="container">
           <section className="custom-section text-center">
-            <h1>Sobre o EuAgendo</h1>
+            <h1>Sobre o VemAgendar</h1>
             <p className="lead">
-              O EuAgendo é uma plataforma inovadora de agendamento que transforma a gestão de compromissos, oferecendo uma solução prática, eficiente e acessível para empresas de todos os tamanhos.
+              O VemAgendar é uma plataforma inovadora de agendamento que transforma a gestão de compromissos, oferecendo uma solução prática, eficiente e acessível para empresas de todos os tamanhos.
             </p>
             <button
               className="custom-btn btn btn-lg px-4 shadow-sm fw-semibold mt-3"

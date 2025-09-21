@@ -213,7 +213,7 @@ function Login() {
         <div className="login-container">
           <div className="login-card" data-aos="fade-up">
             <h2>
-              <FaKey /> EuAgendo - Login
+              <FaKey /> VemAgendar - Login
             </h2>
             <form onSubmit={handleLogin}>
               <div className="mb-3">

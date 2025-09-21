@@ -11,7 +11,7 @@ const roadmapData = [
     date: "Setembro 2025",
     title: "Lançamento Inicial",
     description:
-      "Disponibilização da versão inicial do Agendo com funcionalidades básicas de agendamento.",
+      "Disponibilização da versão inicial do VemAgendar com funcionalidades básicas de agendamento.",
     status: "Feito",
   },
   {
@@ -233,7 +233,7 @@ const Roadmap: React.FC = () => {
         `}</style>
         <div className="roadmap-container">
           <h1 className="roadmap-title" data-aos="fade-up">
-            <FaMapMarkerAlt /> Roadmap do EuAgendo
+            <FaMapMarkerAlt /> Roadmap do VemAgendar
           </h1>
           <div className="timeline">
             {roadmapData.map((item, index) => (

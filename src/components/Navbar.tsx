@@ -149,12 +149,12 @@ const Navbar = () => {
         <div className="container-fluid px-4">
           <a className="navbar-brand d-flex align-items-center" href="/">
             <img
-              src="/eu-agendo-ico.ico"
-              alt="Logo EuAgendo"
+              src="/vem-agendar.ico"
+              alt="Logo VemAgendar"
               className="me-2"
               style={{ width: "36px", height: "36px", filter: "drop-shadow(0 0 2px rgba(255, 255, 255, 0.3))" }}
             />
-            <span className="fw-bold fs-4">EuAgendo</span>
+            <span className="fw-bold fs-4">VemAgendar</span>
           </a>
           <button
             className="navbar-toggler"
