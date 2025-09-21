@@ -262,10 +262,6 @@ function EmpresasSearch() {
             <div className="message loading" data-aos="fade-up">
               <FaSpinner className="fa-spin me-2" /> Carregando empresas...
             </div>
-          ) : empresas.error ? (
-            <div className="message error" data-aos="fade-up">
-              <FaExclamationCircle /> Erro ao carregar empresas: {empresas.error}
-            </div>
           ) : filteredEmpresas && filteredEmpresas.length > 0 ? (
             <div className="row">
               {filteredEmpresas.map((empresa, index) => (
