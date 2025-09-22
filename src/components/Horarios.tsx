@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { Servicos } from "../interfaces/ServicosFuncionarios";
 import "aos/dist/aos.css";
-import { FaCheckCircle, FaTimesCircle, FaUtensils, FaSpinner, FaCalendarCheck } from "react-icons/fa";
+import { FaCheckCircle, FaTimesCircle, FaUtensils, FaSpinner, FaCalendarCheck, FaExclamationCircle } from "react-icons/fa";
 
 interface HorariosDoDiaProps {
   empresa: Empresa;
@@ -48,7 +48,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
   };
 
   const horariosDisponiveis: Record<string, string> = {};
-  const intervaloAlmoco = empresa?.para_almoço && empresa?.horario_pausa_inicio && empresa?.horario_pausa_fim;
+  const intervaloAlmoco = empresa?.para_almoco && empresa?.horario_pausa_inicio && empresa?.horario_pausa_fim;
   const diaSelecionado = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"][data_selecionada.getDay()];
   const fimDeSemana = diaSelecionado === "Sábado" || diaSelecionado === "Domingo";
   const horarioAbertura = fimDeSemana ? empresa?.horario_abertura_fim_de_semana : empresa?.horario_abertura_dia_semana;
@@ -153,6 +153,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
         window.location.reload();
       }
     } catch (error) {
+      // @ts-ignore
       setFormError(`Erro ao agendar: ${error.message}`);
     }
   };
@@ -388,10 +389,6 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
         {agendamentosResponse.loading ? (
           <div className="message" data-aos="fade-up">
             <FaSpinner className="fa-spin me-2" /> Carregando horários...
-          </div>
-        ) : agendamentosResponse.error ? (
-          <div className="message" data-aos="fade-up">
-            <FaExclamationCircle /> Erro ao carregar horários: {agendamentosResponse.error}
           </div>
         ) : Object.keys(horariosDisponiveis).length === 0 ? (
           <div className="message" data-aos="fade-up">

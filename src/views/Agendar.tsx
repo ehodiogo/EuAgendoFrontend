@@ -110,7 +110,7 @@ const Agendar = () => {
           box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
         .funcionarios-section .card.selected {
-          border: 2px solid var(--danger-red);
+          border: 2px solid blue;
         }
         .funcionarios-section .card-img-top {
           width: 120px;
@@ -251,10 +251,6 @@ const Agendar = () => {
           {empresasData.loading ? (
             <div className="message loading" data-aos="fade-up">
               <FaSpinner className="fa-spin me-2" /> Carregando dados da empresa...
-            </div>
-          ) : empresasData.error ? (
-            <div className="message error" data-aos="fade-up">
-              <FaExclamationCircle /> Erro ao carregar empresa: {empresasData.error}
             </div>
           ) : !empresasData.data || empresasData.data.length === 0 ? (
             <div className="message error" data-aos="fade-up">

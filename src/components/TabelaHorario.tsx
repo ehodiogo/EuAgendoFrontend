@@ -17,7 +17,11 @@ interface HorariosTabelaProps {
 
 const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
-  const [dataSelecionada, setDataSelecionada] = useState(new Date());
+  const [dataSelecionada, setDataSelecionada] = useState(() => {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    return hoje;
+  });
   const [assinaturaVencida, setAssinaturaVencida] = useState(false);
 
   const empresaInterfaceList = useFetch<Empresa[]>(`api/empresa/?q=${empresaNome}`);
@@ -54,23 +58,32 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
 
   const limitarDatasDisponiveis = (date: Date) => {
     const hoje = new Date();
-    const amanha = new Date();
+    hoje.setHours(0, 0, 0, 0); // Normaliza a data de hoje para 00:00:00
+    const amanha = new Date(hoje);
     amanha.setDate(hoje.getDate() + 1);
     const diferencaHoras = empresa?.assinatura_vencimento ?? -50;
 
+    // Normaliza a data de entrada para comparar apenas ano, mês e dia
+    const dataNormalizada = new Date(date);
+    dataNormalizada.setHours(0, 0, 0, 0);
+
     if (empresa?.assinatura_ativa === false) {
       if (diferencaHoras > -24) {
+        // Permite hoje ou amanhã
         return (
-          date.getDate() === hoje.getDate() || date.getDate() === amanha.getDate()
+          dataNormalizada.getTime() === hoje.getTime() ||
+          dataNormalizada.getTime() === amanha.getTime()
         );
       }
       if (diferencaHoras >= -49 && diferencaHoras <= -24) {
-        return date.getDate() === hoje.getDate();
+        // Permite apenas hoje
+        return dataNormalizada.getTime() === hoje.getTime();
       }
       return false;
     }
 
-    return date >= hoje;
+    // Se a assinatura está ativa, permite hoje e datas futuras
+    return dataNormalizada >= hoje;
   };
 
   return (
@@ -227,10 +240,6 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
         {empresaInterfaceList.loading ? (
           <div className="message loading" data-aos="fade-up">
             <FaSpinner className="fa-spin me-2" /> Carregando dados da empresa...
-          </div>
-        ) : empresaInterfaceList.error ? (
-          <div className="message error" data-aos="fade-up">
-            <FaExclamationCircle /> Erro ao carregar empresa: {empresaInterfaceList.error}
           </div>
         ) : !empresa ? (
           <div className="message error" data-aos="fade-up">
