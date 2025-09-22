@@ -206,7 +206,7 @@ function Contato() {
                 <FaEnvelope size={24} />
                 <div>
                   <strong>E-mail:</strong>
-                  <a href="mailto:contato@vemagendar.com">contato@vemagendar.com</a>
+                  <a href="mailto:vemagendar@gmail.com">vemagendar@gmail.com</a>
                 </div>
               </div>
               <div className="contact-item">
