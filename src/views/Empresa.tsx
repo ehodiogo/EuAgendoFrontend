@@ -239,10 +239,6 @@ function EmpresaDetails() {
             <div className="message loading" data-aos="fade-up">
               <FaSpinner className="fa-spin me-2" /> Carregando dados da empresa...
             </div>
-          ) : empresas.error ? (
-            <div className="message error" data-aos="fade-up">
-              <FaExclamationCircle /> Erro ao carregar empresa: {empresas.error}
-            </div>
           ) : !empresa ? (
             <div className="message error" data-aos="fade-up">
               <FaExclamationCircle /> Empresa não encontrada.
@@ -307,10 +303,6 @@ function EmpresaDetails() {
                 {funcionarios.loading ? (
                   <div className="message loading" data-aos="fade-up">
                     <FaSpinner className="fa-spin me-2" /> Carregando funcionários...
-                  </div>
-                ) : funcionarios.error ? (
-                  <div className="message error" data-aos="fade-up">
-                    <FaExclamationCircle /> Erro ao carregar funcionários: {funcionarios.error}
                   </div>
                 ) : funcionarios.data && funcionarios.data.length > 0 ? (
                   <div className="row justify-content-center">

@@ -198,6 +198,8 @@ function Dashboard() {
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           cursor: pointer;
           transition: transform 0.3s ease, box-shadow 0.3s ease;
+          margin-bottom: 1.5rem;
+          padding: 1.5rem;
         }
         .empresa-card:hover {
           transform: translateY(-5px);
@@ -207,6 +209,7 @@ function Dashboard() {
           color: var(--primary-blue);
           font-weight: 600;
           font-size: 1.5rem;
+          margin-bottom: 0.5rem;
         }
         .empresa-card .card-text {
           color: var(--dark-gray);
@@ -217,6 +220,7 @@ function Dashboard() {
           border-radius: 12px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           padding: 1.5rem;
+          margin-bottom: 1.5rem;
         }
         .dropdown-card .btn-primary {
           background-color: var(--primary-blue);
@@ -370,7 +374,7 @@ function Dashboard() {
             <div className="row justify-content-center">
               {empresas_usuario.data?.map((empresa: Empresa) => (
                 <div
-                  className="col-md-6 col-lg-4 mb-4"
+                  className="col-12 mb-4"
                   key={empresa.id}
                   data-aos="fade-up"
                   data-aos-delay="400"
