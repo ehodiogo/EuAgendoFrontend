@@ -53,7 +53,7 @@ export interface EmpresaCreate {
   abre_sabado: boolean;
   abre_domingo: boolean;
 
-  para_almoço: boolean;
+  para_almoco: boolean;
   horario_pausa_inicio: string;
   horario_pausa_fim: string;
 }

@@ -118,10 +118,21 @@ function EmpresasSearch() {
           transform: translateY(-5px);
           box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
-        .empresas-list .card-img-top {
+        .empresas-list .card-img-container {
+          width: 100%;
           height: 200px;
-          object-fit: cover;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background-color: var(--light-gray);
           border-radius: 12px 12px 0 0;
+          overflow: hidden;
+        }
+        .empresas-list .card-img-top {
+          max-width: 100%;
+          max-height: 100%;
+          object-fit: contain;
+          margin: auto;
         }
         .empresas-list .card-body {
           padding: 1.5rem;
@@ -226,6 +237,9 @@ function EmpresasSearch() {
             font-size: 1rem;
             padding: 1rem;
           }
+          .empresas-list .card-img-container {
+            height: 150px;
+          }
         }
       `}</style>
       <div className="custom-bg min-vh-100">
@@ -267,11 +281,13 @@ function EmpresasSearch() {
               {filteredEmpresas.map((empresa, index) => (
                 <div key={index} className="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay={index * 100}>
                   <div className="card">
-                    <img
-                      src={empresa.logo || "https://via.placeholder.com/200x200?text=Sem+Logo"}
-                      alt={empresa.nome}
-                      className="card-img-top"
-                    />
+                    <div className="card-img-container">
+                      <img
+                        src={empresa.logo || "https://via.placeholder.com/200x200?text=Sem+Logo"}
+                        alt={empresa.nome}
+                        className="card-img-top"
+                      />
+                    </div>
                     <div className="card-body">
                       <h5 className="card-title">{empresa.nome}</h5>
                       <p className="text-muted">
@@ -283,7 +299,6 @@ function EmpresasSearch() {
                       <h6 className="text-primary">Serviços:</h6>
                       <ul className="list-unstyled">
                         {empresa.servicos && empresa.servicos.length > 0 ? (
-                            console.log("Empresa servicos", empresa.servicos),
                           empresa.servicos.map((servico, i) => (
                             <li key={i} className="text-muted">
                               • {servico.nome}

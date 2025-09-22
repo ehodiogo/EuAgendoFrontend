@@ -264,7 +264,7 @@ function Planos() {
                 cor: "#6c757d",
                 features: [
                   "1 empresa",
-                  "1 funcionário",
+                  "1 funcionário por empresa",
                   "Suporte via e-mail",
                   "Acesso limitado",
                   "7 dias de uso"
@@ -279,7 +279,7 @@ function Planos() {
                 cor: "#28a745",
                 features: [
                   "1 empresa",
-                  "Até 15 funcionários",
+                  "Até 15 funcionários por empresa",
                   "Suporte via e-mail",
                   "Relatórios básicos",
                   "Painel financeiro",
@@ -294,7 +294,7 @@ function Planos() {
                 cor: "#dc3545",
                 features: [
                   "Até 5 empresas",
-                  "Até 25 funcionários",
+                  "Até 25 funcionários por empresa",
                   "Suporte prioritário",
                   "Relatórios avançados",
                   "Painel financeiro",
@@ -309,7 +309,7 @@ function Planos() {
                 cor: "#003087",
                 features: [
                   "Até 20 empresas",
-                  "Até 1000 funcionários",
+                  "Até 1000 funcionários por empresa",
                   "Suporte dedicado",
                   "Relatórios avançados",
                   "API access",

@@ -220,7 +220,7 @@ function Contato() {
                 <FaMapMarkerAlt size={24} />
                 <div>
                   <strong>Endereço:</strong>
-                  <a href="https://maps.google.com/?q=São+Paulo,+SP" target="_blank" rel="noopener noreferrer">São Paulo, SP - Brasil</a>
+                  <a href="https://maps.google.com/?q=Santa+Maria,+RS" target="_blank" rel="noopener noreferrer">Santa Maria, RS - Brasil</a>
                 </div>
               </div>
             </div>

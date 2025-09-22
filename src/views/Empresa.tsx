@@ -338,7 +338,7 @@ function EmpresaDetails() {
                   <p className="text-muted">Nenhum funcionário cadastrado.</p>
                 )}
               </div>
-              <div className="text-center mt-5" data-aos="zoom-in">
+              <div className="text-center mt-5">
                 <Link
                   to={`/agendar/${empresa.nome}`}
                   className="btn btn-success"

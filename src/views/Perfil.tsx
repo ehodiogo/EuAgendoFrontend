@@ -564,7 +564,7 @@ const Profile = () => {
               {usage.data && usage.data.funcionarios_por_empresa && (
                 usage.data.funcionarios_por_empresa.map((item, index) => (
                   <div key={index} className="usage-card" data-aos="fade-up" data-aos-delay="400">
-                    <h4>Limite de Funcionários por Empresa</h4>
+                    <h4>Limite de Funcionários por Empresas</h4>
                     <div className="progress">
                       <div
                         className={`progress-bar ${getProgressBarColor(calculateProgress(item.total_funcionarios, usage.data.limite_funcionarios))}`}
@@ -586,7 +586,7 @@ const Profile = () => {
               )}
               {usage.data?.funcionarios_por_empresa.length === 0 && (
                 <div className="usage-card" data-aos="fade-up" data-aos-delay="400">
-                  <h4>Limite de Funcionários por Empresa</h4>
+                  <h4>Limite de Funcionários Totais</h4>
                   <p className="text-center text-muted">Nenhuma empresa criada para possuir funcionários.</p>
                 </div>
               )}
