@@ -29,7 +29,7 @@ const PendingPage = lazy(() => import("./views/Pending"));
 const ValidarPlano = lazy(() => import("./views/ValidarPlano"));
 const Roadmap = lazy(() => import("./views/Roadmap"));
 const CadastrosUsuario = lazy(() => import("./views/CadastrosUsuario"));
-
+const AvaliacaoAgendamento = lazy(() => import("./views/AvaliarAgendamento"))
 const EmpresaCreate = lazy(() => import("./views/EmpresaCriar"));
 const FuncionarioCreate = lazy(() => import("./views/FuncionarioCriar"));
 const ServicoCreate = lazy(() => import("./views/ServicosCriar"));
@@ -75,6 +75,7 @@ function App() {
       <Route path="/empresas/:empresa" element={<EmpresaDetails />} />
       <Route path="/agendar/:empresa" element={<Agendar />} />
       <Route path="/agendamentos" element={<h1>Agendamentos</h1>} />
+      <Route path="/agendamento/:identificador/avaliar" element={<AvaliacaoAgendamento />} />
 
       <Route path="/login" element={<Login />} />
       <Route path="/cadastro" element={<Register />} />
