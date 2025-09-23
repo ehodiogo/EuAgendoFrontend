@@ -1,5 +1,3 @@
-import {Servico} from "./Servico.tsx";
-import {Cliente} from "./Cliente.tsx";
 import {Funcionario} from "./Funcionario.tsx";
 
 export interface  AvaliacaoAgendamento {

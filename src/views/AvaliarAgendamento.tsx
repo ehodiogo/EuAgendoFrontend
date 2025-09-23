@@ -12,7 +12,7 @@ const AvaliacaoAgendamentoView = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
 
-  const { data: agendamentoData, loading, error } = useFetch<AvaliacaoAgendamento>(
+  const { data: agendamentoData, loading } = useFetch<AvaliacaoAgendamento>(
     `api/agendamento-avaliar/${identificador}`
   );
 
@@ -33,7 +33,7 @@ const AvaliacaoAgendamentoView = () => {
     setSubmitStatus(null);
 
     try {
-      const response = await fetch(`api/agendamento/${agendamento}/avaliacao`, {
+      const response = await fetch(`api/agendamento/${identificador}/avaliacao`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nota_avaliacao: nota, descricao_avaliacao: descricao }),
@@ -42,9 +42,6 @@ const AvaliacaoAgendamentoView = () => {
       if (!response.ok) throw new Error("Erro ao salvar avaliação");
 
       setSubmitStatus("success");
-      setTimeout(() => setSubmitStatus(null), 3000);
-    } catch (err) {
-      setSubmitStatus("error");
       setTimeout(() => setSubmitStatus(null), 3000);
     } finally {
       setIsSubmitting(false);
@@ -351,10 +348,6 @@ const AvaliacaoAgendamentoView = () => {
           {loading ? (
             <div className="message loading">
               <FaSpinner className="fa-spin text-xl" aria-hidden="true" /> Carregando agendamento...
-            </div>
-          ) : error ? (
-            <div className="message error">
-              <FaExclamationCircle className="text-xl" aria-hidden="true" /> Erro ao carregar agendamento: {error}
             </div>
           ) : !agendamentoData ? (
             <div className="message error">

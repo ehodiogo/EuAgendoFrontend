@@ -237,10 +237,6 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
             <div className="loading-container" data-aos="fade-up" data-aos-delay="300">
               <FaSpinner className="fa-spin me-2" /> Carregando agendamentos...
             </div>
-          ) : agendamentosHoje.error ? (
-            <div className="error-container" data-aos="fade-up" data-aos-delay="300">
-              Erro ao carregar agendamentos: {agendamentosHoje.error}
-            </div>
           ) : !agendamentosHoje.data || agendamentosHoje.data.length === 0 ? (
             <div className="empty-container" data-aos="fade-up" data-aos-delay="300">
               Não há agendamentos para hoje.
