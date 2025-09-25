@@ -52,9 +52,17 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
 
   const dataSelecionadaString = dataSelecionada.toISOString().split("T")[0];
 
+  console.log("Data selecionada", dataSelecionadaString);
+  console.log("Abre final de semana", empresa?.abre_sabado);
+  console.log("Abre final de semana", empresa?.abre_domingo);
+
+  console.log("Dia selecionado: --->", diaSelecionado);
+
   const empresaFechada =
     (diaSelecionado === "Sábado" && !empresa?.abre_sabado) ||
     (diaSelecionado === "Domingo" && !empresa?.abre_domingo);
+
+  console.log("Empresa fechada?", empresaFechada);
 
   const limitarDatasDisponiveis = (date: Date) => {
     const hoje = new Date();
@@ -85,6 +93,8 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
     // Se a assinatura está ativa, permite hoje e datas futuras
     return dataNormalizada >= hoje;
   };
+
+  console.log("Servicos: ", empresa?.servicos);
 
   return (
     <div className="horarios-tabela">

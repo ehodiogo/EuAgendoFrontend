@@ -20,7 +20,7 @@ import { Empresa } from "../interfaces/Empresa";
 import { useFetch } from "../functions/GetData";
 import DashBoardDados from "../components/DashboardDados";
 import { Modal } from "react-bootstrap";
-import { FaChartLine, FaExclamationTriangle, FaClock } from "react-icons/fa";
+import { FaChartLine, FaExclamationTriangle, FaClock  } from "react-icons/fa";
 
 ChartJS.register(
   CategoryScale,
@@ -179,6 +179,30 @@ function Dashboard() {
           background-color: var(--light-blue);
           border-color: var(--light-blue);
           color: var(--white);
+        }
+        .nav-button .btn-toggle-checkin {
+          color: var(--white);
+        }
+        .nav-button .btn-toggle-checkin.stop {
+          background-color: var(--danger-red);
+          border-color: var(--danger-red);
+        }
+        .nav-button .btn-toggle-checkin.stop:hover {
+          background-color: #c82333;
+          border-color: #c82333;
+        }
+        .nav-button .btn-toggle-checkin.start {
+          background-color: var(--success-green);
+          border-color: var(--success-green);
+        }
+        .nav-button .btn-toggle-checkin.start:hover {
+          background-color: #218838;
+          border-color: #218838;
+        }
+        .nav-button .btn-toggle-checkin:disabled {
+          background-color: #6c757d;
+          border-color: #6c757d;
+          cursor: not-allowed;
         }
         .nav-button .btn:hover {
           transform: translateY(-2px);
@@ -366,6 +390,12 @@ function Dashboard() {
                   Cadastros
                 </Link>
                 <p>Crie, altere e exclua empresas, serviços e funcionários.</p>
+              </div>
+              <div className="nav-button">
+                <Link to="/checkin" className="btn btn-dark">
+                  Checkins
+                </Link>
+                <p>Gerencie os checkins das suas empresas.</p>
               </div>
             </div>
             <p className="lead" data-aos="fade-up" data-aos-delay="300">

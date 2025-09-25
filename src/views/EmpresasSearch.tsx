@@ -5,10 +5,15 @@ import { Empresa } from "../interfaces/Empresa";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "../components/Navbar";
-import { FaSearch, FaBuilding, FaSpinner, FaExclamationCircle } from "react-icons/fa";
+import { FaSearch, FaSpinner, FaExclamationCircle, FaFilter } from "react-icons/fa";
 
 function EmpresasSearch() {
   const [search, setSearch] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [estado, setEstado] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [pais, setPais] = useState("");
+  const [showModal, setShowModal] = useState(false);
   const empresas = useFetch<Empresa[]>("api/empresa");
 
   useEffect(() => {
@@ -16,8 +21,33 @@ function EmpresasSearch() {
   }, []);
 
   const filteredEmpresas = empresas.data?.filter((empresa: Empresa) =>
-    empresa.nome.toLowerCase().includes(search.toLowerCase())
+    empresa.nome.toLowerCase().includes(search.toLowerCase()) &&
+    (cidade ? empresa.cidade.toLowerCase().includes(cidade.toLowerCase()) : true) &&
+    (estado ? empresa.estado.toLowerCase().includes(estado.toLowerCase()) : true) &&
+    (bairro ? empresa.bairro.toLowerCase().includes(bairro.toLowerCase()) : true) &&
+    (pais ? empresa.pais.toLowerCase().includes(pais.toLowerCase()) : true)
   );
+
+  const estados = [
+    "Acre", "Alagoas", "Amapá", "Amazonas", "Bahia", "Ceará", "Distrito Federal",
+    "Espírito Santo", "Goiás", "Maranhão", "Mato Grosso", "Mato Grosso do Sul",
+    "Minas Gerais", "Pará", "Paraíba", "Paraná", "Pernambuco", "Piauí",
+    "Rio de Janeiro", "Rio Grande do Norte", "Rio Grande do Sul", "Rondônia",
+    "Roraima", "Santa Catarina", "São Paulo", "Sergipe", "Tocantins"
+  ];
+
+  const clearFilters = () => {
+    setSearch("");
+    setCidade("");
+    setEstado("");
+    setBairro("");
+    setPais("");
+    setShowModal(false);
+  };
+
+  const applyFilters = () => {
+    setShowModal(false);
+  };
 
   return (
     <div className="min-vh-100">
@@ -62,7 +92,7 @@ function EmpresasSearch() {
           margin: 0 auto;
         }
 
-        /* Busca */
+        /* Busca e Filtros */
         .search-section {
           padding: 3rem 0;
           text-align: center;
@@ -80,23 +110,111 @@ function EmpresasSearch() {
         .search-section .input-group {
           max-width: 500px;
           margin: 0 auto;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
         }
         .search-section .form-control {
-          border-radius: 8px 0 0 8px;
+          border-radius: 8px;
+          border: 1px solid var(--light-blue);
+          padding: 0.75rem;
+          font-size: 1rem;
+          color: var(--dark-gray);
+          flex: 1;
+          min-width: 200px;
+        }
+        .search-section .btn-filter {
+          background-color: var(--light-blue);
+          border-color: var(--light-blue);
+          color: var(--white);
+          border-radius: 8px;
+          padding: 0.75rem 1.5rem;
+          font-weight: 600;
+          transition: all 0.3s ease;
+        }
+        .search-section .btn-filter:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Modal */
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+        }
+        .modal-content {
+          background: var(--white);
+          border-radius: 12px;
+          padding: 2rem;
+          max-width: 500px;
+          width: 90%;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+          position: relative;
+          animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+          from { transform: translateY(-50px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-content h3 {
+          color: var(--primary-blue);
+          font-weight: 700;
+          margin-bottom: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        .modal-content .form-group {
+          margin-bottom: 1rem;
+        }
+        .modal-content .form-control,
+        .modal-content .form-select {
+          width: 100%;
+          border-radius: 8px;
           border: 1px solid var(--light-blue);
           padding: 0.75rem;
           font-size: 1rem;
           color: var(--dark-gray);
         }
-        .search-section .btn-warning {
-          background-color: var(--warning-orange);
-          border-color: var(--warning-orange);
-          border-radius: 0 8px 8px 0;
+        .modal-content .btn-close {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          color: var(--dark-gray);
+          cursor: pointer;
+        }
+        .modal-content .btn-primary {
+          background-color: var(--primary-blue);
+          border-color: var(--primary-blue);
+          border-radius: 8px;
           padding: 0.75rem 1.5rem;
           font-weight: 600;
           transition: all 0.3s ease;
         }
-        .search-section .btn-warning:hover {
+        .modal-content .btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .modal-content .btn-warning {
+          background-color: var(--warning-orange);
+          border-color: var(--warning-orange);
+          border-radius: 8px;
+          padding: 0.75rem 1.5rem;
+          font-weight: 600;
+          transition: all 0.3s ease;
+        }
+        .modal-content .btn-warning:hover {
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
@@ -219,9 +337,22 @@ function EmpresasSearch() {
           .search-section h2 {
             font-size: 1.5rem;
           }
-          .search-section .form-control, .search-section .btn-warning {
+          .search-section .form-control, .search-section .btn-filter {
             font-size: 0.9rem;
             padding: 0.5rem;
+            min-width: 100%;
+          }
+          .modal-content {
+            padding: 1.5rem;
+            width: 95%;
+          }
+          .modal-content .form-control, .modal-content .form-select {
+            font-size: 0.9rem;
+            padding: 0.5rem;
+          }
+          .modal-content .btn-primary, .modal-content .btn-warning {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
           }
           .empresas-list .card-title {
             font-size: 1.1rem;
@@ -266,11 +397,81 @@ function EmpresasSearch() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <button className="btn btn-warning" onClick={() => setSearch("")}>
-              Limpar
+            <button
+              className="btn btn-filter"
+              onClick={() => setShowModal(true)}
+            >
+              <FaFilter /> Filtros
             </button>
           </div>
         </section>
+        {showModal && (
+          <div className="modal-overlay" onClick={() => setShowModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <button className="btn-close" onClick={() => setShowModal(false)}>
+                &times;
+              </button>
+              <h3>
+                <FaFilter /> Filtros de Pesquisa
+              </h3>
+              <div className="form-group">
+                <label htmlFor="cidade">Cidade</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="cidade"
+                  placeholder="Digite a cidade..."
+                  value={cidade}
+                  onChange={(e) => setCidade(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="estado">Estado</label>
+                <select
+                  className="form-select"
+                  id="estado"
+                  value={estado}
+                  onChange={(e) => setEstado(e.target.value)}
+                >
+                  <option value="">Selecione o estado...</option>
+                  {estados.map((est) => (
+                    <option key={est} value={est}>{est}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="bairro">Bairro</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="bairro"
+                  placeholder="Digite o bairro..."
+                  value={bairro}
+                  onChange={(e) => setBairro(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="pais">País</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="pais"
+                  placeholder="Digite o país..."
+                  value={pais}
+                  onChange={(e) => setPais(e.target.value)}
+                />
+              </div>
+              <div className="d-flex justify-content-between mt-3">
+                <button className="btn btn-warning" onClick={clearFilters}>
+                  Limpar
+                </button>
+                <button className="btn btn-primary" onClick={applyFilters}>
+                  Aplicar Filtros
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         <section className="empresas-list container">
           {empresas.loading ? (
             <div className="message loading" data-aos="fade-up">
@@ -291,7 +492,7 @@ function EmpresasSearch() {
                     <div className="card-body">
                       <h5 className="card-title">{empresa.nome}</h5>
                       <p className="text-muted">
-                        <strong>Endereço:</strong> {empresa.endereco}
+                        <strong>Endereço:</strong> {empresa.endereco}, {empresa.bairro}, {empresa.cidade}, {empresa.estado}, {empresa.pais}
                       </p>
                       <p className="text-muted">
                         <strong>Telefone:</strong> {empresa.telefone}
@@ -321,7 +522,7 @@ function EmpresasSearch() {
             </div>
           ) : (
             <div className="message warning" data-aos="fade-up">
-              <FaExclamationCircle /> Nenhuma empresa encontrada para "<strong>{search}</strong>".
+              <FaExclamationCircle /> Nenhuma empresa encontrada com os filtros aplicados.
             </div>
           )}
         </section>

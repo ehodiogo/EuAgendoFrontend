@@ -18,11 +18,14 @@ const Navbar = () => {
 
     updateCartCount();
 
-    window.addEventListener("storage", updateCartCount);
-
-    return () => {
-      window.removeEventListener("storage", updateCartCount);
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "carrinho") {
+        updateCartCount();
+      }
     };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   const handleLogout = () => {
@@ -33,10 +36,10 @@ const Navbar = () => {
   };
 
   return (
-    <>
+    <div className="navbar-container">
       <style>{`
-        .custom-navbar {
-          background-color: #003087 !important; /* Azul escuro profissional */
+        .navbar-container .custom-navbar {
+          background-color: #003087 !important;
           padding: 0.75rem 0;
           transition: all 0.3s ease;
           position: sticky;
@@ -44,101 +47,101 @@ const Navbar = () => {
           z-index: 1000;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
-        .navbar-brand {
+        .navbar-container .navbar-brand {
           font-size: 1.5rem;
           color: #ffffff !important;
           transition: color 0.3s ease;
         }
-        .navbar-brand:hover {
-          color: #e6f0fa !important; /* Tom claro de azul para hover */
+        .navbar-container .navbar-brand:hover {
+          color: #e6f0fa !important;
         }
-        .nav-link {
+        .navbar-container .nav-link {
           color: #ffffff !important;
           font-weight: 500;
           padding: 0.5rem 1rem !important;
           transition: color 0.3s ease, background-color 0.3s ease;
         }
-        .nav-link:hover {
-          color: #4dabf7 !important; /* Azul claro vibrante para hover */
+        .navbar-container .nav-link:hover {
+          color: #4dabf7 !important;
           background-color: rgba(255, 255, 255, 0.1);
           border-radius: 4px;
         }
-        .btn-outline-primary {
+        .navbar-container .btn-outline-primary {
           border-color: #4dabf7;
           color: #4dabf7;
           border-radius: 8px;
           transition: all 0.3s ease;
         }
-        .btn-primary {
+        .navbar-container .btn-primary {
           background-color: #003087;
           border-color: #003087;
           border-radius: 8px;
           transition: all 0.3s ease;
         }
-        .btn-outline-danger {
+        .navbar-container .btn-outline-danger {
           border-color: #dc3545;
           color: #dc3545;
           border-radius: 8px;
           transition: all 0.3s ease;
         }
-        .btn-outline-primary:hover,
-        .btn-primary:hover {
+        .navbar-container .btn-outline-primary:hover,
+        .navbar-container .btn-primary:hover {
           transform: translateY(-2px);
           box-shadow: 0 2px 8px rgba(0, 48, 135, 0.3);
           background-color: #0040c1;
           border-color: #0040c1;
           color: #ffffff;
         }
-        .btn-outline-danger:hover {
+        .navbar-container .btn-outline-danger:hover {
           transform: translateY(-2px);
           box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
           background-color: #dc3545;
           color: #ffffff;
         }
-        .cart-badge {
+        .navbar-container .cart-badge {
           font-size: 0.7rem;
           padding: 4px 6px;
           line-height: 1;
-          background-color: #dc3545; /* Vermelho para contraste */
+          background-color: #dc3545;
         }
-        .navbar-toggler {
+        .navbar-container .navbar-toggler {
           border: none;
           padding: 0.5rem;
         }
-        .navbar-toggler:focus {
+        .navbar-container .navbar-toggler:focus {
           outline: none;
           box-shadow: none;
         }
-        .dropdown-menu {
+        .navbar-container .dropdown-menu {
           background-color: #ffffff;
           border: none;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           border-radius: 8px;
           min-width: 200px;
         }
-        .dropdown-item {
+        .navbar-container .dropdown-item {
           padding: 0.75rem 1.25rem;
           transition: background-color 0.3s ease;
           color: #003087;
         }
-        .dropdown-item:hover {
+        .navbar-container .dropdown-item:hover {
           background-color: rgba(77, 171, 247, 0.1);
           color: #003087;
         }
         @media (max-width: 991px) {
-          .navbar-nav {
+          .navbar-container .navbar-nav {
             padding-top: 1rem;
             padding-bottom: 1rem;
           }
-          .nav-item {
+          .navbar-container .nav-item {
             margin-bottom: 0.5rem;
           }
-          .btn {
+          .navbar-container .btn {
             width: 100%;
             text-align: left;
             justify-content: start;
           }
-          .dropdown-menu {
+          .navbar-container .dropdown-menu {
             position: static !important;
             transform: none !important;
             background-color: rgba(255, 255, 255, 0.95);
@@ -276,7 +279,7 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-    </>
+    </div>
   );
 };
 

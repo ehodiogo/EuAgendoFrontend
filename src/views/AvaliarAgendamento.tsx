@@ -4,6 +4,7 @@ import { useFetch } from "../functions/GetData";
 import { FaStar, FaSpinner, FaExclamationCircle, FaCheckCircle, FaUserCircle } from "react-icons/fa";
 import { AvaliacaoAgendamento } from "../interfaces/AvaliacaoAgendamento";
 import Navbar from "../components/Navbar";
+import axios from "axios";
 
 const AvaliacaoAgendamentoView = () => {
   const { identificador } = useParams<{ identificador: string }>();
@@ -18,8 +19,8 @@ const AvaliacaoAgendamentoView = () => {
 
   useEffect(() => {
     if (agendamentoData) {
-      setNota(agendamentoData.nota_avaliacao);
-      setDescricao(agendamentoData.descricao_avaliacao);
+      setNota(agendamentoData.nota_avaliacao || 0);
+      setDescricao(agendamentoData.descricao_avaliacao || "");
     }
   }, [agendamentoData]);
 
@@ -33,20 +34,34 @@ const AvaliacaoAgendamentoView = () => {
     setSubmitStatus(null);
 
     try {
-      const response = await fetch(`api/agendamento/${identificador}/avaliacao`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nota_avaliacao: nota, descricao_avaliacao: descricao }),
-      });
+      const url = window.location.origin.includes("localhost:5173")
+        ? "http://localhost:8000"
+        : "https://backend-production-7438.up.railway.app";
 
-      if (!response.ok) throw new Error("Erro ao salvar avaliação");
+      const response = await axios.post(
+        `${url}/api/agendamento-avaliar/${identificador}/avaliar/`,
+        {
+          nota_avaliacao: nota,
+          descricao_avaliacao: descricao,
+          compareceu_agendamento: true,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
-      setSubmitStatus("success");
-      setTimeout(() => setSubmitStatus(null), 3000);
+      if (response.status === 200) {
+        setSubmitStatus("success");
+      }
+    } catch (error) {
+      console.error("Error submitting evaluation:", error);
+      setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
+      setTimeout(() => setSubmitStatus(null), 3000);
     }
   };
+
 
   return (
     <>

@@ -10,7 +10,13 @@ export interface Empresa {
   id: number;
   nome: string;
   cnpj: string;
+
   endereco: string;
+  bairro:  string;
+  cidade: string;
+  pais: string;
+  estado: string;
+
   telefone: string;
   email: string;
   servicos: Servico[];

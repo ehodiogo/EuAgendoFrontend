@@ -25,6 +25,7 @@
     "inputmask": "^5.0.9",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.474.0",
+    "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
     "react-adsense": "^0.1.0",
     "react-bootstrap": "^2.10.9",
