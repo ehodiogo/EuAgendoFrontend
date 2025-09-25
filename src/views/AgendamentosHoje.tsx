@@ -130,7 +130,57 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
           color: var(--dark-gray);
         }
 
-        /* Placeholder para quadro de horários */
+        .quadro-container {
+          position: relative;
+          background-color: var(--white);
+          border-radius: 12px;
+          padding: 1rem 3rem 1rem 80px; /* espaço à esquerda para labels das horas */
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          min-height: 24 * 60px; /* 24h x 60px */
+          overflow-y: auto;
+        }
+        
+        .hora-bloco {
+          position: relative;
+          border-bottom: 1px solid #e0e0e0;
+          height: 60px; /* 1 hora = 60px */
+        }
+        
+        .hora-label {
+          color: var(--primary-blue);
+          font-size: 0.9rem;
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 70px; /* largura suficiente para mostrar HH:MM */
+          text-align: right;
+          padding-right: 5px;
+        }
+        
+          .card {
+            background-color: var(--light-blue);
+            color: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            position: absolute;
+            left: 80px; /* começa depois das labels */
+            right: 0;
+        }
+
+        .hora-bloco .card {
+          background-color: var(--light-blue);
+          color: var(--white);
+          border-radius: 8px;
+          overflow: hidden;
+          padding: 0.25rem 0.5rem;
+          font-size: 0.8rem;
+          position: absolute;
+          width: 95%;
+        }
+
+        /* Placeholder */
         .quadro-placeholder {
           background-color: var(--white);
           border-radius: 12px;
@@ -211,6 +261,7 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
           }
         }
       `}</style>
+
       <div className="custom-bg min-vh-100">
         <div className="agendamentos-container container">
           <h1 data-aos="fade-up">
@@ -233,6 +284,7 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
               <FaCalendar /> Quadro de Horários
             </button>
           </div>
+
           {agendamentosHoje.loading ? (
             <div className="loading-container" data-aos="fade-up" data-aos-delay="300">
               <FaSpinner className="fa-spin me-2" /> Carregando agendamentos...
@@ -246,45 +298,83 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
               </a>
             </div>
           ) : (
-            visualizacao === "tabela" ? (
-              <div className="table-responsive" data-aos="fade-up" data-aos-delay="400">
-                <div className="mb-3">
-                  <FiltrosAgendamento />
-                </div>
-                <table className="table table-striped table-bordered">
-                  <thead>
-                    <tr>
-                      <th>Detalhes dos Agendamentos</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {agendamentosHoje.data.map((agendamento: Agendamento) => (
-                      <tr key={agendamento.id}>
-                        <td>
-                          <AgendamentoDados agendamento={agendamento} />
-                        </td>
+            <>
+              {visualizacao === "tabela" ? (
+                <div className="table-responsive" data-aos="fade-up" data-aos-delay="400">
+                  <div className="mb-3">
+                    <FiltrosAgendamento />
+                  </div>
+                  <table className="table table-striped table-bordered">
+                    <thead>
+                      <tr>
+                        <th>Detalhes dos Agendamentos</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="quadro-placeholder" data-aos="fade-up" data-aos-delay="400">
-                <p>
-                  O quadro de horários está em{" "}
-                  <span className="text-warning">desenvolvimento</span>.
-                </p>
-                <p className="text-muted">
-                  Enquanto isso, use a visualização em tabela para gerenciar seus agendamentos.
-                </p>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => alternarVisualizacao("tabela")}
-                >
-                  Ver em Tabela
-                </button>
-              </div>
-            )
+                    </thead>
+                    <tbody>
+                      {agendamentosHoje.data.map((agendamento: Agendamento) => (
+                        <tr key={agendamento.id}>
+                          <td>
+                            <AgendamentoDados agendamento={agendamento} />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="quadro-container" data-aos="fade-up" data-aos-delay="400">
+                  {[...Array(24)].map((_, hour) => {
+                    const horaLabel = hour.toString().padStart(2, "0") + ":00";
+
+                    // @ts-ignore
+                    const agendamentosHora = agendamentosHoje?.data.filter(ag => {
+                      const [agHour] = ag.hora.split(":");
+                      return parseInt(agHour) === hour;
+                    });
+
+                    return (
+                      <div key={hour} className="hora-bloco">
+                        <div className="hora-label">{horaLabel}</div>
+
+                        {agendamentosHora.length > 0 ? (
+                          agendamentosHora.map(ag => {
+                            const [startHour, startMin] = ag.hora.split(":").map(Number);
+
+                            console.log("startHour", startHour, startMin);
+
+                            const duracao = Number(ag.duracao_servico);
+                            const totalMinutes = startHour * 60 + startMin + duracao;
+                            const endHour = Math.floor(totalMinutes / 60);
+                            const endMin = totalMinutes % 60;
+
+                            console.log("startHour", startHour, startMin);
+                            console.log("Duracao", duracao);
+                            console.log("endHour", endHour, "endMin", endMin);
+                            const altura = totalMinutes - (startHour * 60 + startMin);
+                            const topOffset = startMin;
+
+                            return (
+                              <div
+                                key={ag.id}
+                                className="card"
+                                style={{
+                                  top: `${topOffset}px`,
+                                  height: `${altura}px`,
+                                }}
+                              >
+                                <AgendamentoDados agendamento={ag} />
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="text-muted">Sem agendamentos</div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
