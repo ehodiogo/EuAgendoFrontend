@@ -3,9 +3,10 @@ import { Empresa } from "../interfaces/Empresa";
 import { Agendamento } from "../interfaces/Agendamento";
 import { useFetch } from "../functions/GetData";
 import { useState } from "react";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Servicos } from "../interfaces/ServicosFuncionarios";
 import "aos/dist/aos.css";
+import "bootstrap/dist/css/bootstrap.min.css"; // Ensure Bootstrap CSS is included
 import { FaCheckCircle, FaTimesCircle, FaUtensils, FaSpinner, FaCalendarCheck, FaExclamationCircle } from "react-icons/fa";
 
 interface HorariosDoDiaProps {
@@ -159,11 +160,11 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
   };
 
   const normalizeString = (str: string) => {
-  return str
-    .normalize("NFD") // Decompose accented characters
-    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
-    .toLowerCase(); // Convert to lowercase
-};
+    return str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  };
 
   return (
     <div className="horarios-do-dia">
@@ -175,9 +176,9 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
           --dark-gray: #2d3748;
           --light-gray: #f7fafc;
           --white: #ffffff;
-          --pastel-green: #b8e2c8; /* Novo verde pastel para Disponível */
-          --pastel-red: #f4c7c3; /* Novo vermelho pastel para Indisponível */
-          --warning-orange: #fd7e14; /* Mantido para Agendado */
+          --pastel-green: #b8e2c8;
+          --pastel-red: #f4c7c3;
+          --warning-orange: #fd7e14;
         }
 
         /* Container */
@@ -316,6 +317,18 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
           transform: translateY(-2px);
         }
 
+        /* Tooltip Styling */
+        .tooltip-inner {
+          background-color: var(--primary-blue);
+          color: var(--white);
+          border-radius: 8px;
+          padding: 0.5rem;
+          font-size: 0.9rem;
+        }
+        .tooltip .tooltip-arrow::before {
+          border-right-color: var(--primary-blue);
+        }
+
         /* Mensagens */
         .message {
           font-size: 1.1rem;
@@ -437,9 +450,18 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
                     onChange={() => setServicoSelecionado(servico.nome)}
                     className="form-check-input"
                   />
-                  <label htmlFor={`servico-${servico.id}`} className="form-check-label">
-                    {servico.nome} (R${servico.preco} | {servico.duracao}min)
-                  </label>
+                  <OverlayTrigger
+                    placement="right"
+                    overlay={
+                      <Tooltip id={`tooltip-${servico.id}`}>
+                        {servico.descricao || "Sem descrição disponível"}
+                      </Tooltip>
+                    }
+                  >
+                    <label htmlFor={`servico-${servico.id}`} className="form-check-label">
+                      {servico.nome} (R${servico.preco} | {servico.duracao}min)
+                    </label>
+                  </OverlayTrigger>
                 </div>
               ))}
             </div>
