@@ -4,12 +4,13 @@ import axios from "axios";
 import "aos/dist/aos.css";
 import AOS from "aos";
 import Navbar from "../components/Navbar";
-import { FaUser, FaEnvelope, FaKey, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaKey, FaEye, FaEyeSlash, FaLink } from "react-icons/fa";
 
 function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [referralCode, setReferralCode] = useState(""); // New state for referral code
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +34,7 @@ function Register() {
         first_name: name,
         email: email,
         password: password,
+        codigo_usado: referralCode || null, // Include referral code, send null if empty
       });
 
       console.log("Resposta do registro", response.data);
@@ -109,7 +111,7 @@ function Register() {
         .form-control {
           border: 2px solid #e2e8f0;
           border-radius: 8px;
-          padding: 0.75rem 1rem 0.75rem 2.75rem; /* espaço para o ícone */
+          padding: 0.75rem 1rem 0.75rem 2.75rem;
           font-size: 1rem;
           transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
@@ -287,6 +289,21 @@ function Register() {
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
+              </div>
+
+              <div className="mb-3 input-icon">
+                <label htmlFor="referral-code" className="form-label">
+                  Código de Indicação (Opcional)
+                </label>
+                <FaLink className="left-icon" />
+                <input
+                  type="text"
+                  className="form-control"
+                  id="referral-code"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value)}
+                  placeholder="Digite o código de indicação"
+                />
               </div>
 
               {error && <div className="alert-danger">{error}</div>}

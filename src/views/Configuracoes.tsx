@@ -2,16 +2,21 @@ import { useState, useEffect } from "react";
 import { FaSpinner, FaExclamationCircle, FaCheckCircle, FaEnvelope, FaLink } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import axios from "axios";
-
-interface UserSettings {
-  receiveEmailNotifications: boolean;
-  affiliateCode: string;
-}
+import { PerfilUsuario} from "../interfaces/PerfilUsuario.tsx";
 
 const SettingsView = () => {
-  const [settings, setSettings] = useState<UserSettings>({
-    receiveEmailNotifications: false,
-    affiliateCode: "",
+  const [settings, setSettings] = useState<PerfilUsuario>({
+    id: 0,
+    usuario: {
+      id: 0,
+      first_name: "",
+      email: "",
+      username: "",
+      password: ""
+    },
+    codigo_afiliado: "",
+    codigo_usado: "",
+    receive_email_notifications: false,
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -21,14 +26,28 @@ const SettingsView = () => {
     ? "http://localhost:8000/"
     : "https://backend-production-7438.up.railway.app/";
 
+  const token = localStorage.getItem("access_token");
+
   useEffect(() => {
     const fetchSettings = async () => {
+      if (!token) {
+        console.error("Token de autenticação não encontrado");
+        setIsLoading(false);
+        setSubmitStatus("error");
+        return;
+      }
+
       setIsLoading(true);
       try {
-        const response = await axios.get(`${baseURL}api/user/settings`);
+        const response = await axios.get(`${baseURL}api/perfil-usuario/me/`, {
+          params: { usuario_token: token },
+        });
         setSettings({
-          receiveEmailNotifications: response.data.receiveEmailNotifications ?? false,
-          affiliateCode: response.data.affiliateCode ?? "",
+          id: response.data.id ?? 0,
+          usuario: response.data.usuario ?? { id: 0, name: "", email: "" }, // Adjust based on actual API response
+          codigo_afiliado: response.data.codigo_afiliado ?? "",
+          codigo_usado: response.data.codigo_usado ?? "",
+          receive_email_notifications: response.data.receive_email_notifications ?? false,
         });
       } catch (error) {
         console.error("Error fetching settings:", error);
@@ -38,23 +57,32 @@ const SettingsView = () => {
       }
     };
     fetchSettings();
-  }, []);
+  }, [token]);
 
   const handleToggleEmailNotifications = () => {
-    setSettings((prev) => ({
+    setSettings((prev : PerfilUsuario) => ({
       ...prev,
-      receiveEmailNotifications: !prev.receiveEmailNotifications,
+      receive_email_notifications: !prev.receive_email_notifications,
     }));
   };
 
   const handleGenerateAffiliateCode = async () => {
+    if (!token) {
+      console.error("Token de autenticação não encontrado");
+      setSubmitStatus("error");
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitStatus(null);
     try {
-      const response = await axios.post(`${baseURL}api/user/affiliate-code`, {});
-      setSettings((prev) => ({
+      const response = await axios.post(
+        `${baseURL}api/perfil-usuario/affiliate-code/`,
+        { usuario_token: token },
+      );
+      setSettings((prev: PerfilUsuario) => ({
         ...prev,
-        affiliateCode: response.data.affiliateCode,
+        codigo_afiliado: response.data.codigo_afiliado ?? "",
       }));
       setSubmitStatus("success");
       setTimeout(() => setSubmitStatus(null), 3000);
@@ -68,12 +96,22 @@ const SettingsView = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!token) {
+      console.error("Token de autenticação não encontrado");
+      setSubmitStatus("error");
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitStatus(null);
     try {
-      await axios.patch(`${baseURL}api/user/settings`, {
-        receiveEmailNotifications: settings.receiveEmailNotifications,
-      });
+      await axios.patch(
+        `${baseURL}api/perfil-usuario/settings/`,
+        {
+          usuario_token: token,
+          receive_email_notifications: settings.receive_email_notifications,
+        },
+      );
       setSubmitStatus("success");
       setTimeout(() => setSubmitStatus(null), 3000);
     } catch (error) {
@@ -101,7 +139,7 @@ const SettingsView = () => {
           }
 
           .settings-container {
-            padding-top: 80px; /* Adjust for navbar height */
+            padding-top: 80px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -371,7 +409,7 @@ const SettingsView = () => {
                       <input
                         type="checkbox"
                         id="email-notifications"
-                        checked={settings.receiveEmailNotifications}
+                        checked={settings.receive_email_notifications}
                         onChange={handleToggleEmailNotifications}
                         aria-label="Ativar/desativar e-mails de agendamentos"
                       />
@@ -383,7 +421,7 @@ const SettingsView = () => {
                     Código de Afiliado
                   </label>
                   <div className="affiliate-code" id="affiliate-code">
-                    {settings.affiliateCode || "Nenhum código gerado"}
+                    {settings.codigo_afiliado || "Nenhum código gerado"}
                   </div>
                   <button
                     type="button"
