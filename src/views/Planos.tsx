@@ -26,7 +26,6 @@ function Planos() {
   }
 
   const adicionarAoCarrinho = (plano: Plano) => {
-    console.log(`Adicionando ao carrinho: ${plano.nome} - R$${plano.preco}`);
     const carrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
     carrinho.push(plano);
     localStorage.setItem("carrinho", JSON.stringify(carrinho));

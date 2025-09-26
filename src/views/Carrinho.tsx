@@ -63,7 +63,6 @@ function Carrinho() {
         error.response?.data?.detail ||
           "Erro ao iniciar pagamento. Tente novamente."
       );
-      console.error("Erro ao processar o pagamento:", error);
     } finally {
       setLoading(false);
     }

@@ -22,7 +22,6 @@ const SuccessPage = () => {
 
   const ativarPlano = async () => {
     if (!carrinho.length || !usuario_token) {
-      console.error("Erro: carrinho vazio ou usuário não autenticado.");
       return;
     }
 

@@ -206,8 +206,6 @@ const FuncionarioForm: React.FC = () => {
     });
   };
 
-  console.log("SEUS FUNCIONARIOS", seusFuncionarios);
-
   return (
     <>
       <Navbar />

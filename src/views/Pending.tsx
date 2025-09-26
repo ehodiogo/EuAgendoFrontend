@@ -23,7 +23,6 @@ const PendingPage = () => {
     const usuario_token = localStorage.getItem("access_token");
 
     if (!usuario_token) {
-      console.error("Erro: usuário não autenticado.");
       return;
     }
 

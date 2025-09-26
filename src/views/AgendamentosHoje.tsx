@@ -23,7 +23,6 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
   }, []);
 
   const alternarVisualizacao = (tipo: "tabela" | "quadro") => {
-    console.log(`Visualização alterada para: ${tipo}`);
     setVisualizacao(tipo);
   };
 
@@ -340,16 +339,11 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
                           agendamentosHora.map(ag => {
                             const [startHour, startMin] = ag.hora.split(":").map(Number);
 
-                            console.log("startHour", startHour, startMin);
-
                             const duracao = Number(ag.duracao_servico);
                             const totalMinutes = startHour * 60 + startMin + duracao;
                             const endHour = Math.floor(totalMinutes / 60);
                             const endMin = totalMinutes % 60;
 
-                            console.log("startHour", startHour, startMin);
-                            console.log("Duracao", duracao);
-                            console.log("endHour", endHour, "endMin", endMin);
                             const altura = totalMinutes - (startHour * 60 + startMin);
                             const topOffset = startMin;
 

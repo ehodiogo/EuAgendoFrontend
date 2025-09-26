@@ -19,7 +19,6 @@ function Contato() {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Enviando:", formData);
     setStatus("Mensagem enviada com sucesso! Entraremos em contato em breve.");
     setFormData({ nome: "", email: "", mensagem: "" });
     setTimeout(() => setStatus(""), 5000);

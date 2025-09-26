@@ -56,7 +56,6 @@ export function useFetch<T>(
         setData(result);
         setLoading(false);
       } catch (err) {
-        console.error("Erro na chamada de API:", err);
         setLoading(false);
       }
     }

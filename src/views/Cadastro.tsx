@@ -37,14 +37,12 @@ function Register() {
         codigo_usado: referralCode || null, // Include referral code, send null if empty
       });
 
-      console.log("Resposta do registro", response.data);
       navigate("/login");
     } catch (err: any) {
       setError(
         err.response?.data?.detail ||
           "Erro ao registrar. Verifique os dados e tente novamente."
       );
-      console.error("Erro no registro", err);
     } finally {
       setIsLoading(false);
     }

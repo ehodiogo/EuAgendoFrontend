@@ -72,7 +72,6 @@ const EmpresaForm: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type, checked } = e.target as HTMLInputElement;
-    console.log(`Field: ${name}, Value: ${value}`); // Debug log
     setEmpresa((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
