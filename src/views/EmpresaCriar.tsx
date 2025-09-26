@@ -189,7 +189,11 @@ const EmpresaForm: React.FC = () => {
           horario_pausa_inicio: "", horario_pausa_fim: "",
         });
       } catch (error: unknown) {
-        setFormError(`Erro ao cadastrar empresa: ${error.message}`);
+        if (error instanceof Error) {
+          setFormError(`Erro ao cadastrar empresa: ${error.message}`);
+        } else {
+          setFormError("Erro desconhecido ao cadastrar empresa.");
+        }
       } finally {
         setLoading(false);
       }
@@ -224,7 +228,11 @@ const EmpresaForm: React.FC = () => {
         setFormSuccess("Empresa editada com sucesso!");
         setEmpresaSelecionada(null);
       } catch (error: unknown) {
-        setFormError(`Erro ao editar empresa: ${error.message}`);
+        if (error instanceof Error) {
+          setFormError(`Erro ao editar empresa: ${error.message}`);
+        } else {
+          setFormError("Erro desconhecido ao editar empresa.");
+        }
       } finally {
         setLoading(false);
       }
@@ -243,7 +251,11 @@ const EmpresaForm: React.FC = () => {
         setFormSuccess("Empresa removida com sucesso!");
         setEmpresaSelecionada(null);
       } catch (error: unknown) {
-        setFormError(`Erro ao remover empresa: ${error.message}`);
+        if (error instanceof Error) {
+          setFormError(`Erro ao remover empresa: ${error.message}`);
+        } else {
+          setFormError("Erro desconhecido ao remover empresa.");
+        }
       } finally {
         setLoading(false);
       }
