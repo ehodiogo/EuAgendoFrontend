@@ -188,7 +188,7 @@ const EmpresaForm: React.FC = () => {
           abre_sabado: false, abre_domingo: false, para_almoco: false,
           horario_pausa_inicio: "", horario_pausa_fim: "",
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
         setFormError(`Erro ao cadastrar empresa: ${error.message}`);
       } finally {
         setLoading(false);
@@ -223,7 +223,7 @@ const EmpresaForm: React.FC = () => {
         if (!response.ok) throw new Error("Erro ao editar empresa.");
         setFormSuccess("Empresa editada com sucesso!");
         setEmpresaSelecionada(null);
-      } catch (error: any) {
+      } catch (error: unknown) {
         setFormError(`Erro ao editar empresa: ${error.message}`);
       } finally {
         setLoading(false);
@@ -242,7 +242,7 @@ const EmpresaForm: React.FC = () => {
         if (!response.ok) throw new Error("Erro ao remover empresa.");
         setFormSuccess("Empresa removida com sucesso!");
         setEmpresaSelecionada(null);
-      } catch (error: any) {
+      } catch (error: unknown) {
         setFormError(`Erro ao remover empresa: ${error.message}`);
       } finally {
         setLoading(false);
@@ -474,10 +474,6 @@ const EmpresaForm: React.FC = () => {
           {empresas.loading ? (
             <div className="text-center" data-aos="fade-up">
               <FaSpinner className="fa-spin" style={{ fontSize: "1.5rem", color: "var(--primary-blue)" }} /> Carregando...
-            </div>
-          ) : empresas.error ? (
-            <div className="toast-message error" data-aos="fade-up">
-              <FaExclamationTriangle /> Erro ao carregar empresas: {empresas.error}
             </div>
           ) : (
             <div className="empresa-card" data-aos="fade-up">
