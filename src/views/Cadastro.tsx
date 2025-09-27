@@ -37,6 +37,8 @@ function Register() {
         codigo_usado: referralCode || null, // Include referral code, send null if empty
       });
 
+      console.log("Register", response);
+
       navigate("/login");
     } catch (err: any) {
       setError(
