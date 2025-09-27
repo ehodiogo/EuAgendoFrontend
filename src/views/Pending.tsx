@@ -36,7 +36,7 @@ const PendingPage = () => {
 
       const url = window.location.origin.includes("localhost:5173")
         ? "http://localhost:8000"
-        : "https://backend-production-7438.up.railway.app";
+        : "https://backend-production-6587.up.railway.app";
 
       const response = await axios.post(
         url + "/api/payment-success/",

@@ -41,7 +41,7 @@ const ServicoForm: React.FC = () => {
       try {
         const url = window.location.origin.includes("localhost:5173")
           ? "http://localhost:8000"
-          : "https://backend-production-7438.up.railway.app";
+          : "https://backend-production-6587.up.railway.app";
         const { data } = await axios.get(`${url}/api/funcionarios-criados/`, {
           params: { empresa_id: empresaSelecionada, usuario_token: token },
         });
@@ -60,7 +60,7 @@ const ServicoForm: React.FC = () => {
       try {
         const url = window.location.origin.includes("localhost:5173")
           ? "http://localhost:8000"
-          : "https://backend-production-7438.up.railway.app";
+          : "https://backend-production-6587.up.railway.app";
         const { data } = await axios.get(`${url}/api/servicos-criados-usuario-empresa/`, {
           params: { empresa_id: empresaSelecionada, usuario_token: token },
         });
@@ -139,7 +139,7 @@ const ServicoForm: React.FC = () => {
 
     const url = window.location.origin.includes("localhost:5173")
       ? "http://localhost:8000"
-      : "https://backend-production-7438.up.railway.app";
+      : "https://backend-production-6587.up.railway.app";
 
     if (acaoSelecionada === "cadastrar") {
       try {

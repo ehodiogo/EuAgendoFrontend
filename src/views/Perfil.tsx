@@ -50,7 +50,7 @@ const Profile = () => {
     try {
       const url = window.location.origin.includes("localhost:5173")
         ? "http://localhost:8000"
-        : "https://backend-production-7438.up.railway.app";
+        : "https://backend-production-6587.up.railway.app";
 
       const response = await fetch(url + "/api/user/", {
         method: "POST",
@@ -95,7 +95,7 @@ const Profile = () => {
 
       const url = window.location.origin.includes("localhost:5173")
         ? "http://localhost:8000"
-        : "https://backend-production-7438.up.railway.app";
+        : "https://backend-production-6587.up.railway.app";
 
       const response = await fetch(url + "/api/change-password/", {
         method: "POST",

@@ -24,7 +24,7 @@ const SettingsView = () => {
 
   const baseURL = window.location.origin.includes("localhost")
     ? "http://localhost:8000/"
-    : "https://backend-production-7438.up.railway.app/";
+    : "https://backend-production-6587.up.railway.app/";
 
   const token = localStorage.getItem("access_token");
 

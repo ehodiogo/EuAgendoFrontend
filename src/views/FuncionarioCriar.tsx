@@ -71,7 +71,7 @@ const FuncionarioForm: React.FC = () => {
 
     const url = window.location.origin.includes("localhost:5173")
       ? "http://localhost:8000"
-      : "https://backend-production-7438.up.railway.app";
+      : "https://backend-production-6587.up.railway.app";
 
     if (acaoSelecionada === "cadastrar") {
       try {
@@ -161,7 +161,7 @@ const FuncionarioForm: React.FC = () => {
     try {
       const url = window.location.origin.includes("localhost:5173")
         ? "http://localhost:8000"
-        : "https://backend-production-7438.up.railway.app";
+        : "https://backend-production-6587.up.railway.app";
       await axios.post(`${url}/api/adicionar-funcionarios-empresa/`, {
         empresa_nome: selectedEmpresa!.nome,
         funcionarios: selectedFuncionarios.map((func) => func.id),
@@ -180,7 +180,7 @@ const FuncionarioForm: React.FC = () => {
     try {
       const url = window.location.origin.includes("localhost:5173")
         ? "http://localhost:8000"
-        : "https://backend-production-7438.up.railway.app";
+        : "https://backend-production-6587.up.railway.app";
       await axios.post(`${url}/api/remover-funcionarios-empresa/`, {
         empresa_id: selectedEmpresa!.id,
         funcionarios_ids: selectedFuncionarios.map((func) => func.id),
