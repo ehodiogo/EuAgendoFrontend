@@ -40,17 +40,23 @@ const Navbar = () => {
       <style>{`
         .navbar-container .custom-navbar {
           background-color: #003087 !important;
-          padding: 0.75rem 0;
+          padding: 1rem 0;
           transition: all 0.3s ease;
           position: sticky;
           top: 0;
           z-index: 1000;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          max-height: 70px; /* Fixed navbar height */
+          overflow: hidden; /* Prevent content from expanding navbar */
         }
         .navbar-container .navbar-brand {
           font-size: 1.5rem;
           color: #ffffff !important;
           transition: color 0.3s ease;
+          padding: 0rem !important; /* Removed padding to save space */
+          display: flex;
+          align-items: center; /* Center logo vertically */
+          overflow: hidden; /* Prevent logo from overflowing */
         }
         .navbar-container .navbar-brand:hover {
           color: #e6f0fa !important;
@@ -128,7 +134,15 @@ const Navbar = () => {
           background-color: rgba(77, 171, 247, 0.1);
           color: #003087;
         }
+        .navbar-container .logo-img {
+          width: 120px; /* Increased logo size */
+          height: 120px;
+          object-fit: contain; /* Ensure logo scales without stretching navbar */
+        }
         @media (max-width: 991px) {
+          .navbar-container .custom-navbar {
+            max-height: none; /* Allow navbar to expand on mobile */
+          }
           .navbar-container .navbar-nav {
             padding-top: 1rem;
             padding-bottom: 1rem;
@@ -146,18 +160,20 @@ const Navbar = () => {
             transform: none !important;
             background-color: rgba(255, 255, 255, 0.95);
           }
+          .navbar-container .logo-img {
+            width: 100px; /* Slightly smaller logo on mobile */
+            height: 100px;
+          }
         }
       `}</style>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm custom-navbar">
         <div className="container-fluid px-4">
           <a className="navbar-brand d-flex align-items-center" href="/">
             <img
-              src="/vem-agendar.ico"
+              src="/vem-agendar.png"
               alt="Logo VemAgendar"
-              className="me-2"
-              style={{ width: "36px", height: "36px", filter: "drop-shadow(0 0 2px rgba(255, 255, 255, 0.3))" }}
+              className="me-2 logo-img" // Added class for specific styling
             />
-            <span className="fw-bold fs-4">VemAgendar</span>
           </a>
           <button
             className="navbar-toggler"

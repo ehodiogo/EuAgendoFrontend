@@ -371,19 +371,19 @@ function Home() {
             {[
               {
                 title: "Básico",
-                price: "R$ 49/mês",
+                price: "R$ 19.99/mês",
                 desc: "Ideal para pequenos negócios",
-                features: ["1 empresa", "15 funcionários por empresa"],
+                features: ["1 empresa", "5 funcionários por empresa"],
               },
               {
                 title: "Profissional",
-                price: "R$ 149/mês",
+                price: "R$ 89.99/mês",
                 desc: "Perfeito para negócios em crescimento",
-                features: ["5 empresas", "25 funcionários por empresa"],
+                features: ["5 empresas", "15 funcionários por empresa"],
               },
               {
                 title: "Corporativo",
-                price: "R$ 299/mês",
+                price: "R$ 149.99/mês",
                 desc: "Para grandes empresas",
                 features: ["20 empresas", "1000 funcionários por empresa"],
               },
