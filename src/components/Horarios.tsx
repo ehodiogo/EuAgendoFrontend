@@ -4,7 +4,6 @@ import { useFetch } from "../functions/GetData";
 import { useState } from "react";
 import { Modal, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Servicos } from "../interfaces/ServicosFuncionarios";
-import "aos/dist/aos.css";
 import "bootstrap/dist/css/bootstrap.min.css"; // Ensure Bootstrap CSS is included
 import { FaCheckCircle, FaTimesCircle, FaUtensils, FaSpinner, FaCalendarCheck, FaExclamationCircle } from "react-icons/fa";
 
@@ -397,15 +396,15 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
       `}</style>
       <div className="horarios-do-dia">
         {agendamentosResponse.loading ? (
-          <div className="message" data-aos="fade-up">
+          <div className="message">
             <FaSpinner className="fa-spin me-2" /> Carregando horários...
           </div>
         ) : Object.keys(horariosDisponiveis).length === 0 ? (
-          <div className="message" data-aos="fade-up">
+          <div className="message">
             <FaExclamationCircle /> Nenhum horário disponível para este dia.
           </div>
         ) : (
-          <div className="horarios-grid" data-aos="fade-up">
+          <div className="horarios-grid">
             {Object.entries(horariosDisponiveis).map(([horario, status]) => (
               <div
                 key={horario}

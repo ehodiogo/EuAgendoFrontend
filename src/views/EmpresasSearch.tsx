@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import Navbar from "../components/Navbar";
 import { FaSearch, FaSpinner, FaExclamationCircle, FaFilter } from "react-icons/fa";
 
@@ -15,10 +13,6 @@ function EmpresasSearch() {
   const [pais, setPais] = useState("");
   const [showModal, setShowModal] = useState(false);
   const empresas = useFetch<Empresa[]>("api/empresa");
-
-  useEffect(() => {
-    AOS.init({ duration: 800 });
-  }, []);
 
   const filteredEmpresas = empresas.data?.filter((empresa: Empresa) =>
     empresa.nome.toLowerCase().includes(search.toLowerCase()) &&
@@ -375,7 +369,7 @@ function EmpresasSearch() {
       `}</style>
       <div className="custom-bg min-vh-100">
         <Navbar />
-        <header className="empresas-header" data-aos="fade-down">
+        <header className="empresas-header">
           <div className="container">
             <h1>
               <FaSearch /> Encontre Empresas
@@ -385,7 +379,7 @@ function EmpresasSearch() {
             </p>
           </div>
         </header>
-        <section className="search-section container" data-aos="fade-up">
+        <section className="search-section container">
           <h2>
             <FaSearch /> Pesquise por Empresas
           </h2>
@@ -474,13 +468,13 @@ function EmpresasSearch() {
         )}
         <section className="empresas-list container">
           {empresas.loading ? (
-            <div className="message loading" data-aos="fade-up">
+            <div className="message loading">
               <FaSpinner className="fa-spin me-2" /> Carregando empresas...
             </div>
           ) : filteredEmpresas && filteredEmpresas.length > 0 ? (
             <div className="row">
               {filteredEmpresas.map((empresa, index) => (
-                <div key={index} className="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay={index * 100}>
+                <div key={index} className="col-md-4 mb-4">
                   <div className="card">
                     <div className="card-img-container">
                       <img
@@ -521,7 +515,7 @@ function EmpresasSearch() {
               ))}
             </div>
           ) : (
-            <div className="message warning" data-aos="fade-up">
+            <div className="message warning">
               <FaExclamationCircle /> Nenhuma empresa encontrada com os filtros aplicados.
             </div>
           )}

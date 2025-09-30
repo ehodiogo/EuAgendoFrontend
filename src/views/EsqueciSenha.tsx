@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
-import "aos/dist/aos.css";
-import AOS from "aos";
 import Navbar from "../components/Navbar";
 import { FaEnvelope } from "react-icons/fa";
 
@@ -11,10 +9,6 @@ function ForgotPassword() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    AOS.init({ duration: 1000 });
-  }, []);
 
   const handlePasswordRecovery = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -217,7 +211,7 @@ function ForgotPassword() {
       <div className="custom-bg min-vh-100">
         <Navbar />
         <div className="forgot-password-container">
-          <div className="forgot-password-card" data-aos="fade-up">
+          <div className="forgot-password-card">
             <h2>
               <FaEnvelope /> Recuperar Senha
             </h2>

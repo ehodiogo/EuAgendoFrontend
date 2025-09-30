@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import { FaShoppingCart, FaTrash } from "react-icons/fa";
-import "aos/dist/aos.css";
-import AOS from "aos";
 import { Link } from "react-router-dom";
 
 function Carrinho() {
@@ -17,7 +15,6 @@ function Carrinho() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    AOS.init({ duration: 1000 });
     const itensCarrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
     setCarrinho(itensCarrinho);
   }, []);
@@ -254,10 +251,10 @@ function Carrinho() {
       <div className="custom-bg min-vh-100">
         <Navbar />
         <div className="cart-container container">
-          <h1 data-aos="fade-up">
+          <h1>
             <FaShoppingCart /> Seu Carrinho
           </h1>
-          <div className="cart-card" data-aos="fade-up" data-aos-delay="100">
+          <div className="cart-card">
             {error && <div className="alert-danger">{error}</div>}
             {carrinho.length === 0 ? (
               <div className="empty-cart">

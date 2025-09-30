@@ -2,9 +2,6 @@ import { useParams, Link } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import { Funcionario } from "../interfaces/Funcionario";
-import { useEffect } from "react";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import Navbar from "../components/Navbar";
 import { FaBuilding, FaInfoCircle, FaTools, FaUserTie, FaCalendar, FaSpinner, FaExclamationCircle } from "react-icons/fa";
 
@@ -12,10 +9,6 @@ function EmpresaDetails() {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
   const empresas = useFetch<Empresa[]>(`api/empresa/?q=${empresaNome}`);
   const funcionarios = useFetch<Funcionario[]>(`api/funcionario/?empresa_nome=${empresaNome}`);
-
-  useEffect(() => {
-    AOS.init({ duration: 800 });
-  }, []);
 
   const empresa = empresas.data?.find(
     (e) => e.nome.toLowerCase() === empresaNome?.toLowerCase()
@@ -236,11 +229,11 @@ function EmpresaDetails() {
         <Navbar />
         <div className="empresa-details-container container">
           {empresas.loading ? (
-            <div className="message loading" data-aos="fade-up">
+            <div className="message loading">
               <FaSpinner className="fa-spin me-2" /> Carregando dados da empresa...
             </div>
           ) : !empresa ? (
-            <div className="message error" data-aos="fade-up">
+            <div className="message error">
               <FaExclamationCircle /> Empresa não encontrada.
               <Link to="/" className="btn btn-primary mt-3 ms-3">
                 Voltar para Home
@@ -248,7 +241,7 @@ function EmpresaDetails() {
             </div>
           ) : (
             <>
-              <div className="empresa-header" data-aos="fade-down">
+              <div className="empresa-header">
                 <h1>
                   <FaBuilding /> {empresa.nome}
                 </h1>
@@ -256,7 +249,7 @@ function EmpresaDetails() {
                   {empresa.endereco} | {empresa.telefone}
                 </p>
               </div>
-              <div className="empresa-image" data-aos="zoom-in">
+              <div className="empresa-image">
                 <img
                   src={empresa.logo || "https://via.placeholder.com/400x200?text=Sem+Logo"}
                   alt={empresa.nome}
@@ -264,7 +257,7 @@ function EmpresaDetails() {
                 />
               </div>
               <div className="row">
-                <div className="col-lg-6 info-section" data-aos="fade-right">
+                <div className="col-lg-6 info-section">
                   <h4>
                     <FaInfoCircle /> Informações
                   </h4>
@@ -277,7 +270,7 @@ function EmpresaDetails() {
                     </li>
                   </ul>
                 </div>
-                <div className="col-lg-6 servicos-section" data-aos="fade-left">
+                <div className="col-lg-6 servicos-section">
                   <h4>
                     <FaTools /> Serviços Disponíveis
                   </h4>
@@ -296,12 +289,12 @@ function EmpresaDetails() {
                   </ul>
                 </div>
               </div>
-              <div className="funcionarios-section" data-aos="fade-up">
+              <div className="funcionarios-section">
                 <h4>
                   <FaUserTie /> Funcionários
                 </h4>
                 {funcionarios.loading ? (
-                  <div className="message loading" data-aos="fade-up">
+                  <div className="message loading">
                     <FaSpinner className="fa-spin me-2" /> Carregando funcionários...
                   </div>
                 ) : funcionarios.data && funcionarios.data.length > 0 ? (
@@ -310,8 +303,6 @@ function EmpresaDetails() {
                       <div
                         key={funcionario.id}
                         className="col-md-4 col-sm-6 mb-3"
-                        data-aos="zoom-in"
-                        data-aos-delay={index * 100}
                       >
                         <div className="card">
                           <img

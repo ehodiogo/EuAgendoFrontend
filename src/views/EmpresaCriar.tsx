@@ -4,8 +4,6 @@ import { EmpresaCreate, Empresa } from "../interfaces/Empresa";
 import { Link } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
 import Navbar from "../components/Navbar";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import { FaBuilding, FaSpinner, FaExclamationTriangle, FaCheckCircle } from "react-icons/fa";
 
 const EmpresaForm: React.FC = () => {
@@ -40,7 +38,6 @@ const EmpresaForm: React.FC = () => {
   const empresas = useFetch<Empresa[]>(`api/empresas-usuario/?usuario_token=${localStorage.getItem("access_token")}`);
 
   useEffect(() => {
-    AOS.init({ duration: 800 });
     setAbreSabado(empresa.abre_sabado);
     setAbreDomingo(empresa.abre_domingo);
     setTemPausa(empresa.para_almoco);
@@ -470,21 +467,21 @@ const EmpresaForm: React.FC = () => {
         `}</style>
         <div className="empresa-form-container">
           {formSuccess && (
-            <div className="toast-message success" data-aos="fade-left">
+            <div className="toast-message success">
               <FaCheckCircle /> {formSuccess}
             </div>
           )}
           {formError && (
-            <div className="toast-message error" data-aos="fade-left">
+            <div className="toast-message error">
               <FaExclamationTriangle /> {formError}
             </div>
           )}
           {empresas.loading ? (
-            <div className="text-center" data-aos="fade-up">
+            <div className="text-center">
               <FaSpinner className="fa-spin" style={{ fontSize: "1.5rem", color: "var(--primary-blue)" }} /> Carregando...
             </div>
           ) : (
-            <div className="empresa-card" data-aos="fade-up">
+            <div className="empresa-card">
               <h2 className="empresa-title">
                 <FaBuilding /> Gerenciar Empresas
               </h2>
@@ -505,7 +502,7 @@ const EmpresaForm: React.FC = () => {
                 </div>
 
                 {acaoSelecionada === "cadastrar" && (
-                  <div className="empresa-card" data-aos="fade-up" data-aos-delay="100">
+                  <div className="empresa-card">
                     <h3 className="empresa-title">Cadastrar Empresa</h3>
                     <div className="mb-3">
                       <label className="form-label">Nome da Empresa</label>
@@ -707,7 +704,7 @@ const EmpresaForm: React.FC = () => {
                 )}
 
                 {acaoSelecionada === "editar" && (
-                  <div className="empresa-card" data-aos="fade-up" data-aos-delay="100">
+                  <div className="empresa-card">
                     <h3 className="empresa-title">Editar Empresa</h3>
                     <div className="mb-3">
                       <label className="form-label">Selecione uma Empresa</label>
@@ -929,7 +926,7 @@ const EmpresaForm: React.FC = () => {
                 )}
 
                 {acaoSelecionada === "remover" && (
-                  <div className="empresa-card" data-aos="fade-up" data-aos-delay="100">
+                  <div className="empresa-card">
                     <h3 className="empresa-title">Remover Empresa</h3>
                     <div className="warning-text">
                       <FaExclamationTriangle /> Atenção: Esta ação é irreversível!

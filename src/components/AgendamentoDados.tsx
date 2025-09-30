@@ -3,9 +3,6 @@ import { useFetch } from "../functions/GetData";
 import { Funcionario } from "../interfaces/Funcionario";
 import { Cliente } from "../interfaces/Cliente";
 import { Servico } from "../interfaces/Servico";
-import { useEffect } from "react";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import { FaUserTie, FaUser, FaTools, FaClock, FaSpinner, FaExclamationCircle } from "react-icons/fa";
 
 interface AgendamentoDadosProps {
@@ -16,10 +13,6 @@ const AgendamentoDados = ({ agendamento }: AgendamentoDadosProps) => {
   const funcionario = useFetch<Funcionario>(`api/funcionario/${agendamento.funcionario}`);
   const cliente = useFetch<Cliente>(`api/cliente/${agendamento.cliente}`);
   const servico = useFetch<Servico>(`api/servico/${agendamento.servico}`);
-
-  useEffect(() => {
-    AOS.init({ duration: 800 });
-  }, []);
 
   return (
     <div>
@@ -123,19 +116,19 @@ const AgendamentoDados = ({ agendamento }: AgendamentoDadosProps) => {
         }
       `}</style>
       {funcionario.loading || cliente.loading || servico.loading ? (
-        <div className="message loading" data-aos="fade-up">
+        <div className="message loading">
           <FaSpinner className="fa-spin me-2" /> Carregando detalhes do agendamento...
         </div>
       ) : funcionario.error || cliente.error || servico.error ? (
-        <div className="message error" data-aos="fade-up">
+        <div className="message error">
           <FaExclamationCircle /> Erro ao carregar detalhes: {funcionario.error || cliente.error || servico.error}
         </div>
       ) : !funcionario.data || !cliente.data || !servico.data ? (
-        <div className="message error" data-aos="fade-up">
+        <div className="message error">
           <FaExclamationCircle /> Dados do agendamento não disponíveis.
         </div>
       ) : (
-        <div className="agendamento-card" data-aos="fade-up">
+        <div className="agendamento-card">
           <ul className="agendamento-details">
             <li>
               <strong><FaUserTie /> Funcionário:</strong>

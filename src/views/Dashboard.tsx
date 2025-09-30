@@ -11,8 +11,6 @@ import {
 } from "chart.js";
 import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
 import { Empresa } from "../interfaces/Empresa";
@@ -33,9 +31,6 @@ ChartJS.register(
 );
 
 function Dashboard() {
-  useEffect(() => {
-    AOS.init({ duration: 1000 });
-  }, []);
 
   const token = localStorage.getItem("access_token");
   const empresas_usuario = useFetch<Empresa[]>(
@@ -351,14 +346,14 @@ function Dashboard() {
       <div className="custom-bg min-vh-100">
         <Navbar />
         <div className="dashboard-container container">
-          <h2 data-aos="fade-up">
+          <h2 >
             <FaChartLine /> Painel do Usuário
           </h2>
-          <p className="lead" data-aos="fade-up" data-aos-delay="100">
+          <p className="lead">
             Bem-vindo ao seu painel! Aqui você pode gerenciar suas configurações e
             visualizar seus dados.
           </p>
-          <div className="dashboard-card" data-aos="fade-up" data-aos-delay="200">
+          <div className="dashboard-card">
             <div className="nav-buttons">
               <div className="nav-button">
                 <Link to="/perfil" className="btn btn-primary">
@@ -397,7 +392,7 @@ function Dashboard() {
                 <p>Gerencie os checkins das suas empresas.</p>
               </div>
             </div>
-            <p className="lead" data-aos="fade-up" data-aos-delay="300">
+            <p className="lead">
               Selecione uma empresa para ver seus dados de Dashboard.
             </p>
             <div className="row justify-content-center">
@@ -405,8 +400,6 @@ function Dashboard() {
                 <div
                   className="col-12 mb-4"
                   key={empresa.id}
-                  data-aos="fade-up"
-                  data-aos-delay="400"
                 >
                   <div
                     className="empresa-card"
@@ -420,8 +413,6 @@ function Dashboard() {
                   {dropdownAberto === empresa.id && (
                     <div
                       className="dropdown-card"
-                      data-aos="fade-up"
-                      data-aos-delay="500"
                     >
                       <DashBoardDados empresa_id={empresa.id} />
                       <Link

@@ -1,9 +1,6 @@
-import { useEffect } from "react";
 import { useFetch } from "../functions/GetData";
 import { Financeiro } from "../interfaces/DashboardEarnings";
 import { FaChartLine, FaDollarSign, FaSpinner } from "react-icons/fa";
-import "aos/dist/aos.css";
-import AOS from "aos";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { Bar } from "react-chartjs-2";
 
@@ -15,10 +12,6 @@ interface FinanceiroProps {
 
 const FinanceiroDados = ({ empresa_id }: FinanceiroProps) => {
   const dadosFinanceiros = useFetch<Financeiro>(`api/financeiro/?empresa_id=${empresa_id}`);
-
-  useEffect(() => {
-    AOS.init({ duration: 1000 });
-  }, []);
 
   const chartData = {
     labels: ["Total", "Mensal", "Semanal"],
@@ -176,21 +169,21 @@ const FinanceiroDados = ({ empresa_id }: FinanceiroProps) => {
         }
       `}</style>
 
-      <div className="financeiro-dados-card" data-aos="fade-up">
+      <div className="financeiro-dados-card">
         <h4>
           <FaChartLine /> Informações Financeiras
         </h4>
 
         {dadosFinanceiros.loading ? (
-          <div className="loading-container" data-aos="fade-up" data-aos-delay="100">
+          <div className="loading-container">
             <FaSpinner className="fa-spin me-2" /> Carregando dados...
           </div>
         ) : dadosFinanceiros.error ? (
-          <div className="error-container" data-aos="fade-up" data-aos-delay="100">
+          <div className="error-container">
             Erro ao carregar dados: {dadosFinanceiros.error}
           </div>
         ) : !dadosFinanceiros.data ? (
-          <div className="error-container" data-aos="fade-up" data-aos-delay="100">
+          <div className="error-container">
             Nenhum dado financeiro disponível para esta empresa.
           </div>
         ) : (
@@ -228,7 +221,7 @@ const FinanceiroDados = ({ empresa_id }: FinanceiroProps) => {
               </div>
             </div>
 
-            <div className="chart-container" data-aos="fade-up" data-aos-delay="200">
+            <div className="chart-container">
               <Bar data={chartData} options={chartOptions} />
             </div>
           </>

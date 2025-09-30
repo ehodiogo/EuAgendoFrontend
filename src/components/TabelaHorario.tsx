@@ -6,8 +6,6 @@ import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import HorariosDoDia from "./Horarios";
 import { Servicos } from "../interfaces/ServicosFuncionarios";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import { FaExclamationCircle, FaSpinner, FaClock } from "react-icons/fa";
 
 interface HorariosTabelaProps {
@@ -28,10 +26,6 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
   const empresa = empresaInterfaceList.data?.find(
     (empresa) => empresa.nome === empresaNome
   );
-
-  useEffect(() => {
-    AOS.init({ duration: 800 });
-  }, []);
 
   useEffect(() => {
     if (empresa) {
@@ -238,15 +232,15 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
       `}</style>
       <div className="horarios-tabela">
         {empresaInterfaceList.loading ? (
-          <div className="message loading" data-aos="fade-up">
+          <div className="message loading">
             <FaSpinner className="fa-spin me-2" /> Carregando dados da empresa...
           </div>
         ) : !empresa ? (
-          <div className="message error" data-aos="fade-up">
+          <div className="message error">
             <FaExclamationCircle /> Empresa não encontrada.
           </div>
         ) : (
-          <div className="horarios-card" data-aos="fade-up">
+          <div className="horarios-card">
             {!assinaturaVencida && (
               <>
                 <h2>

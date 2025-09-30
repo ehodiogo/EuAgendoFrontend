@@ -1,7 +1,6 @@
 import { useFetch } from "../functions/GetData";
 import { Dashboard } from "../interfaces/DashboardEarnings";
 import { FaUsers, FaBriefcase, FaCalendarCheck, FaCalendarAlt, FaChartLine, FaSpinner} from "react-icons/fa";
-import "aos/dist/aos.css";
 
 interface DashBoardDadosProps {
   empresa_id: number;
@@ -107,7 +106,7 @@ const DashBoardDados = ({ empresa_id }: DashBoardDadosProps) => {
           }
         }
       `}</style>
-      <div className="dashboard-dados-card" data-aos="fade-up">
+      <div className="dashboard-dados-card">
         <h4>
           <FaChartLine /> Informações da Empresa
         </h4>

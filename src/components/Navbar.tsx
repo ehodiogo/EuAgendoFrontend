@@ -11,6 +11,9 @@ const Navbar = () => {
     localStorage.getItem("refresh_token") !== null;
 
   useEffect(() => {
+    // Scroll to top when the navbar is rendered
+    window.scrollTo(0, 0);
+
     const updateCartCount = () => {
       const cart = JSON.parse(localStorage.getItem("carrinho") || "[]");
       setCartItemCount(cart.length);
@@ -35,6 +38,20 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  // Handle link clicks to support Shift/Ctrl + click for new tab
+  const handleLinkClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    path: string
+  ) => {
+    // Allow default behavior (open in new tab) if Shift or Ctrl is pressed
+    if (e.shiftKey || e.ctrlKey) {
+      return; // Browser will handle opening in new tab/window
+    }
+    // Prevent default navigation and use react-router-dom for same-tab navigation
+    e.preventDefault();
+    navigate(path);
+  };
+
   return (
     <div className="navbar-container">
       <style>{`
@@ -47,7 +64,6 @@ const Navbar = () => {
           z-index: 1000;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
           max-height: 70px; /* Fixed navbar height */
-          overflow: hidden; /* Prevent content from expanding navbar */
         }
         .navbar-container .navbar-brand {
           font-size: 1.5rem;
@@ -124,6 +140,10 @@ const Navbar = () => {
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           border-radius: 8px;
           min-width: 200px;
+          z-index: 1001; /* Ensure dropdown appears above navbar */
+          position: absolute; /* Ensure dropdown is positioned correctly */
+          top: 100%; /* Position below the toggle button */
+          right: 0; /* Align to the right */
         }
         .navbar-container .dropdown-item {
           padding: 0.75rem 1.25rem;
@@ -159,6 +179,7 @@ const Navbar = () => {
             position: static !important;
             transform: none !important;
             background-color: rgba(255, 255, 255, 0.95);
+            z-index: 1001; /* Ensure visibility on mobile */
           }
           .navbar-container .logo-img {
             width: 100px; /* Slightly smaller logo on mobile */
@@ -172,7 +193,7 @@ const Navbar = () => {
             <img
               src="/vem-agendar.png"
               alt="Logo VemAgendar"
-              className="me-2 logo-img" // Added class for specific styling
+              className="me-2 logo-img"
             />
           </a>
           <button
@@ -189,47 +210,52 @@ const Navbar = () => {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto align-items-center">
               <li className="nav-item">
-                <button
-                  className="nav-link btn btn-link text-light px-3"
-                  onClick={() => navigate("/sobre")}
+                <a
+                  className="nav-link text-light px-3"
+                  href="/sobre"
+                  onClick={(e) => handleLinkClick(e, "/sobre")}
                   aria-label="Navegar para a página Sobre"
                 >
                   Sobre
-                </button>
+                </a>
               </li>
               <li className="nav-item">
-                <button
-                  className="nav-link btn btn-link text-light px-3"
-                  onClick={() => navigate("/planos")}
+                <a
+                  className="nav-link text-light px-3"
+                  href="/planos"
+                  onClick={(e) => handleLinkClick(e, "/planos")}
                   aria-label="Navegar para a página Planos"
                 >
                   Planos
-                </button>
+                </a>
               </li>
               <li className="nav-item">
-                <button
-                  className="nav-link btn btn-link text-light px-3"
-                  onClick={() => navigate("/contato")}
+                <a
+                  className="nav-link text-light px-3"
+                  href="/contato"
+                  onClick={(e) => handleLinkClick(e, "/contato")}
                   aria-label="Navegar para a página Contato"
                 >
                   Contato
-                </button>
+                </a>
               </li>
               {isAuthenticated ? (
                 <>
                   <li className="nav-item">
-                    <button
+                    <a
                       className="btn btn-primary px-4 mx-2 fw-semibold"
-                      onClick={() => navigate("/dashboard")}
+                      href="/dashboard"
+                      onClick={(e) => handleLinkClick(e, "/dashboard")}
                       aria-label="Navegar para o Dashboard"
                     >
                       Dashboard
-                    </button>
+                    </a>
                   </li>
                   <li className="nav-item position-relative">
-                    <button
+                    <a
                       className="btn btn-outline-light mx-2 position-relative"
-                      onClick={() => navigate("/carrinho")}
+                      href="/carrinho"
+                      onClick={(e) => handleLinkClick(e, "/carrinho")}
                       aria-label={`Navegar para o carrinho com ${cartItemCount} itens`}
                     >
                       <FaShoppingCart size={20} />
@@ -238,7 +264,7 @@ const Navbar = () => {
                           {cartItemCount}
                         </span>
                       )}
-                    </button>
+                    </a>
                   </li>
                   <li className="nav-item dropdown">
                     <button
@@ -252,20 +278,22 @@ const Navbar = () => {
                     </button>
                     <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                       <li>
-                        <button
+                        <a
                           className="dropdown-item"
-                          onClick={() => navigate("/perfil")}
+                          href="/perfil"
+                          onClick={(e) => handleLinkClick(e, "/perfil")}
                         >
                           Perfil
-                        </button>
+                        </a>
                       </li>
                       <li>
-                        <button
+                        <a
                           className="dropdown-item"
-                          onClick={() => navigate("/configuracoes")}
+                          href="/configuracoes"
+                          onClick={(e) => handleLinkClick(e, "/configuracoes")}
                         >
                           Configurações
-                        </button>
+                        </a>
                       </li>
                       <li><hr className="dropdown-divider" /></li>
                       <li>
@@ -282,13 +310,14 @@ const Navbar = () => {
                 </>
               ) : (
                 <li className="nav-item">
-                  <button
+                  <a
                     className="btn btn-outline-primary px-4 mx-2 fw-semibold"
-                    onClick={() => navigate("/login")}
+                    href="/login"
+                    onClick={(e) => handleLinkClick(e, "/login")}
                     aria-label="Navegar para a página de login"
                   >
                     Entrar
-                  </button>
+                  </a>
                 </li>
               )}
             </ul>

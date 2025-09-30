@@ -1,8 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
-import "aos/dist/aos.css";
-import AOS from "aos";
 import Navbar from "../components/Navbar";
 import { FaKey, FaEnvelope } from "react-icons/fa";
 
@@ -12,10 +10,6 @@ function Login() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    AOS.init({ duration: 1000 });
-  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -209,7 +203,7 @@ function Login() {
       <div className="custom-bg min-vh-100">
         <Navbar />
         <div className="login-container">
-          <div className="login-card" data-aos="fade-up">
+          <div className="login-card">
             <h2>
               <FaKey /> VemAgendar - Login
             </h2>

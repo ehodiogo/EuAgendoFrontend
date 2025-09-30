@@ -4,8 +4,6 @@ import { Funcionario } from "../interfaces/Funcionario";
 import { Empresa } from "../interfaces/Empresa";
 import { useFetch } from "../functions/GetData";
 import Navbar from "../components/Navbar";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import { FaUserPlus, FaSpinner, FaExclamationTriangle, FaCheckCircle } from "react-icons/fa";
 
 const FuncionarioForm: React.FC = () => {
@@ -29,7 +27,6 @@ const FuncionarioForm: React.FC = () => {
   const seusFuncionarios = useFetch<Funcionario[]>(`api/funcionarios-usuario/?usuario_token=${token}`);
 
   useEffect(() => {
-    AOS.init({ duration: 800 });
     if (acaoSelecionada === "editar" && selectedFuncionarios.length === 1) {
       setEditNome(selectedFuncionarios[0].nome);
       setEditFotoUrl(selectedFuncionarios[0].foto || "");
@@ -408,25 +405,25 @@ const FuncionarioForm: React.FC = () => {
         `}</style>
         <div className="funcionario-form-container">
           {formSuccess && (
-            <div className="toast-message success" data-aos="fade-left">
+            <div className="toast-message success">
               <FaCheckCircle /> {formSuccess}
             </div>
           )}
           {formError && (
-            <div className="toast-message error" data-aos="fade-left">
+            <div className="toast-message error">
               <FaExclamationTriangle /> {formError}
             </div>
           )}
           {seusFuncionarios.loading || empresas.loading ? (
-            <div className="text-center" data-aos="fade-up">
+            <div className="text-center">
               <FaSpinner className="fa-spin" style={{ fontSize: "1.5rem", color: "var(--primary-blue)" }} /> Carregando...
             </div>
           ) : seusFuncionarios.error || empresas.error ? (
-            <div className="toast-message error" data-aos="fade-up">
+            <div className="toast-message error">
               <FaExclamationTriangle /> Erro ao carregar dados: {seusFuncionarios.error || empresas.error}
             </div>
           ) : (
-            <div className="funcionario-card" data-aos="fade-up">
+            <div className="funcionario-card">
               <h2 className="funcionario-title">
                 <FaUserPlus /> Gerenciar Funcionários
               </h2>
@@ -447,7 +444,7 @@ const FuncionarioForm: React.FC = () => {
                 </div>
 
                 {acaoSelecionada === "cadastrar" && (
-                  <div className="funcionario-card" data-aos="fade-up" data-aos-delay="100">
+                  <div className="funcionario-card">
                     <h3 className="funcionario-title">Cadastrar Funcionário</h3>
                     <div className="mb-3">
                       <label className="form-label">Nome</label>
@@ -565,7 +562,7 @@ const FuncionarioForm: React.FC = () => {
                 )}
 
                 {acaoSelecionada === "editar" && (
-                  <div className="funcionario-card" data-aos="fade-up" data-aos-delay="100">
+                  <div className="funcionario-card">
                     <h3 className="funcionario-title">Editar Funcionário</h3>
                     <div className="mb-3">
                       <label className="form-label">Selecione um Funcionário</label>
@@ -740,7 +737,7 @@ const FuncionarioForm: React.FC = () => {
                 )}
 
                 {acaoSelecionada === "remover" && (
-                  <div className="funcionario-card" data-aos="fade-up" data-aos-delay="100">
+                  <div className="funcionario-card">
                     <h3 className="funcionario-title">Remover Funcionário</h3>
                     <div className="warning-text">
                       <FaExclamationTriangle /> Atenção: Esta ação é irreversível!

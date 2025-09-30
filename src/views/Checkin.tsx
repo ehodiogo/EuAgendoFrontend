@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import Navbar from "../components/Navbar";
 import { FaBuilding, FaExclamationCircle, FaSpinner } from "react-icons/fa";
 
@@ -13,10 +11,6 @@ function CheckIn() {
     `api/empresas-usuario/?usuario_token=${token}`
   );
   const [search, setSearch] = useState("");
-
-  useEffect(() => {
-    AOS.init({ duration: 1000 });
-  }, []);
 
   // Filtra empresas com base na busca
   const filteredEmpresas = empresas_usuario.data?.filter((empresa: Empresa) =>
@@ -274,7 +268,7 @@ function CheckIn() {
       `}</style>
       <div className="custom-bg min-vh-100">
         <Navbar />
-        <header className="checkin-header" data-aos="fade-down">
+        <header className="checkin-header">
           <div className="container">
             <h1>
               <FaBuilding /> Check-In
@@ -284,7 +278,7 @@ function CheckIn() {
             </p>
           </div>
         </header>
-        <section className="search-section container" data-aos="fade-up">
+        <section className="search-section container">
           <div className="input-group">
             <input
               type="text"
@@ -302,11 +296,11 @@ function CheckIn() {
           </div>
         </section>
         <div className="checkin-container container">
-          <h2 data-aos="fade-up">
+          <h2>
             <FaBuilding /> Suas Empresas
           </h2>
           {empresas_usuario.loading ? (
-            <div className="message loading" data-aos="fade-up">
+            <div className="message loading">
               <FaSpinner className="fa-spin me-2" /> Carregando empresas...
             </div>
           ) : filteredEmpresas && filteredEmpresas.length > 0 ? (
@@ -315,8 +309,6 @@ function CheckIn() {
                 <div
                   className="col-12 col-md-6 col-lg-4 mb-4"
                   key={empresa.id}
-                  data-aos="zoom-in"
-                  data-aos-delay={100 * (empresa.id % 3)}
                 >
                   <Link to={`/checkin/empresa/${empresa.id}`}>
                     <div className="empresa-card">
@@ -341,12 +333,12 @@ function CheckIn() {
               ))}
             </div>
           ) : (
-            <div className="message warning" data-aos="fade-up">
+            <div className="message warning">
               <FaExclamationCircle /> Nenhuma empresa encontrada.
             </div>
           )}
         </div>
-        <footer className="checkin-footer" data-aos="fade-up">
+        <footer className="checkin-footer">
           <p>&copy; 2025 VemAgendar. Todos os direitos reservados.</p>
         </footer>
       </div>

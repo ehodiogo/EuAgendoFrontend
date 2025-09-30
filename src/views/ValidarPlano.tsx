@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import { FaSpinner, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
-import "aos/dist/aos.css";
-import AOS from "aos";
 
 const ValidarPlano = () => {
   const [loading, setLoading] = useState(false);
@@ -12,7 +10,6 @@ const ValidarPlano = () => {
   const [statusPagamento, setStatusPagamento] = useState<string | null>(null);
 
   useEffect(() => {
-    AOS.init({ duration: 1000 });
     verificarPagamento();
   }, []);
 
@@ -184,7 +181,7 @@ const ValidarPlano = () => {
       <div className="custom-bg min-vh-100">
         <Navbar />
         <div className="validar-plano-container">
-          <div className="card" data-aos="fade-up">
+          <div className="card">
             <div className="card-body">
               <h1>
                 <FaCheckCircle /> Verificação de Pagamento
@@ -222,8 +219,6 @@ const ValidarPlano = () => {
                 onClick={verificarPagamento}
                 className="btn btn-success w-100 mb-3"
                 disabled={loading || verified}
-                data-aos="fade-up"
-                data-aos-delay="100"
               >
                 {loading
                   ? "Verificando..."
@@ -234,8 +229,6 @@ const ValidarPlano = () => {
               <Link
                 to="/"
                 className="btn btn-outline-success w-100"
-                data-aos="fade-up"
-                data-aos-delay="200"
               >
                 Voltar ao Início
               </Link>

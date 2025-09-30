@@ -5,7 +5,6 @@ import { Empresa } from "../interfaces/Empresa";
 import axios from "axios";
 import { useFetch } from "../functions/GetData";
 import Navbar from "../components/Navbar";
-import "aos/dist/aos.css";
 import { FaTools, FaSpinner, FaExclamationTriangle, FaCheckCircle } from "react-icons/fa";
 import { InputMask } from "@react-input/mask";
 
@@ -263,7 +262,7 @@ const ServicoForm: React.FC = () => {
   };
 
   return (
-    <>
+    <>F
       <Navbar />
       <div className="servico-form-container">
         <style>{`
@@ -470,21 +469,21 @@ const ServicoForm: React.FC = () => {
         `}</style>
         <div className="servico-form-container">
           {formSuccess && (
-            <div className="toast-message success" data-aos="fade-left">
+            <div className="toast-message success">
               <FaCheckCircle /> {formSuccess}
             </div>
           )}
           {formError && (
-            <div className="toast-message error" data-aos="fade-left">
+            <div className="toast-message error">
               <FaExclamationTriangle /> {formError}
             </div>
           )}
           {empresas.loading ? (
-            <div className="text-center" data-aos="fade-up">
+            <div className="text-center">
               <FaSpinner className="fa-spin" style={{ fontSize: "1.5rem", color: "var(--primary-blue)" }} /> Carregando...
             </div>
           ) : (
-            <div className="servico-card" data-aos="fade-up">
+            <div className="servico-card">
               <h2 className="servico-title">
                 <FaTools /> Gerenciar Serviços
               </h2>
@@ -533,7 +532,7 @@ const ServicoForm: React.FC = () => {
                 </div>
 
                 {acaoSelecionada === "cadastrar" && empresaSelecionada && (
-                  <div className="servico-card" data-aos="fade-up" data-aos-delay="100">
+                  <div className="servico-card">
                     <h3 className="servico-title">Cadastrar Serviço</h3>
                     <div className="mb-3">
                       <label className="form-label">Nome</label>
@@ -625,7 +624,7 @@ const ServicoForm: React.FC = () => {
                 )}
 
                 {(acaoSelecionada === "adicionar" || acaoSelecionada === "remover-funcionarios") && empresaSelecionada && (
-                  <div className="servico-card" data-aos="fade-up" data-aos-delay="100">
+                  <div className="servico-card">
                     <h3 className="servico-title">{acaoSelecionada === "adicionar" ? "Adicionar Serviço a Funcionários" : "Remover Serviço de Funcionários"}</h3>
                     <div className="mb-3">
                       <label className="form-label">Selecione um Serviço</label>
@@ -690,7 +689,7 @@ const ServicoForm: React.FC = () => {
                 )}
 
                 {acaoSelecionada === "editar" && empresaSelecionada && (
-                  <div className="servico-card" data-aos="fade-up" data-aos-delay="100">
+                  <div className="servico-card">
                     <h3 className="servico-title">Editar Serviço</h3>
                     <div className="mb-3">
                       <label className="form-label">Selecione um Serviço</label>
@@ -770,7 +769,7 @@ const ServicoForm: React.FC = () => {
                 )}
 
                 {acaoSelecionada === "remover" && empresaSelecionada && (
-                  <div className="servico-card" data-aos="fade-up" data-aos-delay="100">
+                  <div className="servico-card">
                     <h3 className="servico-title">Remover Serviço</h3>
                     <div className="warning-text">
                       <FaExclamationTriangle /> Atenção: Esta ação é irreversível!

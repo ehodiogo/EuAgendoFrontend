@@ -1,18 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useEffect } from "react";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import Navbar from "../components/Navbar";
 import { FaGithub, FaInstagram, FaLinkedin, FaRoad, FaUser } from "react-icons/fa";
 import { BsFillFileLockFill } from "react-icons/bs";
 
 function Home() {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    AOS.init({ duration: 1000 });
-  }, []);
 
   return (
     <div className="min-vh-100">
@@ -268,7 +261,7 @@ function Home() {
       <div className="custom-bg min-vh-100">
         <Navbar />
 
-        <header className="custom-header d-flex align-items-center text-white" data-aos="fade-down">
+        <header className="custom-header d-flex align-items-center text-white">
           <div className="container d-flex align-items-center flex-wrap justify-content-center">
             <div className="text-center">
               <h1 className="display-4 fw-bold">Gerencie seus Agendamentos com Facilidade</h1>
@@ -290,14 +283,14 @@ function Home() {
           </div>
         </header>
 
-        <section className="custom-section container text-center" data-aos="fade-up">
+        <section className="custom-section container text-center">
           <h2 className="fw-bold">O que é o VemAgendar?</h2>
           <p className="text-muted mx-auto">
             O VemAgendar é uma plataforma inteligente que simplifica o agendamento de compromissos para empresas e clientes. Nossa ferramenta permite um gerenciamento eficiente, envio de lembretes automáticos e maior organização.
           </p>
         </section>
 
-        <section className="custom-section container text-center" data-aos="fade-up">
+        <section className="custom-section container text-center">
           <h2 className="fw-bold">Benefícios para Você</h2>
           <div className="row mt-4">
             {[
@@ -328,7 +321,7 @@ function Home() {
           </div>
         </section>
 
-        <section className="custom-section bg-light" data-aos="fade-up">
+        <section className="custom-section bg-light">
           <div className="container">
             <h2 className="fw-bold text-center">O que nossos clientes dizem</h2>
             <div className="row mt-4 justify-content-center">
@@ -364,7 +357,7 @@ function Home() {
           </div>
         </section>
 
-        <section className="custom-section container text-center" data-aos="fade-up">
+        <section className="custom-section container text-center">
           <h2 className="fw-bold">Escolha seu Plano</h2>
           <div className="row mt-4">
             {[
@@ -409,7 +402,7 @@ function Home() {
           </div>
         </section>
 
-        <section className="custom-section roadmap-section" data-aos="fade-up">
+        <section className="custom-section roadmap-section">
           <div className="container text-center">
             <h2 className="fw-bold">Lançamentos Futuros</h2>
             <p className="text-muted">Descubra as próximas inovações do VemAgendar.</p>

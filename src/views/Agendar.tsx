@@ -1,10 +1,8 @@
 import { useFetch } from "../functions/GetData";
 import { ServicosFuncionariosEmpresa } from "../interfaces/ServicosFuncionarios";
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import HorariosTabela from "../components/TabelaHorario";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import Navbar from "../components/Navbar";
 import { FaCalendar, FaUserTie, FaSpinner, FaExclamationCircle, FaTimes } from "react-icons/fa";
 
@@ -14,10 +12,6 @@ const Agendar = () => {
     `api/empresaservico/?empresa_nome=${empresaNome}`
   );
   const [funcionarioSelecionado, setFuncionarioSelecionado] = useState<number | null>(null);
-
-  useEffect(() => {
-    AOS.init({ duration: 800 });
-  }, []);
 
   const handleClearSelection = () => {
     setFuncionarioSelecionado(null);

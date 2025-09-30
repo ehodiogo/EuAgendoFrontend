@@ -1,8 +1,6 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "../components/Navbar";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
 const roadmapData = [
@@ -58,9 +56,6 @@ const roadmapData = [
 ];
 
 const Roadmap: React.FC = () => {
-  React.useEffect(() => {
-    AOS.init({ duration: 800 });
-  }, []);
 
   return (
     <>
@@ -231,7 +226,7 @@ const Roadmap: React.FC = () => {
           }
         `}</style>
         <div className="roadmap-container">
-          <h1 className="roadmap-title" data-aos="fade-up">
+          <h1 className="roadmap-title">
             <FaMapMarkerAlt /> Roadmap do VemAgendar
           </h1>
           <div className="timeline">
@@ -239,8 +234,6 @@ const Roadmap: React.FC = () => {
               <div
                 key={index}
                 className={`timeline-item ${item.status.toLowerCase().replace(" ", "-")}`}
-                data-aos="fade-up"
-                data-aos-delay={index * 100}
               >
                 <div className="timeline-card">
                   <div className="date">{item.date}</div>

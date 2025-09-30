@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import Navbar from "../components/Navbar";
 import FinanceiroDados from "../components/FinanceiroDados";
 import { FaChartBar, FaSpinner } from "react-icons/fa";
-import "aos/dist/aos.css";
-import AOS from "aos";
 
 const Financeiro = () => {
   const token = localStorage.getItem("access_token");
@@ -13,10 +11,6 @@ const Financeiro = () => {
     `api/empresas-usuario/?usuario_token=${token}`
   );
   const [dropdownAberto, setDropdownAberto] = useState<number | null>(null);
-
-  useEffect(() => {
-    AOS.init({ duration: 1000 });
-  }, []);
 
   const handleToggleDropdown = async (empresaId: number) => {
     if (dropdownAberto === empresaId) {
@@ -142,22 +136,22 @@ const Financeiro = () => {
       <div className="custom-bg min-vh-100">
         <Navbar />
         <div className="financeiro-container container">
-          <h1 data-aos="fade-up">
+          <h1>
             <FaChartBar /> Seus Dados Financeiros
           </h1>
-          <p className="lead" data-aos="fade-up" data-aos-delay="100">
+          <p className="lead">
             Selecione uma empresa para ver seus dados financeiros.
           </p>
           {empresas_usuario.loading ? (
-            <div className="loading-container" data-aos="fade-up" data-aos-delay="200">
+            <div className="loading-container">
               <FaSpinner className="fa-spin me-2" /> Carregando empresas...
             </div>
           ) : empresas_usuario.error ? (
-            <div className="error-container" data-aos="fade-up" data-aos-delay="200">
+            <div className="error-container">
               Erro ao carregar empresas: {empresas_usuario.error}
             </div>
           ) : !empresas_usuario.data || empresas_usuario.data.length === 0 ? (
-            <div className="error-container" data-aos="fade-up" data-aos-delay="200">
+            <div className="error-container">
               Nenhuma empresa encontrada.
             </div>
           ) : (
@@ -166,8 +160,6 @@ const Financeiro = () => {
                 <div
                   className="col-12 mb-4"
                   key={empresa.id}
-                  data-aos="fade-up"
-                  data-aos-delay="300"
                 >
                   <div
                     className="empresa-card"
@@ -181,8 +173,6 @@ const Financeiro = () => {
                   {dropdownAberto === empresa.id && (
                     <div
                       className="dropdown-card"
-                      data-aos="fade-up"
-                      data-aos-delay="400"
                     >
                       <FinanceiroDados empresa_id={empresa.id} />
                     </div>

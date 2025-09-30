@@ -1,8 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
-import "aos/dist/aos.css";
-import AOS from "aos";
 import Navbar from "../components/Navbar";
 import { FaUser, FaEnvelope, FaKey, FaEye, FaEyeSlash, FaLink } from "react-icons/fa";
 
@@ -15,10 +13,6 @@ function Register() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    AOS.init({ duration: 1000 });
-  }, []);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -226,7 +220,7 @@ function Register() {
       <div className="custom-bg min-vh-100">
         <Navbar />
         <div className="register-container">
-          <div className="register-card" data-aos="fade-up">
+          <div className="register-card">
             <h2>
               <FaUser /> Criar Conta
             </h2>

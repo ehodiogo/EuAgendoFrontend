@@ -1,12 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Agendamento } from "../interfaces/Agendamento";
 import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import AgendamentoDados from "../components/AgendamentoDados";
 import FiltrosAgendamento from "../components/FiltrosAgendamentos";
 import { FaTable, FaCalendar, FaSpinner } from "react-icons/fa";
-import "aos/dist/aos.css";
-import AOS from "aos";
 
 interface AgendamentosHojeProps {
   empresa: Empresa;
@@ -17,10 +15,6 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
   const agendamentosHoje = useFetch<Agendamento[]>(
     `api/agendamentos-hoje/?empresa_id=${empresa.id}`
   );
-
-  useEffect(() => {
-    AOS.init({ duration: 1000 });
-  }, []);
 
   const alternarVisualizacao = (tipo: "tabela" | "quadro") => {
     setVisualizacao(tipo);
@@ -263,13 +257,13 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
 
       <div className="custom-bg min-vh-100">
         <div className="agendamentos-container container">
-          <h1 data-aos="fade-up">
+          <h1 >
             <FaCalendar /> Agendamentos para Hoje
           </h1>
-          <p className="lead" data-aos="fade-up" data-aos-delay="100">
+          <p className="lead" >
             Confira os agendamentos para hoje na empresa <strong>{empresa.nome}</strong>.
           </p>
-          <div className="view-toggle-buttons" data-aos="fade-up" data-aos-delay="200">
+          <div className="view-toggle-buttons">
             <button
               className={`btn ${visualizacao === "tabela" ? "btn-primary active" : "btn-outline-primary"}`}
               onClick={() => alternarVisualizacao("tabela")}
@@ -285,11 +279,11 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
           </div>
 
           {agendamentosHoje.loading ? (
-            <div className="loading-container" data-aos="fade-up" data-aos-delay="300">
+            <div className="loading-container">
               <FaSpinner className="fa-spin me-2" /> Carregando agendamentos...
             </div>
           ) : !agendamentosHoje.data || agendamentosHoje.data.length === 0 ? (
-            <div className="empty-container" data-aos="fade-up" data-aos-delay="300">
+            <div className="empty-container">
               Não há agendamentos para hoje.
               <br />
               <a href="/cadastros-usuario" className="btn btn-primary mt-3">
@@ -299,7 +293,7 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
           ) : (
             <>
               {visualizacao === "tabela" ? (
-                <div className="table-responsive" data-aos="fade-up" data-aos-delay="400">
+                <div className="table-responsive">
                   <div className="mb-3">
                     <FiltrosAgendamento />
                   </div>
@@ -321,7 +315,7 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
                   </table>
                 </div>
               ) : (
-                <div className="quadro-container" data-aos="fade-up" data-aos-delay="400">
+                <div className="quadro-container">
                   {[...Array(24)].map((_, hour) => {
                     const horaLabel = hour.toString().padStart(2, "0") + ":00";
 

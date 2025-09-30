@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import { Agendamento } from "../interfaces/Agendamento";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import Navbar from "../components/Navbar";
 import { FaSpinner, FaExclamationCircle, FaQrcode, FaCheckCircle, FaBuilding, FaCalendarDay, FaClock } from "react-icons/fa";
 import { QRCodeCanvas } from "qrcode.react";
@@ -16,10 +14,6 @@ function CheckInEmpresa() {
   const agendamentos = useFetch<Agendamento[]>(`api/agendamento?empresaId=${id}&usuario_token=${token}`);
   const [showQRCode, setShowQRCode] = useState<number | null>(null);
   const [filterType, setFilterType] = useState<"today" | "pending">("pending");
-
-  useEffect(() => {
-    AOS.init({ duration: 1000 });
-  }, []);
 
   // Obtém a data de hoje no formato YYYY-MM-DD
   const today = new Date().toISOString().split("T")[0]; // e.g., "2025-09-25"
@@ -308,7 +302,7 @@ function CheckInEmpresa() {
       `}</style>
       <div className="custom-bg min-vh-100">
         <Navbar />
-        <header className="checkin-header" data-aos="fade-down">
+        <header className="checkin-header">
           <div className="container">
             {empresa.data ? (
               <>
@@ -329,7 +323,7 @@ function CheckInEmpresa() {
             )}
           </div>
         </header>
-        <section className="filter-section container" data-aos="fade-up">
+        <section className="filter-section container">
           <div className="btn-group">
             <button
               className={`btn-filter ${filterType === "pending" ? "active" : ""}`}
@@ -346,11 +340,11 @@ function CheckInEmpresa() {
           </div>
         </section>
         <div className="checkin-container container">
-          <h2 data-aos="fade-up">
+          <h2>
             <FaCheckCircle /> Agendamentos {filterType === "today" ? "de Hoje" : "Pendentes"}
           </h2>
           {empresa.loading || agendamentos.loading ? (
-            <div className="message loading" data-aos="fade-up">
+            <div className="message loading">
               <FaSpinner className="fa-spin me-2" /> Carregando dados...
             </div>
           ) : filteredAgendamentos && filteredAgendamentos.length > 0 ? (
@@ -359,8 +353,6 @@ function CheckInEmpresa() {
                 <div
                   className="col-12 col-md-6 col-lg-4 mb-4"
                   key={agendamento.id}
-                  data-aos="zoom-in"
-                  data-aos-delay={100 * (index % 3)}
                 >
                   <div className="agendamento-card">
                     <div className="card-body">
@@ -416,12 +408,12 @@ function CheckInEmpresa() {
               ))}
             </div>
           ) : (
-            <div className="message warning" data-aos="fade-up">
+            <div className="message warning">
               <FaExclamationCircle /> Nenhum agendamento {filterType === "today" ? "de hoje" : "pendente"} encontrado para esta empresa.
             </div>
           )}
         </div>
-        <footer className="checkin-footer" data-aos="fade-up">
+        <footer className="checkin-footer">
           <p>&copy; 2025 VemAgendar. Todos os direitos reservados.</p>
         </footer>
       </div>

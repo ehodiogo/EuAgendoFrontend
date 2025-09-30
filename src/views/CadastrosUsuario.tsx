@@ -1,14 +1,8 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { FaBuilding, FaUserTie, FaTools, FaList, FaLink, FaCog, FaCalendar, FaDatabase } from "react-icons/fa";
-import "aos/dist/aos.css";
-import AOS from "aos";
 
 export default function CadastrosUsuario() {
-  useEffect(() => {
-    AOS.init({ duration: 1000 });
-  }, []);
 
   return (
     <div className="min-vh-100">
@@ -206,13 +200,13 @@ export default function CadastrosUsuario() {
       <div className="custom-bg min-vh-100">
         <Navbar />
         <div className="cadastros-container container">
-          <h1 data-aos="fade-up">
+          <h1>
             <FaCog /> Cadastros de Empresas, Funcionários e Serviços
           </h1>
-          <p className="lead" data-aos="fade-up" data-aos-delay="100">
+          <p className="lead">
             <FaList /> Nesta seção, você pode cadastrar novas empresas, funcionários e serviços. Além disso, em cada uma dessas telas, é possível editar ou excluir os dados cadastrados.
           </p>
-          <div className="action-buttons" data-aos="fade-up" data-aos-delay="200">
+          <div className="action-buttons">
             <Link to="/criar-empresa" className="btn btn-success">
               <FaBuilding /> Criar Empresa
             </Link>
@@ -223,7 +217,7 @@ export default function CadastrosUsuario() {
               <FaTools /> Criar Serviço
             </Link>
           </div>
-          <div className="fluxo-section" data-aos="fade-up" data-aos-delay="300">
+          <div className="fluxo-section">
             <h3>
               <FaCog /> Fluxo para Cadastro Correto
             </h3>
@@ -248,7 +242,7 @@ export default function CadastrosUsuario() {
               </li>
             </ul>
           </div>
-          <div className="relacao-section" data-aos="fade-up" data-aos-delay="400">
+          <div className="relacao-section">
             <h5>
               <FaLink /> Relação entre os Dados
             </h5>

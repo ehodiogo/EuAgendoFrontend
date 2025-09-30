@@ -6,8 +6,6 @@ import { FaCreditCard, FaPix, FaRegCreditCard, FaUser, FaEnvelope, FaKey, FaEye,
 import { Usage } from "../interfaces/Usage";
 import { Pagamentos } from "../interfaces/Pagamentos";
 import { FaSpinner } from "react-icons/fa";
-import "aos/dist/aos.css";
-import AOS from "aos";
 
 const Profile = () => {
   const token = localStorage.getItem("access_token");
@@ -29,7 +27,6 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    AOS.init({ duration: 1000 });
     if (user.data) {
       setUserData(user.data);
     }
@@ -362,20 +359,20 @@ const Profile = () => {
       <div className="custom-bg min-vh-100">
         <Navbar />
         <div className="profile-container container">
-          <h1 data-aos="fade-up">
+          <h1>
             <FaUser /> Suas Informações
           </h1>
           {user.loading || usage.loading || payments.loading ? (
-            <div className="loading-container" data-aos="fade-up">
+            <div className="loading-container">
               <FaSpinner className="fa-spin me-2" /> Carregando dados...
             </div>
           ) : user.error || usage.error || payments.error ? (
-            <div className="error-container" data-aos="fade-up">
+            <div className="error-container">
               Erro ao carregar dados: {user.error || usage.error || payments.error}
             </div>
           ) : (
             <>
-              <div className="profile-card" data-aos="fade-up" data-aos-delay="100">
+              <div className="profile-card">
                 <h4>Informações do Perfil</h4>
                 {error && <div className="alert-danger">{error}</div>}
                 {success && <div className="alert-success">{success}</div>}
@@ -524,7 +521,7 @@ const Profile = () => {
                   </form>
                 )}
               </div>
-              <div className="plan-card" data-aos="fade-up" data-aos-delay="200">
+              <div className="plan-card">
                 <h4>Plano Ativo</h4>
                 {usage.data?.plano_ativo ? (
                   <>
@@ -536,7 +533,7 @@ const Profile = () => {
                 )}
               </div>
               {(usage.data?.quantia_empresas_criadas && usage.data?.quantia_empresas_criadas > 0) ? (
-                <div className="usage-card" data-aos="fade-up" data-aos-delay="300">
+                <div className="usage-card">
                   <h4>Limite de Empresas Criadas</h4>
                   <div className="progress">
                     <div
@@ -552,14 +549,14 @@ const Profile = () => {
                   </div>
                 </div>
               ) : (
-                <div className="usage-card" data-aos="fade-up" data-aos-delay="300">
+                <div className="usage-card">
                   <h4>Limite de Empresas Criadas</h4>
                   <p className="text-center text-muted">Nenhuma empresa criada.</p>
                 </div>
               )}
               {usage.data && usage.data.funcionarios_por_empresa && (
                 usage.data.funcionarios_por_empresa.map((item, index) => (
-                  <div key={index} className="usage-card" data-aos="fade-up" data-aos-delay="400">
+                  <div key={index} className="usage-card">
                     <h4>Limite de Funcionários por Empresas</h4>
                     <div className="progress">
                       <div
@@ -581,12 +578,12 @@ const Profile = () => {
                 ))
               )}
               {usage.data?.funcionarios_por_empresa.length === 0 && (
-                <div className="usage-card" data-aos="fade-up" data-aos-delay="400">
+                <div className="usage-card">
                   <h4>Limite de Funcionários Totais</h4>
                   <p className="text-center text-muted">Nenhuma empresa criada para possuir funcionários.</p>
                 </div>
               )}
-              <div className="payment-card" data-aos="fade-up" data-aos-delay="500">
+              <div className="payment-card">
                 <h4>Histórico de Pagamentos</h4>
                 <table className="table table-striped text-center">
                   <thead>
