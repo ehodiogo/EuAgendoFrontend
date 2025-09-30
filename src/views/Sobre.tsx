@@ -194,7 +194,7 @@ function Sobre() {
               <div className="col-md-4 col-sm-6">
                 <div className="team-card">
                   <img
-                    src="https://eu-agendo.s3.us-east-1.amazonaws.com/imagens/Foto+Campe%C3%A3o+CodeRace24.jpg"
+                    src="https://eu-agendo.s3.us-east-1.amazonaws.com/imagens/minhaFoto_Diogo_Antonio_dapereirainf.ufsm.br.jpeg"
                     className="card-img-top"
                     alt="Diogo Antonio"
                   />
