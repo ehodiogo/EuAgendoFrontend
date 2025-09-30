@@ -327,17 +327,17 @@ function Home() {
             <div className="row mt-4 justify-content-center">
               {[
                 {
-                  name: "Mariana R.",
+                  name: "Helena D.",
                   review: "O VemAgendar revolucionou meu negócio! Nunca foi tão fácil organizar meus clientes.",
                   stars: "⭐⭐⭐⭐⭐",
                 },
                 {
-                  name: "Carlos M.",
+                  name: "Paulo B.",
                   review: "Reduziu o tempo de organizar meus atendimentos em 90% com a facilidade para visualizar horários disponíveis!",
                   stars: "⭐⭐⭐⭐⭐",
                 },
                 {
-                  name: "Fernanda T.",
+                  name: "Luciana D.",
                   review: "Prático, eficiente e muito intuitivo. Recomendo para todos os autônomos!",
                   stars: "⭐⭐⭐⭐⭐",
                 },
