@@ -12,7 +12,7 @@ function EmpresasSearch() {
   const [bairro, setBairro] = useState("");
   const [pais, setPais] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const empresas = useFetch<Empresa[]>("api/empresa");
+  const empresas = useFetch<Empresa[]>("/api/empresa");
 
   const filteredEmpresas = empresas.data?.filter((empresa: Empresa) =>
     empresa.nome.toLowerCase().includes(search.toLowerCase()) &&
