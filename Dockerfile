@@ -13,6 +13,8 @@ FROM nginx:alpine
 RUN rm -rf /usr/share/nginx/html/*
 
 COPY --from=builder /app/dist /usr/share/nginx/html
+COPY ssl/cf-origin.pem /etc/ssl/certs/cf-origin.pem
+COPY ssl/cf-origin-key.pem /etc/ssl/private/cf-origin-key.pem
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
