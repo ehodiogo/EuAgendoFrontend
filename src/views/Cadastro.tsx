@@ -35,8 +35,6 @@ function Register() {
         codigo_usado: referralCode || null, // Include referral code, send null if empty
       });
 
-      console.log("Register", response);
-
       navigate("/login");
     } catch (err: any) {
       setError(
@@ -51,8 +49,6 @@ function Register() {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
-  console.log("URL: ", import.meta.env.VITE_API_URL);
 
   return (
     <div className="min-vh-100">
