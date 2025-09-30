@@ -1,4 +1,3 @@
-"use client";
 import React, { useState, useEffect } from "react";
 import { ServicoCreate, Servico } from "../interfaces/Servico";
 import { FuncionarioServicos } from "../interfaces/ServicosFuncionarios";

@@ -1,4 +1,3 @@
-"use client";
 import React, { useEffect, useState } from "react";
 import InputMask from "react-input-mask";
 import { EmpresaCreate, Empresa } from "../interfaces/Empresa";
