@@ -11,10 +11,10 @@ import AOS from "aos";
 
 const Profile = () => {
   const token = localStorage.getItem("access_token");
-  const url = token ? `api/user/?usuario_token=${token}` : "";
+  const url = token ? `/api/user/?usuario_token=${token}` : "";
   const user = useFetch<UserProfile>(url);
-  const usage = useFetch<Usage>(`api/limite-plano-usage/?usuario_token=${token}`);
-  const payments = useFetch<Pagamentos>(`api/pagamentos-usuario/?usuario_token=${token}`);
+  const usage = useFetch<Usage>(`/api/limite-plano-usage/?usuario_token=${token}`);
+  const payments = useFetch<Pagamentos>(`/api/pagamentos-usuario/?usuario_token=${token}`);
 
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
