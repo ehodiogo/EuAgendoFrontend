@@ -19,6 +19,10 @@ const EmpresaForm: React.FC = () => {
     nome: "",
     cnpj: "",
     endereco: "",
+    bairro: "",
+    cidade: "",
+    pais: "",
+    estado: "",
     telefone: "",
     email: "",
     servicos: [],
@@ -48,6 +52,10 @@ const EmpresaForm: React.FC = () => {
           nome: selectedEmpresa.nome || "",
           cnpj: selectedEmpresa.cnpj || "",
           endereco: selectedEmpresa.endereco || "",
+          bairro: selectedEmpresa.bairro || "",
+          cidade: selectedEmpresa.cidade || "",
+          pais: selectedEmpresa.pais || "",
+          estado: selectedEmpresa.estado || "",
           telefone: selectedEmpresa.telefone || "",
           email: selectedEmpresa.email || "",
           servicos: selectedEmpresa.servicos || [],
@@ -101,6 +109,10 @@ const EmpresaForm: React.FC = () => {
       if (!empresa.nome.trim()) return setFormError("O nome da empresa é obrigatório."), false;
       if (!empresa.cnpj || !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(empresa.cnpj)) return setFormError("CNPJ inválido."), false;
       if (!empresa.endereco.trim()) return setFormError("O endereço é obrigatório."), false;
+      if (!empresa.bairro.trim()) return setFormError("O bairro é obrigatório."), false;
+      if (!empresa.cidade.trim()) return setFormError("A cidade é obrigatória."), false;
+      if (!empresa.estado.trim()) return setFormError("O estado é obrigatório."), false;
+      if (!empresa.pais.trim()) return setFormError("O país é obrigatório."), false;
       if (!empresa.telefone || !/^\(\d{2}\)\s?\d{4,5}-\d{4}$/.test(empresa.telefone)) return setFormError("Telefone inválido."), false;
       if (!empresa.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(empresa.email)) return setFormError("E-mail inválido."), false;
       if (!empresa.horario_abertura_dia_semana || !/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(empresa.horario_abertura_dia_semana)) return setFormError("Horário de abertura (semana) inválido."), false;
@@ -156,10 +168,21 @@ const EmpresaForm: React.FC = () => {
         }
 
         const requiredFields = [
-          "nome", "cnpj", "endereco", "telefone", "email",
-          "horario_abertura_dia_semana", "horario_fechamento_dia_semana",
-          "horario_abertura_fim_de_semana", "horario_fechamento_fim_de_semana",
-          "horario_pausa_inicio", "horario_pausa_fim",
+          "nome",
+          "cnpj",
+          "endereco",
+          "bairro",
+          "cidade",
+          "pais",
+          "estado",
+          "telefone",
+          "email",
+          "horario_abertura_dia_semana",
+          "horario_fechamento_dia_semana",
+          "horario_abertura_fim_de_semana",
+          "horario_fechamento_fim_de_semana",
+          "horario_pausa_inicio",
+          "horario_pausa_fim",
         ];
         requiredFields.forEach((field) => formData.append(field, empresa[field as keyof EmpresaCreate] as string || ""));
         formData.append("abre_sabado", empresa.abre_sabado.toString());
@@ -175,11 +198,26 @@ const EmpresaForm: React.FC = () => {
         setFormSuccess("Empresa cadastrada com sucesso!");
         setEmpresaCriada(true);
         setEmpresa({
-          nome: "", cnpj: "", endereco: "", telefone: "", email: "", servicos: [], logo: "",
-          horario_abertura_dia_semana: "", horario_fechamento_dia_semana: "",
-          horario_abertura_fim_de_semana: "", horario_fechamento_fim_de_semana: "",
-          abre_sabado: false, abre_domingo: false, para_almoco: false,
-          horario_pausa_inicio: "", horario_pausa_fim: "",
+          nome: "",
+          cnpj: "",
+          endereco: "",
+          bairro: "",
+          cidade: "",
+          pais: "",
+          estado: "",
+          telefone: "",
+          email: "",
+          servicos: [],
+          logo: "",
+          horario_abertura_dia_semana: "",
+          horario_fechamento_dia_semana: "",
+          horario_abertura_fim_de_semana: "",
+          horario_fechamento_fim_de_semana: "",
+          abre_sabado: false,
+          abre_domingo: false,
+          para_almoco: false,
+          horario_pausa_inicio: "",
+          horario_pausa_fim: "",
         });
       } catch (error: unknown) {
         if (error instanceof Error) {
@@ -201,10 +239,21 @@ const EmpresaForm: React.FC = () => {
         }
 
         const requiredFields = [
-          "nome", "cnpj", "endereco", "telefone", "email",
-          "horario_abertura_dia_semana", "horario_fechamento_dia_semana",
-          "horario_abertura_fim_de_semana", "horario_fechamento_fim_de_semana",
-          "horario_pausa_inicio", "horario_pausa_fim",
+          "nome",
+          "cnpj",
+          "endereco",
+          "bairro",
+          "cidade",
+          "pais",
+          "estado",
+          "telefone",
+          "email",
+          "horario_abertura_dia_semana",
+          "horario_fechamento_dia_semana",
+          "horario_abertura_fim_de_semana",
+          "horario_fechamento_fim_de_semana",
+          "horario_pausa_inicio",
+          "horario_pausa_fim",
         ];
         requiredFields.forEach((field) => formData.append(field, empresa[field as keyof EmpresaCreate] as string || ""));
         formData.append("abre_sabado", empresa.abre_sabado.toString());
@@ -541,6 +590,54 @@ const EmpresaForm: React.FC = () => {
                       />
                     </div>
                     <div className="mb-3">
+                      <label className="form-label">Bairro</label>
+                      <input
+                        type="text"
+                        name="bairro"
+                        className="form-control"
+                        value={empresa.bairro}
+                        onChange={handleChange}
+                        placeholder="Ex: Centro"
+                        required
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Cidade</label>
+                      <input
+                        type="text"
+                        name="cidade"
+                        className="form-control"
+                        value={empresa.cidade}
+                        onChange={handleChange}
+                        placeholder="Ex: São Paulo"
+                        required
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Estado</label>
+                      <input
+                        type="text"
+                        name="estado"
+                        className="form-control"
+                        value={empresa.estado}
+                        onChange={handleChange}
+                        placeholder="Ex: SP"
+                        required
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">País</label>
+                      <input
+                        type="text"
+                        name="pais"
+                        className="form-control"
+                        value={empresa.pais}
+                        onChange={handleChange}
+                        placeholder="Ex: Brasil"
+                        required
+                      />
+                    </div>
+                    <div className="mb-3">
                       <label className="form-label">Telefone</label>
                       <InputMask
                         mask="(99) 99999-9999"
@@ -757,6 +854,54 @@ const EmpresaForm: React.FC = () => {
                             value={empresa.endereco}
                             onChange={handleChange}
                             placeholder="Ex: Rua Exemplo, 123"
+                            required
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label">Bairro</label>
+                          <input
+                            type="text"
+                            name="bairro"
+                            className="form-control"
+                            value={empresa.bairro}
+                            onChange={handleChange}
+                            placeholder="Ex: Centro"
+                            required
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label">Cidade</label>
+                          <input
+                            type="text"
+                            name="cidade"
+                            className="form-control"
+                            value={empresa.cidade}
+                            onChange={handleChange}
+                            placeholder="Ex: São Paulo"
+                            required
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label">Estado</label>
+                          <input
+                            type="text"
+                            name="estado"
+                            className="form-control"
+                            value={empresa.estado}
+                            onChange={handleChange}
+                            placeholder="Ex: SP"
+                            required
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label">País</label>
+                          <input
+                            type="text"
+                            name="pais"
+                            className="form-control"
+                            value={empresa.pais}
+                            onChange={handleChange}
+                            placeholder="Ex: Brasil"
                             required
                           />
                         </div>
