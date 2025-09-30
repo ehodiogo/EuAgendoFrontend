@@ -135,9 +135,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
     };
 
     try {
-      const url = window.location.origin.includes("localhost:5173")
-        ? "http://localhost:8000"
-        : "https://backend-production-6587.up.railway.app";
+      const url = import.meta.env.VITE_API_URL;
 
       const response = await fetch(`${url}/api/agendamento/create`, {
         method: "POST",

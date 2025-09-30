@@ -45,9 +45,7 @@ function Carrinho() {
     setLoading(true);
     setError(null);
     try {
-      const url = window.location.origin.includes("localhost:5173")
-        ? "http://localhost:8000"
-        : "https://backend-production-6587.up.railway.app";
+      const url = import.meta.env.VITE_API_URL;
 
       const response = await axios.post(url + "/api/pagamento-plano/", {
         plano_nome: carrinho[0].nome,

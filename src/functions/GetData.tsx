@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 
 const baseUrl =
-  window.location.hostname === "localhost" ||
-  window.location.hostname === "127.0.0.1"
-    ? "http://127.0.0.1:8000/"
-    : "https://backend-production-6587.up.railway.app/";
-// TODO: TROCAR URL DE PRD 
+  import.meta.env.VITE_API_URL;
 
 type FetchOptions = {
   method?: "GET" | "POST" | "PUT" | "DELETE";

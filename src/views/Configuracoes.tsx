@@ -22,9 +22,7 @@ const SettingsView = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
 
-  const baseURL = window.location.origin.includes("localhost")
-    ? "http://localhost:8000/"
-    : "https://backend-production-6587.up.railway.app/";
+  const baseURL = import.meta.env.VITE_API_URL;
 
   const token = localStorage.getItem("access_token");
 
