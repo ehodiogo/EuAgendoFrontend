@@ -8,7 +8,7 @@ import { FaBuilding, FaExclamationCircle, FaSpinner } from "react-icons/fa";
 function CheckIn() {
   const token = localStorage.getItem("access_token");
   const empresas_usuario = useFetch<Empresa[]>(
-    `api/empresas-usuario/?usuario_token=${token}`
+    `/api/empresas-usuario/?usuario_token=${token}`
   );
   const [search, setSearch] = useState("");
 

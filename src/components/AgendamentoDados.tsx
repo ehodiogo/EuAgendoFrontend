@@ -10,9 +10,9 @@ interface AgendamentoDadosProps {
 }
 
 const AgendamentoDados = ({ agendamento }: AgendamentoDadosProps) => {
-  const funcionario = useFetch<Funcionario>(`api/funcionario/${agendamento.funcionario}`);
-  const cliente = useFetch<Cliente>(`api/cliente/${agendamento.cliente}`);
-  const servico = useFetch<Servico>(`api/servico/${agendamento.servico}`);
+  const funcionario = useFetch<Funcionario>(`/api/funcionario/${agendamento.funcionario}`);
+  const cliente = useFetch<Cliente>(`/api/cliente/${agendamento.cliente}`);
+  const servico = useFetch<Servico>(`/api/servico/${agendamento.servico}`);
 
   return (
     <div>

@@ -8,7 +8,7 @@ interface DashBoardDadosProps {
 
 const DashBoardDados = ({ empresa_id }: DashBoardDadosProps) => {
   const dadosDashboard = useFetch<Dashboard>(
-    `api/dashboard/?empresa_id=${empresa_id}`
+    `/api/dashboard/?empresa_id=${empresa_id}`
   );
 
   return (

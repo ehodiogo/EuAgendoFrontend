@@ -13,7 +13,7 @@ interface AgendamentosHojeProps {
 export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
   const [visualizacao, setVisualizacao] = useState<"tabela" | "quadro">("tabela");
   const agendamentosHoje = useFetch<Agendamento[]>(
-    `api/agendamentos-hoje/?empresa_id=${empresa.id}`
+    `/api/agendamentos-hoje/?empresa_id=${empresa.id}`
   );
 
   const alternarVisualizacao = (tipo: "tabela" | "quadro") => {

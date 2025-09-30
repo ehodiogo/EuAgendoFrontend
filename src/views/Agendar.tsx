@@ -9,7 +9,7 @@ import { FaCalendar, FaUserTie, FaSpinner, FaExclamationCircle, FaTimes } from "
 const Agendar = () => {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
   const empresasData = useFetch<ServicosFuncionariosEmpresa[]>(
-    `api/empresaservico/?empresa_nome=${empresaNome}`
+    `/api/empresaservico/?empresa_nome=${empresaNome}`
   );
   const [funcionarioSelecionado, setFuncionarioSelecionado] = useState<number | null>(null);
 

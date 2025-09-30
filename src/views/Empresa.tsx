@@ -7,8 +7,8 @@ import { FaBuilding, FaInfoCircle, FaTools, FaUserTie, FaCalendar, FaSpinner, Fa
 
 function EmpresaDetails() {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
-  const empresas = useFetch<Empresa[]>(`api/empresa/?q=${empresaNome}`);
-  const funcionarios = useFetch<Funcionario[]>(`api/funcionario/?empresa_nome=${empresaNome}`);
+  const empresas = useFetch<Empresa[]>(`/api/empresa/?q=${empresaNome}`);
+  const funcionarios = useFetch<Funcionario[]>(`/api/funcionario/?empresa_nome=${empresaNome}`);
 
   const empresa = empresas.data?.find(
     (e) => e.nome.toLowerCase() === empresaNome?.toLowerCase()

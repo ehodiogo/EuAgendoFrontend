@@ -11,7 +11,7 @@ interface FinanceiroProps {
 }
 
 const FinanceiroDados = ({ empresa_id }: FinanceiroProps) => {
-  const dadosFinanceiros = useFetch<Financeiro>(`api/financeiro/?empresa_id=${empresa_id}`);
+  const dadosFinanceiros = useFetch<Financeiro>(`/api/financeiro/?empresa_id=${empresa_id}`);
 
   const chartData = {
     labels: ["Total", "Mensal", "Semanal"],

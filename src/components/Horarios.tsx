@@ -25,7 +25,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
   const [formError, setFormError] = useState<string | null>(null);
 
   const agendamentosResponse = useFetch<Agendamento[]>(
-    `api/agendamentos_funcionario/?id_funcionario=${funcionario_id}&data=${dataString}`
+    `/api/agendamentos_funcionario/?id_funcionario=${funcionario_id}&data=${dataString}`
   );
   const agendamentos = agendamentosResponse.data;
 

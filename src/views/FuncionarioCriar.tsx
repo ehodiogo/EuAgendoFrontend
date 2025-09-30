@@ -23,8 +23,8 @@ const FuncionarioForm: React.FC = () => {
   const [editFotoArquivo, setEditFotoArquivo] = useState<File | null>(null);
   const [editUseFile, setEditUseFile] = useState<boolean>(false);
   const token = localStorage.getItem("access_token");
-  const empresas = useFetch<Empresa[]>(`api/empresas-usuario/?usuario_token=${token}`);
-  const seusFuncionarios = useFetch<Funcionario[]>(`api/funcionarios-usuario/?usuario_token=${token}`);
+  const empresas = useFetch<Empresa[]>(`/api/empresas-usuario/?usuario_token=${token}`);
+  const seusFuncionarios = useFetch<Funcionario[]>(`/api/funcionarios-usuario/?usuario_token=${token}`);
 
   useEffect(() => {
     if (acaoSelecionada === "editar" && selectedFuncionarios.length === 1) {

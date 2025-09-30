@@ -10,8 +10,8 @@ import { QRCodeCanvas } from "qrcode.react";
 function CheckInEmpresa() {
   const { id } = useParams<{ id: string }>();
   const token = localStorage.getItem("access_token");
-  const empresa = useFetch<Empresa>(`api/empresas-usuario/${id}?usuario_token=${token}`);
-  const agendamentos = useFetch<Agendamento[]>(`api/agendamento?empresaId=${id}&usuario_token=${token}`);
+  const empresa = useFetch<Empresa>(`/api/empresas-usuario/${id}?usuario_token=${token}`);
+  const agendamentos = useFetch<Agendamento[]>(`/api/agendamento?empresaId=${id}&usuario_token=${token}`);
   const [showQRCode, setShowQRCode] = useState<number | null>(null);
   const [filterType, setFilterType] = useState<"today" | "pending">("pending");
 

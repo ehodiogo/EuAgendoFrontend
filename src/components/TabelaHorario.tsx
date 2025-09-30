@@ -22,7 +22,7 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
   });
   const [assinaturaVencida, setAssinaturaVencida] = useState(false);
 
-  const empresaInterfaceList = useFetch<Empresa[]>(`api/empresa/?q=${empresaNome}`);
+  const empresaInterfaceList = useFetch<Empresa[]>(`/api/empresa/?q=${empresaNome}`);
   const empresa = empresaInterfaceList.data?.find(
     (empresa) => empresa.nome === empresaNome
   );

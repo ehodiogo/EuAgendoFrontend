@@ -14,7 +14,7 @@ const AvaliacaoAgendamentoView = () => {
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
 
   const { data: agendamentoData, loading } = useFetch<AvaliacaoAgendamento>(
-    `api/agendamento-avaliar/${identificador}`
+    `/api/agendamento-avaliar/${identificador}`
   );
 
   useEffect(() => {

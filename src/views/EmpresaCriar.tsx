@@ -35,7 +35,7 @@ const EmpresaForm: React.FC = () => {
   });
   const [empresaCriada, setEmpresaCriada] = useState(false);
   const [empresaSelecionada, setEmpresaSelecionada] = useState<number | null>(null);
-  const empresas = useFetch<Empresa[]>(`api/empresas-usuario/?usuario_token=${localStorage.getItem("access_token")}`);
+  const empresas = useFetch<Empresa[]>(`/api/empresas-usuario/?usuario_token=${localStorage.getItem("access_token")}`);
 
   useEffect(() => {
     setAbreSabado(empresa.abre_sabado);

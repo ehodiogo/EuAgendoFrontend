@@ -25,7 +25,7 @@ const ServicoForm: React.FC = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
   const token = localStorage.getItem("access_token");
-  const empresas = useFetch<Empresa[]>(`api/empresas-usuario/?usuario_token=${token}`);
+  const empresas = useFetch<Empresa[]>(`/api/empresas-usuario/?usuario_token=${token}`);
   const [servicosEmpresa, setServicosEmpresa] = useState<Servico[]>([]);
 
   useEffect(() => {

@@ -34,7 +34,7 @@ function Dashboard() {
 
   const token = localStorage.getItem("access_token");
   const empresas_usuario = useFetch<Empresa[]>(
-    `api/empresas-usuario/?usuario_token=${token}`
+    `/api/empresas-usuario/?usuario_token=${token}`
   );
   const [dropdownAberto, setDropdownAberto] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
