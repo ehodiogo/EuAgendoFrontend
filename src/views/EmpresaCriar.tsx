@@ -780,17 +780,6 @@ const EmpresaForm: React.FC = () => {
                         onChange={handleFileChange}
                       />
                     </div>
-                    <div className="mb-3">
-                      <label className="form-label">URL do Logo</label>
-                      <input
-                        type="text"
-                        name="logo"
-                        className="form-control"
-                        value={empresa.logo}
-                        onChange={handleChange}
-                        placeholder="Ou insira a URL da imagem"
-                      />
-                    </div>
                     {empresa.logo && (
                       <img src={empresa.logo} alt="Prévia do logo" className="logo-preview" />
                     )}
@@ -1046,17 +1035,6 @@ const EmpresaForm: React.FC = () => {
                             accept="image/*"
                             className="form-control"
                             onChange={handleFileChange}
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <label className="form-label">URL do Logo</label>
-                          <input
-                            type="text"
-                            name="logo"
-                            className="form-control"
-                            value={empresa.logo}
-                            onChange={handleChange}
-                            placeholder="Ou insira a URL da imagem"
                           />
                         </div>
                         {empresa.logo && (

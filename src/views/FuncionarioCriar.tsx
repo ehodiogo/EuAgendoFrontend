@@ -8,30 +8,49 @@ import { FaUserPlus, FaSpinner, FaExclamationTriangle, FaCheckCircle } from "rea
 
 const FuncionarioForm: React.FC = () => {
   const [nome, setNome] = useState("");
-  const [fotoUrl, setFotoUrl] = useState("");
   const [fotoArquivo, setFotoArquivo] = useState<File | null>(null);
+  const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
-  const [useFile, setUseFile] = useState(false);
   const [selectedFuncionarios, setSelectedFuncionarios] = useState<Funcionario[]>([]);
   const [selectedEmpresa, setSelectedEmpresa] = useState<Empresa | null>(null);
   const [acaoSelecionada, setAcaoSelecionada] = useState<string>("");
   const [acaoEmpresa, setAcaoEmpresa] = useState<string>("");
   const [editNome, setEditNome] = useState<string>("");
-  const [editFotoUrl, setEditFotoUrl] = useState<string>("");
   const [editFotoArquivo, setEditFotoArquivo] = useState<File | null>(null);
-  const [editUseFile, setEditUseFile] = useState<boolean>(false);
+  const [editFotoPreview, setEditFotoPreview] = useState<string | null>(null);
   const token = localStorage.getItem("access_token");
   const empresas = useFetch<Empresa[]>(`/api/empresas-usuario/?usuario_token=${token}`);
   const seusFuncionarios = useFetch<Funcionario[]>(`/api/funcionarios-usuario/?usuario_token=${token}`);
 
   useEffect(() => {
+    if (fotoArquivo) {
+      setFotoPreview(URL.createObjectURL(fotoArquivo));
+    } else {
+      setFotoPreview(null);
+    }
+    return () => {
+      if (fotoPreview) URL.revokeObjectURL(fotoPreview);
+    };
+  }, [fotoArquivo]);
+
+  useEffect(() => {
+    if (editFotoArquivo) {
+      setEditFotoPreview(URL.createObjectURL(editFotoArquivo));
+    } else {
+      setEditFotoPreview(selectedFuncionarios[0]?.foto || null);
+    }
+    return () => {
+      if (editFotoPreview) URL.revokeObjectURL(editFotoPreview);
+    };
+  }, [editFotoArquivo, selectedFuncionarios]);
+
+  useEffect(() => {
     if (acaoSelecionada === "editar" && selectedFuncionarios.length === 1) {
       setEditNome(selectedFuncionarios[0].nome);
-      setEditFotoUrl(selectedFuncionarios[0].foto || "");
       setEditFotoArquivo(null);
-      setEditUseFile(false);
+      setEditFotoPreview(selectedFuncionarios[0].foto || null);
     }
   }, [acaoSelecionada, selectedFuncionarios]);
 
@@ -39,17 +58,14 @@ const FuncionarioForm: React.FC = () => {
     if (!acaoSelecionada) return setFormError("Selecione uma ação."), false;
     if (acaoSelecionada === "cadastrar") {
       if (!nome.trim()) return setFormError("O nome do funcionário é obrigatório."), false;
-      if (useFile && !fotoArquivo) return setFormError("Selecione uma imagem para upload."), false;
-      if (!useFile && !fotoUrl.trim()) return setFormError("Insira a URL da imagem."), false;
-      if (!useFile && !/^https?:\/\/.*\.(png|jpg|jpeg|gif)$/.test(fotoUrl)) return setFormError("URL da imagem inválida."), false;
+      if (!fotoArquivo) return setFormError("Selecione uma imagem para upload."), false;
     }
     if (acaoSelecionada === "editar" && !selectedFuncionarios.length) return setFormError("Selecione um funcionário para editar."), false;
     if (acaoSelecionada === "remover" && !selectedFuncionarios.length) return setFormError("Selecione ao menos um funcionário para remover."), false;
     if ((acaoEmpresa === "inserir" || acaoEmpresa === "remover") && !selectedEmpresa) return setFormError("Selecione uma empresa."), false;
     if (acaoEmpresa === "editar_nome_foto") {
       if (!editNome.trim()) return setFormError("O novo nome do funcionário é obrigatório."), false;
-      if (editUseFile && !editFotoArquivo) return setFormError("Selecione uma nova imagem para upload."), false;
-      if (!editUseFile && editFotoUrl && !/^https?:\/\/.*\.(png|jpg|jpeg|gif)$/.test(editFotoUrl)) return setFormError("URL da nova imagem inválida."), false;
+      if (editFotoArquivo && editFotoArquivo.size > 5 * 1024 * 1024) return setFormError("A nova imagem deve ter menos de 5MB."), false;
     }
     return true;
   };
@@ -83,27 +99,28 @@ const FuncionarioForm: React.FC = () => {
 
         const formData = new FormData();
         formData.append("nome", nome);
-        if (useFile && fotoArquivo) {
-          if (fotoArquivo.size > 5 * 1024 * 1024) {
-            setFormError("A imagem deve ter menos de 5MB.");
-            setLoading(false);
-            return;
-          }
-          formData.append("foto", fotoArquivo);
-        } else {
-          formData.append("foto", fotoUrl);
-        }
+        formData.append("foto", fotoArquivo!);
         formData.append("usuario_token", token || "");
 
-        const res = await axios.post(`${url}/api/funcionario-create/`, formData, {
+        if (fotoArquivo!.size > 5 * 1024 * 1024) {
+          setFormError("A imagem deve ter menos de 5MB.");
+          setLoading(false);
+          return;
+        }
+
+        await axios.post(`${url}/api/funcionario-create/`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setFormSuccess("Funcionário cadastrado com sucesso!");
         setNome("");
-        setFotoUrl("");
         setFotoArquivo(null);
-      } catch (error) {
-        setFormError(`Erro ao cadastrar funcionário: ${error.message}`);
+        setFotoPreview(null);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setFormError(`Erro ao cadastrar funcionário: ${error.message}`);
+        } else {
+          setFormError("Erro desconhecido ao cadastrar funcionário.");
+        }
       } finally {
         setLoading(false);
       }
@@ -111,15 +128,10 @@ const FuncionarioForm: React.FC = () => {
       try {
         const formData = new FormData();
         formData.append("nome", editNome);
-        if (editUseFile && editFotoArquivo) {
-          if (editFotoArquivo.size > 5 * 1024 * 1024) {
-            setFormError("A nova imagem deve ter menos de 5MB.");
-            setLoading(false);
-            return;
-          }
+        if (editFotoArquivo) {
           formData.append("foto", editFotoArquivo);
         } else {
-          formData.append("foto", editFotoUrl);
+          formData.append("foto", selectedFuncionarios[0].foto || "");
         }
         formData.append("usuario_token", token || "");
         formData.append("funcionario_id", selectedFuncionarios[0].id.toString());
@@ -129,8 +141,15 @@ const FuncionarioForm: React.FC = () => {
         });
         setFormSuccess("Funcionário editado com sucesso!");
         setSelectedFuncionarios([]);
-      } catch (error) {
-        setFormError(`Erro ao editar funcionário: ${error.message}`);
+        setEditNome("");
+        setEditFotoArquivo(null);
+        setEditFotoPreview(null);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setFormError(`Erro ao editar funcionários da empresa: ${error.message}`);
+        } else {
+          setFormError("Erro desconhecido ao editar funcionários da empresa.");
+        }
       } finally {
         setLoading(false);
       }
@@ -142,8 +161,12 @@ const FuncionarioForm: React.FC = () => {
         });
         setFormSuccess("Funcionários removidos com sucesso!");
         setSelectedFuncionarios([]);
-      } catch (error) {
-        setFormError(`Erro ao remover funcionários: ${error.message}`);
+      } catch (error: unknown) {
+          if (error instanceof Error) {
+            setFormError(`Erro ao remover funcionários da empresa: ${error.message}`);
+          } else {
+            setFormError("Erro desconhecido ao remover funcionários da empresa.");
+          }
       } finally {
         setLoading(false);
       }
@@ -163,8 +186,12 @@ const FuncionarioForm: React.FC = () => {
       setFormSuccess("Funcionários adicionados à empresa com sucesso!");
       setSelectedFuncionarios([]);
       setSelectedEmpresa(null);
-    } catch (error) {
-      setFormError(`Erro ao adicionar funcionários à empresa: ${error.message}`);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+          setFormError(`Erro ao adicionar funcionários a: ${error.message}`);
+        } else {
+          setFormError("Erro desconhecido ao adicionar funcionários a empresa.");
+        }
     }
   };
 
@@ -181,8 +208,12 @@ const FuncionarioForm: React.FC = () => {
       setFormSuccess("Funcionários removidos da empresa com sucesso!");
       setSelectedFuncionarios([]);
       setSelectedEmpresa(null);
-    } catch (error) {
-      setFormError(`Erro ao remover funcionários da empresa: ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+          setFormError(`Erro ao remover funcionários da empresa: ${error.message}`);
+        } else {
+          setFormError("Erro desconhecido ao remover funcionários da empresa.");
+        }
     }
   };
 
@@ -418,10 +449,6 @@ const FuncionarioForm: React.FC = () => {
             <div className="text-center">
               <FaSpinner className="fa-spin" style={{ fontSize: "1.5rem", color: "var(--primary-blue)" }} /> Carregando...
             </div>
-          ) : seusFuncionarios.error || empresas.error ? (
-            <div className="toast-message error">
-              <FaExclamationTriangle /> Erro ao carregar dados: {seusFuncionarios.error || empresas.error}
-            </div>
           ) : (
             <div className="funcionario-card">
               <h2 className="funcionario-title">
@@ -459,57 +486,16 @@ const FuncionarioForm: React.FC = () => {
                     </div>
                     <div className="mb-3">
                       <label className="form-label">Foto</label>
-                      <div className="form-check">
-                        <input
-                          type="radio"
-                          className="form-check-input"
-                          id="urlOption"
-                          name="fotoOption"
-                          checked={!useFile}
-                          onChange={() => setUseFile(false)}
-                        />
-                        <label className="form-check-label" htmlFor="urlOption">
-                          Usar URL
-                        </label>
-                      </div>
-                      <div className="form-check">
-                        <input
-                          type="radio"
-                          className="form-check-input"
-                          id="fileOption"
-                          name="fotoOption"
-                          checked={useFile}
-                          onChange={() => setUseFile(true)}
-                        />
-                        <label className="form-check-label" htmlFor="fileOption">
-                          Upload de arquivo
-                        </label>
-                      </div>
+                      <input
+                        type="file"
+                        className="form-control"
+                        accept="image/*"
+                        onChange={(e) => setFotoArquivo(e.target.files ? e.target.files[0] : null)}
+                        required
+                      />
                     </div>
-                    {!useFile ? (
-                      <div className="mb-3">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Insira a URL da imagem (ex: https://exemplo.com/imagem.jpg)"
-                          value={fotoUrl}
-                          onChange={(e) => setFotoUrl(e.target.value)}
-                          required={!useFile}
-                        />
-                      </div>
-                    ) : (
-                      <div className="mb-3">
-                        <input
-                          type="file"
-                          className="form-control"
-                          accept="image/*"
-                          onChange={(e) => setFotoArquivo(e.target.files ? e.target.files[0] : null)}
-                          required={useFile}
-                        />
-                      </div>
-                    )}
-                    {fotoUrl && !useFile && (
-                      <img src={fotoUrl} alt="Prévia da foto" className="employee-photo" />
+                    {fotoPreview && (
+                      <img src={fotoPreview} alt="Prévia da foto" className="employee-photo mb-3" />
                     )}
                     <button type="submit" className="btn btn-success w-100" disabled={loading}>
                       {loading ? <><FaSpinner className="fa-spin me-2" />Cadastrando...</> : "Cadastrar Funcionário"}
@@ -519,7 +505,7 @@ const FuncionarioForm: React.FC = () => {
                         <h4>Funcionários Cadastrados</h4>
                         <p className="text-muted mb-3">Selecione funcionários para adicionar a uma empresa</p>
                         <ul className="list-group">
-                          {seusFuncionarios.data.funcionarios.map((func : Funcionario) => (
+                          {seusFuncionarios.data.funcionarios.map((func: Funcionario) => (
                             <li key={func.id} className="list-group-item">
                               <input
                                 type="checkbox"
@@ -636,57 +622,18 @@ const FuncionarioForm: React.FC = () => {
                             </div>
                             <div className="mb-3">
                               <label className="form-label">Nova Foto</label>
-                              <div className="form-check">
-                                <input
-                                  type="radio"
-                                  className="form-check-input"
-                                  id="editUrlOption"
-                                  name="editFotoOption"
-                                  checked={!editUseFile}
-                                  onChange={() => setEditUseFile(false)}
-                                />
-                                <label className="form-check-label" htmlFor="editUrlOption">
-                                  Usar URL
-                                </label>
-                              </div>
-                              <div className="form-check">
-                                <input
-                                  type="radio"
-                                  className="form-check-input"
-                                  id="editFileOption"
-                                  name="editFotoOption"
-                                  checked={editUseFile}
-                                  onChange={() => setEditUseFile(true)}
-                                />
-                                <label className="form-check-label" htmlFor="editFileOption">
-                                  Upload de arquivo
-                                </label>
-                              </div>
+                              <input
+                                type="file"
+                                className="form-control"
+                                accept="image/*"
+                                onChange={(e) => setEditFotoArquivo(e.target.files ? e.target.files[0] : null)}
+                              />
                             </div>
-                            {!editUseFile ? (
-                              <div className="mb-3">
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Insira a URL da nova imagem"
-                                  value={editFotoUrl}
-                                  onChange={(e) => setEditFotoUrl(e.target.value)}
-                                />
-                              </div>
-                            ) : (
-                              <div className="mb-3">
-                                <input
-                                  type="file"
-                                  className="form-control"
-                                  accept="image/*"
-                                  onChange={(e) => setEditFotoArquivo(e.target.files ? e.target.files[0] : null)}
-                                  required={editUseFile}
-                                />
-                              </div>
+                            {editFotoPreview && (
+                              <img src={editFotoPreview} alt="Prévia da foto" className="employee-photo mb-3" />
                             )}
-                            {editFotoUrl && !editUseFile && (
-                              <img src={editFotoUrl} alt="Prévia da foto" className="employee-photo" />
-                            )}
+
+
                             <button type="submit" className="btn btn-primary w-100" disabled={loading}>
                               {loading ? <><FaSpinner className="fa-spin me-2" />Salvando...</> : "Salvar Alterações"}
                             </button>
@@ -744,7 +691,7 @@ const FuncionarioForm: React.FC = () => {
                     </div>
                     <p className="text-muted mb-3">Selecione os funcionários para remover</p>
                     <ul className="list-group">
-                      {seusFuncionarios.data?.funcionarios.map((func : Funcionario) => (
+                      {seusFuncionarios.data?.funcionarios.map((func: Funcionario) => (
                         <li key={func.id} className="list-group-item">
                           <input
                             type="checkbox"
