@@ -56,10 +56,12 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
   const horarioPausaFim = empresa?.horario_pausa_fim;
 
   const dataAtual = new Date();
-  const dataAtualString = dataAtual.toISOString().split("T")[0];
   const horarioAtual = `${String(dataAtual.getHours()).padStart(2, "0")}:${String(dataAtual.getMinutes()).padStart(2, "0")}`;
-  const isDataMenorQueAtual = dataString < dataAtualString;
-  const isDataIgualAoAtual = dataString === dataAtualString;
+  const dataAtualSemHora = new Date(dataAtual.getFullYear(), dataAtual.getMonth(), dataAtual.getDate());
+  const dataSelecionadaSemHora = new Date(data_selecionada.getFullYear(), data_selecionada.getMonth(), data_selecionada.getDate());
+
+  const isDataMenorQueAtual = dataSelecionadaSemHora < dataAtualSemHora;
+  const isDataIgualAoAtual = dataSelecionadaSemHora.getTime() === dataAtualSemHora.getTime();
 
   if (horarioAbertura && horarioFechamento) {
     const horarios = gerarHorarios(horarioAbertura, horarioFechamento);
@@ -70,26 +72,29 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
       );
 
       if (agendamentoExistente) {
-        horariosDisponiveis[hora] = "Agendado";
-      } else if (isDataMenorQueAtual || (isDataIgualAoAtual && hora <= horarioAtual)) {
-        horariosDisponiveis[hora] = "Indisponível";
-      } else if (intervaloAlmoco && horarioPausaInicio && horarioPausaFim) {
-        const converterParaMinutos = (hora: string) => {
-          const [horaInt, minutoInt] = hora.split(":").map(Number);
-          return horaInt * 60 + minutoInt;
-        };
-        const horaMinutos = converterParaMinutos(hora);
-        const inicioPausaMinutos = converterParaMinutos(horarioPausaInicio);
-        const fimPausaMinutos = converterParaMinutos(horarioPausaFim);
+          horariosDisponiveis[hora] = "Agendado";
+        }
+        else if (isDataMenorQueAtual || (isDataIgualAoAtual && hora <= horarioAtual)) {
+          horariosDisponiveis[hora] = "Indisponível";
+        }
+        else if (intervaloAlmoco && horarioPausaInicio && horarioPausaFim) {
+          const converterParaMinutos = (hora: string) => {
+            const [h, m] = hora.split(":").map(Number);
+            return h * 60 + m;
+          };
+          const horaMinutos = converterParaMinutos(hora);
+          const inicioPausaMinutos = converterParaMinutos(horarioPausaInicio);
+          const fimPausaMinutos = converterParaMinutos(horarioPausaFim);
 
-        if (horaMinutos >= inicioPausaMinutos && horaMinutos < fimPausaMinutos) {
-          horariosDisponiveis[hora] = "Intervalo";
-        } else {
+          if (horaMinutos >= inicioPausaMinutos && horaMinutos < fimPausaMinutos) {
+            horariosDisponiveis[hora] = "Intervalo";
+          } else {
+            horariosDisponiveis[hora] = "Disponível";
+          }
+        }
+        else {
           horariosDisponiveis[hora] = "Disponível";
         }
-      } else {
-        horariosDisponiveis[hora] = "Disponível";
-      }
     });
   }
 
@@ -161,6 +166,8 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
   };
+
+  console.log("Data selecionada:", data_selecionada);
 
   return (
     <div className="horarios-do-dia">
