@@ -22,8 +22,6 @@ const CancelarAgendamentoView = () => {
     `/api/agendamento/detalhe/${identificador}`
   );
 
-  console.log("Agendamento",  agendamentoData);
-
   const handleCancel = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
