@@ -35,6 +35,7 @@ const ServicoCreate = lazy(() => import("./views/ServicosCriar"));
 const Configuracao = lazy(() => import("./views/Configuracoes"));
 const Checkin = lazy(() => import("./views/Checkin"));
 const CheckinEmpresa = lazy(() => import("./views/CheckinEmpresa"));
+const ResetPassword = lazy(() => import("./views/ResetPassword"));
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const isAuthenticated = localStorage.getItem("access_token");
@@ -232,6 +233,7 @@ function App() {
       <Route path="/planos" element={<Planos />} />
       <Route path="/termos" element={<Termos />} />
       <Route path="/roadmap" element={<Roadmap />} />
+      <Route path="/reset-password" element={<ResetPassword />}/>
 
       <Route path="*" element={<NotFound />} />
     </Routes>
