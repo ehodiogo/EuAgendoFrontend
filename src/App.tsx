@@ -36,6 +36,7 @@ const Configuracao = lazy(() => import("./views/Configuracoes"));
 const Checkin = lazy(() => import("./views/Checkin"));
 const CheckinEmpresa = lazy(() => import("./views/CheckinEmpresa"));
 const ResetPassword = lazy(() => import("./views/ResetPassword"));
+const CancelarAgendamento = lazy(() => import("./views/CancelarAgendamento"));
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const isAuthenticated = localStorage.getItem("access_token");
@@ -234,6 +235,7 @@ function App() {
       <Route path="/termos" element={<Termos />} />
       <Route path="/roadmap" element={<Roadmap />} />
       <Route path="/reset-password" element={<ResetPassword />}/>
+      <Route path="/cancelar/:identificador" element={<CancelarAgendamento />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
