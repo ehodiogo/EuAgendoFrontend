@@ -4,63 +4,93 @@ import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import { Agendamento } from "../interfaces/Agendamento";
 import Navbar from "../components/Navbar";
-import { FaSpinner, FaExclamationCircle, FaQrcode, FaCheckCircle, FaBuilding, FaCalendarDay, FaClock } from "react-icons/fa";
+import { FaSpinner, FaQrcode, FaBuilding, FaCalendarDay, FaClock, FaUser, FaToolbox, FaArrowRightToBracket } from "react-icons/fa6"; // Usando Fa6 para consistência
 import { QRCodeCanvas } from "qrcode.react";
+import {FaExclamationCircle} from "react-icons/fa";
 
 function CheckInEmpresa() {
   const { id } = useParams<{ id: string }>();
   const token = localStorage.getItem("access_token");
   const empresa = useFetch<Empresa>(`/api/empresas-usuario/${id}?usuario_token=${token}`);
   const agendamentos = useFetch<Agendamento[]>(`/api/agendamento?empresaId=${id}&usuario_token=${token}`);
+
+  // Estado para controlar qual agendamento está exibindo o QR Code
   const [showQRCode, setShowQRCode] = useState<number | null>(null);
+  // Estado para controlar o tipo de filtro
   const [filterType, setFilterType] = useState<"today" | "pending">("pending");
+  // Estado para controlar o loading de um check-in específico
+  const [isCheckingIn, setIsCheckingIn] = useState<number | null>(null);
 
   // Obtém a data de hoje no formato YYYY-MM-DD
-  const today = new Date().toISOString().split("T")[0]; // e.g., "2025-09-25"
+  const today = new Date().toISOString().split("T")[0];
 
-  // Filtra agendamentos com base no tipo de filtro
+  // Filtra agendamentos
   const filteredAgendamentos = agendamentos.data?.filter((agendamento) => {
+    // Apenas agendamentos que ainda não compareceram
     if (!agendamento.compareceu_agendamento) {
       if (filterType === "today") {
         return agendamento.data === today;
       }
-      return true; // Para "pending", mostra todos os não comparecidos
+      // Para "pending", mostra todos os não comparecidos, independente da data
+      return true;
     }
     return false;
+  }).sort((a, b) => {
+      // Ordena por data e hora para melhor visualização operacional
+      const dateA = new Date(`${a.data}T${a.hora}`);
+      const dateB = new Date(`${b.data}T${b.hora}`);
+      return dateA.getTime() - dateB.getTime();
   });
 
-  // Função para simular o check-in (substitua por chamada à API)
-  const handleCheckIn = (agendamentoId: number) => {
-    alert(`Check-in realizado para o agendamento ID ${agendamentoId}!`);
-    setShowQRCode(null); // Esconde o QR code após o check-in
-    // Exemplo de chamada à API:
-    // fetch(`api/agendamento/${agendamentoId}/checkin`, {
-    //   method: "PATCH",
-    //   body: JSON.stringify({ compareceu_agendamento: true }),
-    //   headers: { "Content-Type": "application/json" },
-    // })
-    //   .then(() => {
-    //     alert("Check-in realizado com sucesso!");
-    //     agendamentos.refetch(); // Atualiza a lista de agendamentos
-    //   })
-    //   .catch(() => alert("Erro ao realizar check-in."));
+  // Função para simular ou realizar o check-in na API
+  const handleCheckIn = async (agendamentoId: number) => {
+    setIsCheckingIn(agendamentoId); // Inicia o loading
+    setShowQRCode(null); // Fecha o QR code se estiver aberto
+
+    try {
+      // Simulação de chamada à API:
+      console.log(`Iniciando check-in para o agendamento ID ${agendamentoId}...`);
+      await new Promise(resolve => setTimeout(resolve, 800)); // Simula delay da rede
+
+      // Aqui você faria a chamada real à API (exemplo comentado abaixo):
+      // const response = await fetch(`/api/agendamento/${agendamentoId}/checkin`, {
+      //   method: "PATCH",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     "Authorization": `Bearer ${token}` // Inclua seu token real
+      //   },
+      //   body: JSON.stringify({ compareceu_agendamento: true }),
+      // });
+
+      // if (!response.ok) {
+      //   throw new Error("Erro na API ao realizar check-in.");
+      // }
+
+      alert("Check-in realizado com sucesso! Atualizando lista...");
+
+    } catch (error) {
+      console.error(error);
+      alert(`Erro ao realizar check-in para o agendamento ID ${agendamentoId}.`);
+    } finally {
+      setIsCheckingIn(null); // Finaliza o loading
+    }
   };
 
   return (
     <div className="min-vh-100">
       <style>{`
-        /* Paleta de cores */
+        /* Paleta de cores (Ajustada) */
         :root {
           --primary-blue: #003087;
-          --light-blue: #4dabf7;
-          --dark-gray: #2d3748;
-          --light-gray: #f7fafc;
+          --accent-blue: #0056b3;
+          --dark-gray: #212529;
+          --light-gray: #f5f7fa;
           --white: #ffffff;
-          --accent-yellow: #f6c107;
           --success-green: #28a745;
           --danger-red: #dc3545;
           --warning-orange: #fd7e14;
-          --gradient-blue: linear-gradient(135deg, #003087, #4dabf7);
+          --gradient-blue: linear-gradient(135deg, #003087, #0056b3);
+          --border-light: #e0e0e0;
         }
 
         /* Estilos gerais */
@@ -72,331 +102,315 @@ function CheckInEmpresa() {
         .checkin-header {
           background: var(--gradient-blue);
           color: var(--white);
-          padding: 4rem 0;
+          padding: 3rem 0;
           text-align: center;
-          position: relative;
-          overflow: hidden;
-        }
-        .checkin-header::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: radial-gradient(circle, rgba(255,255,255,0.2), transparent);
-          opacity: 0.3;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         .checkin-header h1 {
           font-weight: 800;
-          font-size: 2.8rem;
+          font-size: 2.5rem;
           margin-bottom: 0.5rem;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.5rem;
-          text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-          position: relative;
+          gap: 0.75rem;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         .checkin-header .lead {
-          font-size: 1.3rem;
-          max-width: 700px;
-          margin: 0 auto;
+          font-size: 1.2rem;
           font-weight: 300;
-          position: relative;
         }
         .checkin-header .empresa-info {
-          font-size: 1rem;
-          margin-top: 1rem;
-          color: rgba(255, 255, 255, 0.9);
+          font-size: 0.9rem;
+          margin-top: 0.5rem;
+          color: rgba(255, 255, 255, 0.8);
         }
 
         /* Seção de Filtros */
         .filter-section {
-          padding: 2rem 0;
+          padding: 1.5rem 0;
           text-align: center;
+          background-color: var(--white);
+          border-bottom: 1px solid var(--border-light);
         }
         .filter-section .btn-group {
           display: flex;
           justify-content: center;
-          gap: 1rem;
+          gap: 1.5rem;
           flex-wrap: wrap;
         }
         .filter-section .btn-filter {
-          padding: 0.75rem 1.5rem;
+          padding: 0.6rem 1.2rem;
           font-weight: 600;
           border-radius: 8px;
           transition: all 0.3s ease;
-          border: 1px solid var(--light-blue);
+          border: 2px solid var(--primary-blue);
           background-color: var(--white);
           color: var(--primary-blue);
         }
         .filter-section .btn-filter.active {
           background-color: var(--primary-blue);
           color: var(--white);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 4px 10px rgba(0, 48, 135, 0.3);
         }
         .filter-section .btn-filter:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          background-color: var(--accent-blue);
+          color: var(--white);
         }
 
-        /* Container */
+        /* Container Principal */
         .checkin-container {
           padding: 3rem 0;
         }
         .checkin-container h2 {
-          color: var(--primary-blue);
+          color: var(--dark-gray);
           font-weight: 700;
-          font-size: 2rem;
+          font-size: 1.8rem;
           margin-bottom: 2rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          text-align: center;
         }
 
-        /* Cartões de agendamento */
+        /* Cartões de agendamento (Novo Layout) */
         .agendamento-card {
           background-color: var(--white);
-          border-radius: 16px;
-          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-          margin-bottom: 2rem;
+          border-radius: 12px;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+          transition: all 0.3s ease;
+          margin-bottom: 1.5rem;
           padding: 1.5rem;
-          position: relative;
-          border: 1px solid rgba(77, 171, 247, 0.2);
+          border-left: 5px solid var(--primary-blue);
+          display: flex;
+          flex-direction: column;
+          height: 100%;
         }
         .agendamento-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
-          background: linear-gradient(135deg, #ffffff, #f8fbff);
+          transform: translateY(-3px);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
+        
+        .agendamento-info {
+            flex-grow: 1;
+        }
+
         .agendamento-card .card-title {
-          color: var(--primary-blue);
-          font-weight: 700;
-          font-size: 1.6rem;
-          margin-bottom: 0.5rem;
-          text-align: center;
-        }
-        .agendamento-card .card-text {
           color: var(--dark-gray);
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          border-bottom: 1px solid var(--border-light);
+          padding-bottom: 0.5rem;
+          text-align: left;
+        }
+
+        .info-item {
+          display: flex;
+          align-items: center;
+          margin-bottom: 0.75rem;
           font-size: 1rem;
-          text-align: center;
-          margin-bottom: 0.5rem;
+          color: var(--dark-gray);
         }
-        .agendamento-card .btn-primary {
-          background-color: var(--primary-blue);
-          border-color: var(--primary-blue);
-          padding: 0.75rem 1.5rem;
-          font-weight: 600;
-          border-radius: 8px;
-          margin: 0.5rem;
-          transition: all 0.3s ease;
+        .info-item svg {
+          color: var(--primary-blue);
+          font-size: 1.2rem;
+          margin-right: 0.75rem;
+          flex-shrink: 0;
         }
-        .agendamento-card .btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        .info-item strong {
+            font-weight: 600;
+            color: var(--accent-blue);
         }
-        .agendamento-card .btn-success {
+
+        /* Ações e QR Code */
+        .agendamento-actions {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--border-light);
+            text-align: center;
+        }
+        .agendamento-card .btn-checkin {
           background-color: var(--success-green);
           border-color: var(--success-green);
-          padding: 0.75rem 1.5rem;
-          font-weight: 600;
+          padding: 0.8rem 1.5rem;
+          font-weight: 700;
           border-radius: 8px;
           margin: 0.5rem;
           transition: all 0.3s ease;
         }
-        .agendamento-card .btn-success:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        .agendamento-card .btn-checkin:hover {
+          background-color: #218838;
+          box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+        .agendamento-card .btn-qrcode {
+          background-color: var(--primary-blue);
+          border-color: var(--primary-blue);
+          padding: 0.8rem 1.5rem;
+          font-weight: 600;
+          border-radius: 8px;
+          margin: 0.5rem;
+        }
+        .agendamento-card .btn-qrcode:hover {
+          background-color: var(--accent-blue);
         }
         .agendamento-card .qrcode-container {
-          margin: 1.5rem auto;
+          margin: 1.5rem auto 0;
           padding: 1rem;
-          background-color: var(--white);
-          border: 2px solid var(--light-blue);
+          background-color: var(--light-gray);
+          border: 2px solid var(--primary-blue);
           border-radius: 12px;
-          max-width: 200px;
+          max-width: 220px;
           text-align: center;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        /* Mensagens */
+        /* Mensagens (Loading, Vazio, Erro) */
         .message {
           font-size: 1.1rem;
-          padding: 1.5rem;
+          padding: 2rem;
           border-radius: 12px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          max-width: 600px;
+          max-width: 700px;
           margin: 0 auto;
           text-align: center;
           background-color: var(--white);
         }
         .message.loading {
-          color: var(--dark-gray);
+          color: var(--primary-blue);
+          border: 1px solid var(--border-light);
         }
         .message.warning {
           color: var(--warning-orange);
-        }
-
-        /* Footer */
-        .checkin-footer {
-          background: var(--gradient-blue);
-          color: var(--white);
-          padding: 2rem 0;
-          text-align: center;
-          margin-top: 2rem;
-        }
-        .checkin-footer p {
-          margin: 0;
-          font-size: 1rem;
-          font-weight: 300;
+          background-color: #fff3cd;
+          border: 1px solid #ffeeba;
         }
 
         /* Responsividade */
-        @media (max-width: 991px) {
-          .checkin-header, .filter-section, .checkin-container {
-            padding: 2rem 1rem;
-          }
-          .filter-section .btn-group {
-            flex-direction: column;
-            gap: 0.5rem;
-          }
-          .agendamento-card .card-title {
-            font-size: 1.4rem;
-          }
-        }
         @media (max-width: 576px) {
-          .checkin-header h1 {
-            font-size: 2.2rem;
-          }
-          .checkin-header .lead {
-            font-size: 1.1rem;
-          }
-          .checkin-header .empresa-info {
-            font-size: 0.9rem;
-          }
-          .checkin-container h2 {
-            font-size: 1.8rem;
-          }
-          .agendamento-card .card-title {
-            font-size: 1.2rem;
-          }
-          .agendamento-card .card-text {
-            font-size: 0.9rem;
-          }
-          .agendamento-card .btn-primary, .agendamento-card .btn-success {
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-          }
-          .agendamento-card .qrcode-container {
-            max-width: 150px;
-          }
-          .message {
-            font-size: 1rem;
-            padding: 1rem;
-          }
+          .checkin-header h1 { font-size: 2rem; }
+          .checkin-header .lead { font-size: 1rem; }
+          .agendamento-card .card-title { font-size: 1.25rem; }
+          .info-item { font-size: 0.9rem; }
+          .agendamento-actions .btn { width: 100%; margin: 0.5rem 0; }
         }
       `}</style>
       <div className="custom-bg min-vh-100">
         <Navbar />
         <header className="checkin-header">
           <div className="container">
-            {empresa.data ? (
+            {empresa.loading ? (
+                 <h1><FaBuilding /> Carregando Empresa...</h1>
+            ) : (
               <>
                 <h1>
-                  <FaBuilding /> Check-In - {empresa.data.nome}
+                  <FaBuilding /> Check-In - {empresa.data?.nome || "Empresa Desconhecida"}
                 </h1>
                 <p className="lead">
-                  Selecione um agendamento para realizar o check-in ou gerar um QR code.
+                  Gerencie os agendamentos pendentes da sua empresa com facilidade.
                 </p>
                 <p className="empresa-info">
-                  CNPJ: {empresa.data.cnpj} | {empresa.data.endereco}, {empresa.data.bairro}, {empresa.data.cidade}, {empresa.data.estado}, {empresa.data.pais}
+                  {empresa.data?.cnpj} | {empresa.data?.cidade}, {empresa.data?.estado}
                 </p>
               </>
-            ) : (
-              <h1>
-                <FaBuilding /> Carregando Empresa...
-              </h1>
             )}
           </div>
         </header>
+
         <section className="filter-section container">
           <div className="btn-group">
             <button
               className={`btn-filter ${filterType === "pending" ? "active" : ""}`}
               onClick={() => setFilterType("pending")}
             >
-              <FaClock /> Pendentes
+              <FaClock className="me-2" /> Agendamentos Pendentes
             </button>
             <button
               className={`btn-filter ${filterType === "today" ? "active" : ""}`}
               onClick={() => setFilterType("today")}
             >
-              <FaCalendarDay /> Hoje
+              <FaCalendarDay className="me-2" /> Agendamentos de Hoje
             </button>
           </div>
         </section>
+
         <div className="checkin-container container">
           <h2>
-            <FaCheckCircle /> Agendamentos {filterType === "today" ? "de Hoje" : "Pendentes"}
+            {filterType === "today" ? "Próximos Agendamentos de Hoje" : "Todos os Agendamentos Pendentes"}
           </h2>
-          {empresa.loading || agendamentos.loading ? (
+
+          {/* Lógica de Carregamento/Erro/Vazio */}
+          {agendamentos.loading ? (
             <div className="message loading">
-              <FaSpinner className="fa-spin me-2" /> Carregando dados...
+              <FaSpinner className="fa-spin me-2" /> Carregando lista de agendamentos...
             </div>
           ) : filteredAgendamentos && filteredAgendamentos.length > 0 ? (
+
+            /* Lista de Agendamentos */
             <div className="row justify-content-center">
-              {filteredAgendamentos.map((agendamento, index) => (
+              {filteredAgendamentos.map((agendamento) => (
                 <div
-                  className="col-12 col-md-6 col-lg-4 mb-4"
+                  className="col-12 col-md-6 col-lg-4 d-flex"
                   key={agendamento.id}
                 >
-                  <div className="agendamento-card">
-                    <div className="card-body">
+                  <div className="agendamento-card w-100">
+                    <div className="agendamento-info">
                       <h4 className="card-title">{agendamento.servico_nome}</h4>
-                      <p className="card-text">
-                        <strong>Cliente:</strong> {agendamento.cliente_nome}
-                      </p>
-                      <p className="card-text">
-                        <strong>Funcionário:</strong> {agendamento.funcionario_nome}
-                      </p>
-                      <p className="card-text">
-                        <strong>Data:</strong> {agendamento.data}
-                      </p>
-                      <p className="card-text">
-                        <strong>Hora:</strong> {agendamento.hora}
-                      </p>
-                      <p className="card-text">
-                        <strong>Duração:</strong> {agendamento.duracao_servico} minutos
-                      </p>
-                      <div className="d-flex justify-content-center gap-2">
-                        <button
-                          className="btn btn-primary"
-                          onClick={() => setShowQRCode(agendamento.id)}
-                        >
-                          <FaQrcode /> Gerar QR Code
-                        </button>
-                        <button
-                          className="btn btn-success"
-                          onClick={() => handleCheckIn(agendamento.id)}
-                        >
-                          <FaCheckCircle /> Fazer Check-In
-                        </button>
+
+                      <div className="info-item">
+                        <FaUser />
+                        <span><strong>Cliente</strong>: <strong>{agendamento.cliente_nome}</strong></span>
                       </div>
+
+                      <div className="info-item">
+                        <FaToolbox />
+                        <span><strong>Funcionário:</strong> {agendamento.funcionario_nome}</span>
+                      </div>
+
+                      <div className="info-item">
+                        <FaCalendarDay />
+                        <span><strong>Data:</strong> {agendamento.data}</span>
+                      </div>
+
+                      <div className="info-item">
+                        <FaClock />
+                        <span><strong>Hora:</strong> {agendamento.hora} (Duração: {agendamento.duracao_servico} min)</span>
+                      </div>
+                    </div>
+
+                    <div className="agendamento-actions">
+                      <button
+                        className="btn btn-checkin"
+                        onClick={() => handleCheckIn(agendamento.id)}
+                        disabled={isCheckingIn === agendamento.id}
+                      >
+                        {isCheckingIn === agendamento.id ? (
+                          <>
+                            <FaSpinner className="fa-spin me-2" /> Registrando...
+                          </>
+                        ) : (
+                          <>
+                            <FaArrowRightToBracket /> Fazer Check-In
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        className={`btn btn-qrcode ${showQRCode === agendamento.id ? 'active' : ''}`}
+                        onClick={() => setShowQRCode(showQRCode === agendamento.id ? null : agendamento.id)}
+                        disabled={isCheckingIn !== null}
+                      >
+                        <FaQrcode /> {showQRCode === agendamento.id ? 'Fechar QR Code' : 'Gerar QR Code'}
+                      </button>
+
                       {showQRCode === agendamento.id && (
                         <div className="qrcode-container">
                           <QRCodeCanvas
-                            value={`https://vemagendar.com/checkin/${agendamento.id}`}
-                            size={150}
+                            value={`https://vemagendar.com/checkin/${agendamento.id}`} // Use uma URL real de check-in
+                            size={180}
                             level="H"
                             fgColor="#003087"
                             imageSettings={{
                               src: empresa.data?.logo || "https://via.placeholder.com/40",
-                              height: 24,
-                              width: 24,
+                              height: 30,
+                              width: 30,
                               excavate: true,
                             }}
                           />
@@ -408,14 +422,12 @@ function CheckInEmpresa() {
               ))}
             </div>
           ) : (
+            /* Mensagem de Vazio */
             <div className="message warning">
-              <FaExclamationCircle /> Nenhum agendamento {filterType === "today" ? "de hoje" : "pendente"} encontrado para esta empresa.
+              <FaExclamationCircle className="me-2" /> Nenhum agendamento <strong>{filterType === "today" ? "de hoje" : "pendente"}</strong> encontrado para esta empresa.
             </div>
           )}
         </div>
-        <footer className="checkin-footer">
-          <p>&copy; 2025 VemAgendar. Todos os direitos reservados.</p>
-        </footer>
       </div>
     </div>
   );

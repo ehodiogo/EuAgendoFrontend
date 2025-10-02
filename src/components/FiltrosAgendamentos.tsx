@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FaFilter, FaTriangleExclamation } from "react-icons/fa6"; // Ícones Fa6
 
 const FiltrosAgendamento: React.FC = () => {
   const [filtroFuncionario, setFiltroFuncionario] = useState<string>("todos");
@@ -26,10 +27,125 @@ const FiltrosAgendamento: React.FC = () => {
   };
 
   return (
-    <div className="filters-container mb-4">
-      <p className="mb-3">Filtros de Agendamentos <span className="fw-bold text-warning">EM DESENVOLVIMENTO</span></p>
+    <div className="filters-container">
+      <style>{`
+        /* Paleta de cores */
+        :root {
+          --primary-blue: #003087;
+          --accent-blue: #0056b3;
+          --dark-gray: #212529;
+          --light-gray-bg: #f5f7fa;
+          --white: #ffffff;
+          --warning-orange: #fd7e14;
+        }
 
-      {/* Filtros de Agendamentos */}
+        .filters-container {
+          background-color: var(--light-gray-bg);
+          border-radius: 12px;
+          padding: 1.5rem;
+          box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+          border: 1px solid #e2e8f0;
+        }
+
+        .filters-container h4 {
+            color: var(--dark-gray);
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .filters-container h4 svg {
+            color: var(--primary-blue);
+        }
+
+        .development-alert {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--warning-orange);
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem 0.75rem;
+            background-color: #fff7e6;
+            border-left: 4px solid var(--warning-orange);
+            border-radius: 4px;
+        }
+
+        /* Labels */
+        .form-label {
+          font-weight: 600;
+          color: var(--dark-gray);
+          font-size: 0.95rem;
+          margin-bottom: 0.4rem;
+        }
+
+        /* Select Inputs */
+        .form-select {
+          border-radius: 8px;
+          border: 1px solid #ced4da;
+          padding: 0.65rem 1rem;
+          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+          color: var(--dark-gray);
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .form-select:focus {
+          border-color: var(--accent-blue);
+          box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.25);
+          outline: none;
+        }
+
+        /* Responsividade do Layout de Filtros */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0;
+        }
+        .col-md-3 {
+            flex-grow: 1;
+            padding: 0 0.5rem;
+        }
+        .col-md-3:first-child {
+            padding-left: 0;
+        }
+        .col-md-3:last-child {
+            padding-right: 0;
+        }
+
+        @media (max-width: 992px) {
+            .col-md-3 {
+                flex-basis: 50%; /* Duas colunas em telas médias */
+                padding: 0 0.5rem;
+                margin-bottom: 1rem;
+            }
+            .col-md-3:nth-child(2n-1) {
+                padding-left: 0;
+            }
+            .col-md-3:nth-child(2n) {
+                padding-right: 0;
+            }
+            .filters-container {
+                padding: 1.25rem;
+            }
+        }
+        @media (max-width: 576px) {
+            .col-md-3 {
+                flex-basis: 100%; /* Uma coluna em telas pequenas */
+                padding: 0;
+                margin-bottom: 1rem;
+            }
+            .filters-container {
+                padding: 1rem;
+            }
+        }
+      `}</style>
+
+      <h4><FaFilter /> Filtragem da Agenda</h4>
+      <p className="development-alert">
+        <FaTriangleExclamation /> Esta seção está <strong>EM DESENVOLVIMENTO</strong> e não aplica filtros reais.
+      </p>
 
       <div className="row">
         {/* Filtro por Funcionário */}
@@ -68,10 +184,10 @@ const FiltrosAgendamento: React.FC = () => {
           </select>
         </div>
 
-        {/* Filtro por Horário */}
+        {/* Filtro por Horário (Período) */}
         <div className="col-md-3 mb-2">
           <label htmlFor="filtroHorario" className="form-label">
-            Horário
+            Período
           </label>
           <select
             id="filtroHorario"
@@ -80,9 +196,9 @@ const FiltrosAgendamento: React.FC = () => {
             onChange={handleFiltroHorario}
           >
             <option value="todos">Todos</option>
-            <option value="manha">Manhã</option>
-            <option value="tarde">Tarde</option>
-            <option value="noite">Noite</option>
+            <option value="manha">Manhã (08h - 12h)</option>
+            <option value="tarde">Tarde (12h - 18h)</option>
+            <option value="noite">Noite (18h - 22h)</option>
           </select>
         </div>
 

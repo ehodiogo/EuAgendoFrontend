@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
-import { FaSpinner, FaExclamationCircle, FaCheckCircle, FaUserCircle, FaTimesCircle } from "react-icons/fa";
+import { FaSpinner, FaBan } from "react-icons/fa6"; // Atualizado para Fa6
+import {FaCheckCircle, FaExclamationCircle, FaUserCircle as FaUserCircleSolid}  from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import axios from "axios";
 
@@ -18,6 +19,7 @@ const CancelarAgendamentoView = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
 
+  // Busca de dados
   const { data: agendamentoData, loading } = useFetch<Agendamento>(
     `/api/agendamento/detalhe/${identificador}`
   );
@@ -45,162 +47,173 @@ const CancelarAgendamentoView = () => {
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
-      setTimeout(() => setSubmitStatus(null), 3000);
+      setTimeout(() => setSubmitStatus(null), 3500); // Aumentei o tempo para melhor feedback
     }
   };
 
   return (
     <>
       <Navbar />
-      <div className="cancelamento-container min-h-screen bg-gradient-to-b from-light-gray via-white to-light-blue/10 flex items-center justify-center py-14">
+      <div className="cancelamento-container min-h-screen">
         <style>{`
+          /* Paleta de Cores (Consistente) */
           :root {
             --primary-blue: #003087;
-            --light-blue: #4dabf7;
-            --dark-gray: #2d3748;
-            --light-gray: #f7fafc;
+            --accent-blue: #0056b3;
+            --dark-gray: #212529;
+            --light-gray-bg: #f5f7fa;
             --white: #ffffff;
             --success-green: #28a745;
             --danger-red: #dc3545;
-            --warning-orange: #fd7e14;
+            --shadow-color: rgba(0, 0, 0, 0.15);
           }
 
           .cancelamento-container {
+            background-color: var(--light-gray-bg);
+            background-image: linear-gradient(135deg, var(--light-gray-bg) 0%, var(--white) 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 100%;
-            padding: 3rem 1rem;
+            padding: 5rem 1rem;
+            min-height: calc(100vh - 56px);
           }
 
           .cancelamento-card {
             background-color: var(--white);
             border: 1px solid rgba(0, 48, 135, 0.08);
-            border-radius: 24px;
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.07);
+            border-radius: 28px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
             padding: 3.5rem;
-            max-width: 720px;
+            max-width: 760px;
             width: 100%;
             text-align: center;
             transition: transform 0.4s ease, box-shadow 0.4s ease;
+            border-top: 6px solid var(--danger-red); /* Borda vermelha para indicar cancelamento */
           }
           .cancelamento-card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
           }
 
           .cancelamento-card h2 {
-            color: var(--primary-blue);
+            color: var(--dark-gray);
             font-weight: 800;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
+            font-size: 2.75rem;
+            margin-bottom: 2.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 1rem;
-            font-family: 'Inter', sans-serif;
-            letter-spacing: -0.03em;
+            letter-spacing: -0.05em;
+          }
+          .cancelamento-card h2 svg {
+              color: var(--danger-red);
+              font-size: 3rem;
+          }
+          .cancelamento-card p.alert-message {
+            color: var(--dark-gray);
+            font-size: 1.15rem;
+            margin-bottom: 2.5rem;
+            font-weight: 500;
+          }
+          .cancelamento-card p.alert-message strong {
+              color: var(--danger-red);
+              font-weight: 700;
           }
 
           .info-agendamento {
-            background-color: var(--light-gray);
-            border-radius: 16px;
-            padding: 2rem;
+            background-color: var(--light-gray-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
             margin-bottom: 3rem;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.04);
+            box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.08);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1.5rem;
+            gap: 1rem;
+            border: 1px solid rgba(0, 48, 135, 0.1);
           }
           .info-agendamento p {
             color: var(--dark-gray);
-            font-size: 1.2rem;
-            margin-bottom: 1.25rem;
-            font-family: 'Inter', sans-serif;
-            line-height: 1.7;
+            font-size: 1.15rem;
+            margin: 0;
+            line-height: 1.6;
           }
           .info-agendamento p strong {
             color: var(--primary-blue);
             font-weight: 700;
+            margin-right: 0.5rem;
           }
 
           .funcionario-foto {
-            width: 100px;
-            height: 100px;
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid var(--light-blue);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-          }
-          .funcionario-foto:hover {
-            transform: scale(1.05);
+            border: 4px solid var(--accent-blue);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            margin-bottom: 1.5rem;
           }
           .funcionario-foto-placeholder {
-            width: 100px;
-            height: 100px;
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
-            background-color: var(--light-gray);
+            background-color: #e0e7ff;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid var(--light-blue);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            font-size: 3rem;
-            color: var(--dark-gray);
+            border: 4px solid var(--accent-blue);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            font-size: 3.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
           }
 
           .btn-cancel {
-            background: linear-gradient(135deg, var(--danger-red), #b02a37);
+            background: linear-gradient(135deg, var(--danger-red), #a12331);
             color: var(--white);
-            padding: 1.1rem 3rem;
-            border-radius: 14px;
-            font-size: 1.25rem;
-            font-weight: 700;
-            font-family: 'Inter', sans-serif;
+            padding: 1.2rem 3rem;
+            border-radius: 16px;
+            font-size: 1.3rem;
+            font-weight: 800;
             transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.75rem;
             width: 100%;
-            max-width: 360px;
+            max-width: 400px;
             margin: 0 auto;
-            box-shadow: 0 6px 16px rgba(220, 53, 69, 0.25);
+            box-shadow: 0 6px 16px rgba(220, 53, 69, 0.3);
+            border: none;
           }
           .btn-cancel:hover {
-            background: linear-gradient(135deg, #a12331, #9b1d2a);
+            background: linear-gradient(135deg, #a12331, var(--danger-red));
             transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.35);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
           }
           .btn-cancel:disabled {
             background: #d1d5db;
+            color: var(--dark-gray);
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
-            animation: pulse 1.8s infinite;
-          }
-          @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.65; }
-            100% { opacity: 1; }
+            opacity: 0.8;
           }
 
           .message {
             font-size: 1.2rem;
             padding: 1.75rem;
-            border-radius: 14px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 1rem;
-            background-color: var(--white);
-            font-family: 'Inter', sans-serif;
+            font-weight: 600;
             margin-top: 2.5rem;
-            max-width: 560px;
+            max-width: 600px;
             width: 100%;
             opacity: 0;
             transform: translateY(10px);
@@ -208,14 +221,17 @@ const CancelarAgendamentoView = () => {
           }
           .message.success {
             color: var(--success-green);
+            background-color: #d4edda;
             border: 2px solid var(--success-green);
           }
           .message.error {
             color: var(--danger-red);
+            background-color: #fcebeb;
             border: 2px solid var(--danger-red);
           }
           .message.loading {
             color: var(--dark-gray);
+            background-color: #f0f4f8;
             border: 2px solid var(--dark-gray);
           }
           @keyframes fadeIn {
@@ -225,10 +241,8 @@ const CancelarAgendamentoView = () => {
             }
           }
 
+          /* Responsividade */
           @media (max-width: 768px) {
-            .cancelamento-container {
-              padding: 2.5rem 1rem;
-            }
             .cancelamento-card {
               padding: 2.5rem;
             }
@@ -236,53 +250,48 @@ const CancelarAgendamentoView = () => {
               font-size: 2.25rem;
             }
             .info-agendamento {
-              padding: 1.75rem;
-            }
-            .info-agendamento p {
-              font-size: 1.1rem;
+              padding: 2rem;
             }
             .funcionario-foto, .funcionario-foto-placeholder {
-              width: 80px;
-              height: 80px;
+              width: 90px;
+              height: 90px;
+              margin-bottom: 1rem;
             }
             .btn-cancel {
-              font-size: 1.15rem;
-              padding: 1rem 2.5rem;
-              max-width: 320px;
-            }
-            .message {
-              font-size: 1.1rem;
-              padding: 1.5rem;
+              font-size: 1.2rem;
+              padding: 1.1rem 2.5rem;
             }
           }
           @media (max-width: 576px) {
-            .cancelamento-container {
-              padding: 2rem 0.75rem;
-            }
             .cancelamento-card {
-              padding: 2rem;
+              padding: 1.5rem;
+              border-radius: 20px;
             }
             .cancelamento-card h2 {
-              font-size: 1.875rem;
+              font-size: 2rem;
+              gap: 0.75rem;
+            }
+            .cancelamento-card h2 svg {
+                font-size: 2.25rem;
             }
             .info-agendamento {
               padding: 1.5rem;
             }
             .info-agendamento p {
               font-size: 1rem;
-              margin-bottom: 0.875rem;
             }
             .funcionario-foto, .funcionario-foto-placeholder {
-              width: 60px;
-              height: 60px;
+              width: 70px;
+              height: 70px;
+              font-size: 3rem;
             }
             .btn-cancel {
-              font-size: 1.05rem;
-              padding: 0.875rem 2rem;
-              max-width: 280px;
+              font-size: 1.1rem;
+              padding: 1rem 2rem;
+              max-width: 100%;
             }
             .message {
-              font-size: 1rem;
+              font-size: 1.05rem;
               padding: 1.25rem;
               max-width: 100%;
             }
@@ -291,16 +300,16 @@ const CancelarAgendamentoView = () => {
         <section className="cancelamento-card" aria-labelledby="cancelamento-title">
           {loading ? (
             <div className="message loading">
-              <FaSpinner className="fa-spin text-xl" aria-hidden="true" /> Carregando agendamento...
+              <FaSpinner className="fa-spin text-xl" aria-hidden="true" /> Carregando detalhes do agendamento...
             </div>
           ) : !agendamentoData ? (
             <div className="message error">
-              <FaExclamationCircle className="text-xl" aria-hidden="true" /> Agendamento não encontrado.
+              <FaExclamationCircle className="text-xl" aria-hidden="true" /> Agendamento não encontrado ou link inválido.
             </div>
           ) : (
             <>
               <h2 id="cancelamento-title">
-                <FaTimesCircle className="text-danger-red text-4xl" aria-hidden="true" /> Cancelar Agendamento
+                <FaBan aria-hidden="true" /> Cancelar Agendamento
               </h2>
               <div className="info-agendamento">
                 {agendamentoData.funcionario.foto ? (
@@ -311,7 +320,7 @@ const CancelarAgendamentoView = () => {
                   />
                 ) : (
                   <div className="funcionario-foto-placeholder">
-                    <FaUserCircle />
+                    <FaUserCircleSolid />
                   </div>
                 )}
                 <p>
@@ -336,8 +345,8 @@ const CancelarAgendamentoView = () => {
                 </p>
               </div>
               <form onSubmit={handleCancel} aria-label="Formulário de cancelamento do agendamento">
-                <p className="text-dark-gray mb-8 text-lg">
-                  Tem certeza de que deseja cancelar este agendamento? Esta ação não pode ser desfeita.
+                <p className="alert-message">
+                  Atenção: Tem certeza de que deseja <strong>cancelar</strong> este agendamento? Esta ação não poderá ser desfeita.
                 </p>
                 <button
                   type="submit"
@@ -346,7 +355,9 @@ const CancelarAgendamentoView = () => {
                   aria-label="Confirmar cancelamento"
                 >
                   {isSubmitting ? (
-                    <FaSpinner className="fa-spin inline mr-2 text-xl" aria-hidden="true" />
+                    <>
+                        <FaSpinner className="fa-spin inline" aria-hidden="true" /> Processando...
+                    </>
                   ) : (
                     "Confirmar Cancelamento"
                   )}
@@ -359,7 +370,7 @@ const CancelarAgendamentoView = () => {
               )}
               {submitStatus === "error" && (
                 <div className="message error">
-                  <FaExclamationCircle className="text-xl" aria-hidden="true" /> Erro ao cancelar agendamento. Tente novamente.
+                  <FaExclamationCircle className="text-xl" aria-hidden="true" /> Erro ao cancelar agendamento. O agendamento pode já ter sido cancelado ou concluído.
                 </div>
               )}
             </>

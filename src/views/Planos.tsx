@@ -2,13 +2,11 @@ import {
   FaPix,
   FaCcVisa,
   FaCcMastercard,
-  FaCcAmazonPay,
   FaCcApplePay,
   FaCreditCard,
   FaCcAmex,
-  FaCcJcb,
-  FaRegCreditCard,
 } from "react-icons/fa6";
+import {FaCheckCircle} from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -21,7 +19,6 @@ function Planos() {
   const [planos, setPlanos] = useState<Plano[]>([]);
 
   useEffect(() => {
-
     console.log("data", data);
     if (!loading && data) {
       // @ts-ignore
@@ -41,6 +38,9 @@ function Planos() {
           features: [
             `Até ${plano.quantidade_empresas} empresa${plano.quantidade_empresas > 1 ? "s" : ""}`,
             `Até ${plano.quantidade_funcionarios} funcionário${plano.quantidade_funcionarios > 1 ? "s" : ""} por empresa`,
+            ...(plano.nome.toLowerCase() !== "free trial" ? ["Agendamento Online 24/7", "Lembretes Automáticos"] : ["Acesso Limitado por 7 dias"]),
+            ...(plano.nome.toLowerCase() === "plano profissional" || plano.nome.toLowerCase() === "plano corporativo" ? ["Relatórios Básicos"] : []),
+            ...(plano.nome.toLowerCase() === "plano corporativo" ? ["API de Integração", "Suporte VIP 24h"] : []),
           ],
         }));
         // @ts-ignore
@@ -52,13 +52,13 @@ function Planos() {
   const getPlanColor = (nome: string) => {
     switch (nome.toLowerCase()) {
       case "free trial":
-        return "#6c757d";
+        return "#6c757d"; // Cinza
       case "plano básico":
-        return "#28a745";
+        return "#28a745"; // Verde (Bom)
       case "plano profissional":
-        return "#dc3545";
+        return "#fd7e14"; // Laranja (Destaque/Popular)
       case "plano corporativo":
-        return "#003087";
+        return "#003087"; // Azul Escuro (Premium)
       default:
         return "#6c757d";
     }
@@ -75,56 +75,62 @@ function Planos() {
     <div className="min-vh-100">
       <style>
         {`
+          /* Cores Aprimoradas */
           :root {
             --primary-blue: #003087;
-            --light-blue: #4dabf7;
+            --secondary-blue: #0056b3;
             --dark-gray: #2d3748;
-            --light-gray: #f7fafc;
+            --light-gray-bg: #f5f7fa; /* Fundo mais suave */
             --white: #ffffff;
             --accent-yellow: #f6c107;
+            --danger-red: #dc3545;
           }
           .custom-bg {
-            background-color: var(--light-gray);
+            background-color: var(--light-gray-bg);
           }
           .custom-section {
-            padding: 4rem 0;
+            padding: 5rem 0;
           }
           .custom-section h1 {
             color: var(--primary-blue);
-            font-weight: 700;
-            font-size: 2.75rem;
-            margin-bottom: 1rem;
+            font-weight: 800;
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
           }
           .custom-section p.lead {
             color: var(--dark-gray);
-            font-size: 1.25rem;
-            max-width: 700px;
-            margin: 0 auto;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 3rem;
           }
+
+          /* Cards de Plano - NOVO ESTILO */
           .plan-row {
             display: flex;
-            flex-wrap: nowrap;
-            gap: 1.5rem;
+            flex-wrap: wrap;
+            gap: 2rem;
             justify-content: center;
           }
           .plan-card {
-            border: none;
-            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
             background-color: var(--white);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            padding: 2rem;
+            padding: 2.5rem;
             position: relative;
             display: flex;
             flex-direction: column;
             height: 100%;
             flex: 1;
-            max-width: 280px;
+            max-width: 300px;
+            overflow: hidden;
+            text-align: center;
           }
           .plan-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
           }
           .plan-card::before {
             content: '';
@@ -132,162 +138,168 @@ function Planos() {
             top: 0;
             left: 0;
             width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--light-blue), var(--primary-blue));
-            border-radius: 12px 12px 0 0;
+            height: 6px; /* Linha de destaque maior */
+            background-color: var(--primary-blue); /* Padrão, será sobrescrito inline */
+            border-radius: 16px 16px 0 0;
           }
+          .plan-card.highlight {
+              transform: scale(1.05);
+              border: 2px solid #fd7e14;
+          }
+          .plan-card.highlight .ribbon {
+              position: absolute;
+              top: 0;
+              right: 20px;
+              background-color: #fd7e14;
+              color: var(--white);
+              padding: 0.25rem 0.75rem;
+              font-size: 0.85rem;
+              font-weight: 700;
+              border-radius: 0 0 8px 8px;
+              box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+              z-index: 10;
+          }
+
           .plan-card h4 {
-            color: var(--primary-blue);
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            line-height: 1.2;
+          }
+          .plan-card .price-group {
+              padding: 1.5rem 0;
+              margin-bottom: 1.5rem;
+              border-bottom: 1px solid #f0f0f0;
           }
           .plan-card .plan-price {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary-blue);
-            margin-bottom: 0.5rem;
+            font-size: 3.25rem; /* Maior destaque */
+            font-weight: 900;
+            color: var(--primary-blue); /* Será sobrescrito inline */
+            line-height: 1;
+            display: block;
+          }
+          .plan-card .plan-price small {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark-gray);
           }
           .plan-card .full-price {
-            font-size: 1.25rem;
-            color: #6c757d;
+            font-size: 1.1rem;
+            color: var(--danger-red);
             text-decoration: line-through;
-            margin-left: 0.5rem;
+            display: block;
+            margin-top: 0.5rem;
           }
           .plan-card .discount {
-            font-size: 1rem;
-            color: #dc3545;
-            font-weight: 600;
-            margin-bottom: 1rem;
+            font-size: 1.05rem;
+            color: #28a745;
+            font-weight: 700;
+            margin-top: 0.5rem;
           }
           .plan-card ul {
             list-style: none;
             padding: 0;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             color: var(--dark-gray);
             flex-grow: 1;
+            text-align: left;
           }
           .plan-card ul li {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
+            font-size: 0.95rem;
           }
-          .plan-card ul li::before {
-            content: "✔";
-            color: var(--light-blue);
-            margin-right: 0.5rem;
+          .plan-card ul li svg {
+            color: #28a745; /* Cor para o ícone de check */
+            margin-right: 0.75rem;
+            margin-top: 3px;
+            flex-shrink: 0;
           }
-          .custom-btn {
-            background-color: var(--accent-yellow);
+          .plan-card .free-trial-text {
             color: var(--dark-gray);
             font-weight: 600;
-            padding: 0.75rem;
-            border-radius: 8px;
+            margin-bottom: 1rem;
+          }
+
+          .custom-btn {
+            font-weight: 700;
+            padding: 0.9rem;
+            border-radius: 10px;
             transition: all 0.3s ease;
             border: none;
             width: 100%;
+            font-size: 1rem;
           }
           .custom-btn:hover {
-            background-color: #e0a800;
+            opacity: 0.9;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
           }
           .custom-btn:disabled {
-            background-color: #6c757d;
+            background-color: #6c757d !important;
+            color: var(--white);
             cursor: not-allowed;
-            opacity: 0.7;
+            opacity: 0.8;
+            transform: none;
+          }
+          
+          /* Seção de Pagamento */
+          .payment-methods-section {
+            padding: 2rem 0;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 3rem;
           }
           .payment-methods {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-top: 2rem;
-            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 1.5rem;
           }
           .payment-methods svg {
-            font-size: 2.5rem;
-            transition: transform 0.3s ease;
+            font-size: 3rem;
+            opacity: 0.85;
           }
-          .payment-methods svg:hover {
-            transform: scale(1.1);
+
+          /* Tabela de Expiração */
+          .expiration-table-section {
+            padding: 2rem 0;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 3rem;
           }
           .expiration-table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: var(--white);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            overflow: hidden;
-          }
-          .expiration-table th, .expiration-table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+            border: 1px solid #e0e0e0;
           }
           .expiration-table th {
-            background-color: var(--primary-blue);
-            color: var(--white);
-            font-weight: 600;
-          }
-          .expiration-table td {
-            color: var(--dark-gray);
+            background-color: var(--secondary-blue);
           }
           .expiration-table .highlight {
-            color: #dc3545;
-            font-weight: 700;
-          }
-          .expiration-table p.note {
-            color: var(--dark-gray);
-            font-size: 1rem;
-            margin-top: 1rem;
+            color: var(--danger-red);
           }
           .expiration-table p.note .highlight {
-            color: #dc3545;
-            font-weight: 700;
+            color: var(--primary-blue);
           }
+
           @media (max-width: 1200px) {
-            .plan-row {
-              flex-wrap: wrap;
-            }
             .plan-card {
-              max-width: 45%;
-              flex: 1 1 45%;
+              max-width: 48%;
+              flex: 1 1 48%;
             }
           }
           @media (max-width: 768px) {
-            .custom-section {
-              padding: 2rem 0;
+            .plan-row {
+              gap: 1.5rem;
             }
             .plan-card {
               max-width: 100%;
               flex: 1 1 100%;
-              margin-bottom: 1.5rem;
+              padding: 2rem;
             }
-            .expiration-table {
-              font-size: 0.9rem;
+            .plan-card.highlight {
+                transform: none;
             }
-          }
-          @media (max-width: 576px) {
             .custom-section h1 {
-              font-size: 2rem;
-            }
-            .custom-section p.lead {
-              font-size: 1.1rem;
-            }
-            .plan-card h4 {
-              font-size: 1.25rem;
+                font-size: 2.5rem;
             }
             .plan-card .plan-price {
-              font-size: 1.75rem;
-            }
-            .plan-card .full-price {
-              font-size: 1rem;
-            }
-            .plan-card .discount {
-              font-size: 0.9rem;
-            }
-            .payment-methods svg {
-              font-size: 2rem;
+                font-size: 2.75rem;
             }
           }
         `}
@@ -296,64 +308,102 @@ function Planos() {
         <Navbar />
         <div className="container custom-section text-center">
           <h1>Nossos Planos</h1>
-          <p className="lead">Escolha o plano ideal para o seu negócio.</p>
+          <p className="lead">
+            Escolha o plano ideal para o seu negócio. Todos os planos incluem
+            agendamento online 24/7 e lembretes automáticos.
+          </p>
 
           {loading ? (
-            <p>Carregando planos...</p>
+            <p className="fw-bold text-primary-blue">Carregando planos...</p>
           ): (
             <div className="plan-row">
               {planos.map((plano: Plano, index: number) => (
-                <div key={index} className="plan-card">
-                  <h4>{plano.nome}</h4>
-                  <div className="plan-price">
-                    R${plano.valor.toFixed(2)}
-                    {plano.is_promo && (
-                      <span className="full-price">
-                        R${plano.valor_cheio.toFixed(2)}
-                      </span>
+                <div
+                    key={index}
+                    className={`plan-card ${plano.nome.toLowerCase().includes('profissional') ? 'highlight' : ''}`}
+                    style={{'--plan-color': plano.cor} as React.CSSProperties} // Propriedade CSS para a cor
+                >
+                    {/* Linha de Destaque por Cor */}
+                    <div style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '6px',
+                        backgroundColor: plano.cor,
+                        borderRadius: '16px 16px 0 0'
+                    }}></div>
+
+                    {plano.nome.toLowerCase().includes('profissional') && (
+                        <div className="ribbon">MAIS POPULAR</div>
                     )}
-                  </div>
-                  {plano.is_promo && (
-                    <div className="discount">
-                      {plano.porcentagem_promo}% de desconto!
+
+                    <h4 style={{ color: plano.cor }}>{plano.nome}</h4>
+
+                    <div className="price-group">
+                        <span className="plan-price" style={{ color: plano.cor }}>
+                            R${plano.valor.toFixed(2)}
+                            <small>/mês</small>
+                        </span>
+                        {plano.is_promo && (
+                            <span className="full-price">
+                                De R${plano.valor_cheio.toFixed(2)}
+                            </span>
+                        )}
+                        {plano.is_promo && (
+                            <div className="discount">
+                                Economize {plano.porcentagem_promo}% na Promoção!
+                            </div>
+                        )}
+                        {plano.valor === 0 && (
+                            <div className="free-trial-text">
+                                Período de Avaliação Gratuito
+                            </div>
+                        )}
                     </div>
-                  )}
-                  <ul>
-                    {plano.features.map((feature, idx) => (
-                      <li key={idx}>{feature}</li>
-                    ))}
-                  </ul>
-                  <button
-                    className="custom-btn"
-                    onClick={() => adicionarAoCarrinho(plano)}
-                    disabled={plano.valor === 0}
-                  >
-                    {plano.valor === 0 ? "Crie sua conta para obter!" : "Adquirir"}
-                  </button>
+
+                    <ul>
+                        {plano.features.map((feature, idx) => (
+                            <li key={idx}>
+                                <FaCheckCircle style={{ color: plano.cor }} />
+                                {feature}
+                            </li>
+                        ))}
+                    </ul>
+                    <button
+                        className="custom-btn"
+                        style={{
+                            backgroundColor: plano.cor,
+                            color: plano.nome.toLowerCase() === 'plano profissional' ? 'var(--dark-gray)' : 'var(--white)',
+                        }}
+                        onClick={() => adicionarAoCarrinho(plano)}
+                        disabled={plano.valor === 0}
+                    >
+                        {plano.valor === 0 ? "Comece seu Teste Grátis" : "Adquirir"}
+                    </button>
                 </div>
               ))}
             </div>
           )}
 
-          <div className="custom-section text-center">
-            <h5 style={{ color: "var(--primary-blue)", fontWeight: "600" }}>
+          {/* Seção de Pagamento */}
+          <div className="payment-methods-section text-center">
+            <h5 style={{ color: "var(--primary-blue)", fontWeight: "700" }}>
               Formas de Pagamento Aceitas
             </h5>
-            <div className="payment-methods">
-              <FaPix style={{ color: "#28a745" }} />
-              <FaCcVisa style={{ color: "#003087" }} />
-              <FaCcMastercard style={{ color: "#dc3545" }} />
-              <FaCcAmazonPay style={{ color: "#ff9900" }} />
-              <FaCcApplePay style={{ color: "#000" }} />
+            <div className="payment-methods d-flex justify-content-center">
+              <FaPix style={{ color: "#00b39e" }} />
+              <FaCcVisa style={{ color: "#1966d2" }} />
+              <FaCcMastercard style={{ color: "#ff6d00" }} />
+              <FaCcApplePay style={{ color: "#333" }} />
               <FaCreditCard style={{ color: "#6c757d" }} />
               <FaCcAmex style={{ color: "#17a2b8" }} />
-              <FaCcJcb style={{ color: "#343a40" }} />
-              <FaRegCreditCard style={{ color: "#343a40" }} />
             </div>
           </div>
 
-          <div className="custom-section text-center">
-            <h5 style={{ color: "var(--primary-blue)", fontWeight: "600" }}>
+          {/* Seção de Expiração */}
+          <div className="expiration-table-section text-center">
+            <h5 style={{ color: "var(--primary-blue)", fontWeight: "700" }}>
               O que acontece se meu plano vencer?
             </h5>
             <p className="text-muted">
@@ -389,7 +439,7 @@ function Planos() {
                 </tbody>
               </table>
               <p className="note">
-                <span className="highlight">IMPORTANTE:</span> Para reativar o acesso completo, basta renovar o plano.
+                <span className="highlight" style={{ color: "var(--primary-blue)" }}>IMPORTANTE:</span> Para reativar o acesso completo, basta renovar o plano. Seus dados são mantidos seguros.
               </p>
             </div>
           </div>

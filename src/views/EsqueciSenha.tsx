@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { FaEnvelope } from "react-icons/fa";
+import { FaEnvelope, FaLockOpen, FaSpinner, FaArrowLeft } from "react-icons/fa6"; // Atualizado para Fa6
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -25,7 +25,8 @@ function ForgotPassword() {
 
       if (response.status === 200) {
         setSuccess(true);
-        setEmail(""); // Clear input after success
+        // Não limpa o email para que o usuário veja qual email foi usado
+        // setEmail("");
       }
     } catch (err: any) {
       setError(
@@ -41,170 +42,208 @@ function ForgotPassword() {
   return (
     <div className="min-vh-100">
       <style>{`
-        /* Paleta de cores */
+        /* Cores Aprimoradas */
         :root {
           --primary-blue: #003087;
-          --light-blue: #4dabf7;
-          --dark-gray: #2d3748;
-          --light-gray: #f7fafc;
+          --accent-blue: #0056b3;
+          --dark-gray: #212529;
+          --light-gray-bg: #f5f7fa;
           --white: #ffffff;
-          --accent-yellow: #f6c107;
           --success-green: #28a745;
+          --danger-red: #dc3545;
+          --shadow-color: rgba(0, 0, 0, 0.15);
         }
 
-        /* Estilos gerais */
         .custom-bg {
-          background-color: var(--light-gray);
+          background-color: var(--light-gray-bg);
+          background-image: linear-gradient(135deg, var(--light-gray-bg) 0%, var(--white) 100%);
         }
 
-        /* Layout */
         .forgot-password-container {
           display: flex;
           justify-content: center;
           align-items: center;
-          min-height: calc(100vh - 70px); /* Ajusta para altura da Navbar */
+          min-height: calc(100vh - 70px);
+          padding: 2rem 1rem;
         }
 
         /* Cartão de recuperação */
         .forgot-password-card {
           background-color: var(--white);
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          padding: 2.5rem;
-          max-width: 450px;
+          border-radius: 20px;
+          box-shadow: 0 10px 30px var(--shadow-color);
+          padding: 3rem;
+          max-width: 420px;
           width: 100%;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          transition: transform 0.4s ease, box-shadow 0.4s ease;
+          border-top: 5px solid var(--primary-blue);
         }
         .forgot-password-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+          transform: translateY(-8px);
+          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
         }
         .forgot-password-card h2 {
-          color: var(--primary-blue);
-          font-weight: 700;
-          font-size: 2rem;
-          margin-bottom: 1.5rem;
+          color: var(--dark-gray);
+          font-weight: 800;
+          font-size: 2.25rem;
+          margin-bottom: 2rem;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.5rem;
+          gap: 0.75rem;
+          letter-spacing: -0.04em;
+        }
+        .forgot-password-card h2 svg {
+            color: var(--primary-blue);
+            font-size: 2.5rem;
+        }
+        .forgot-password-card p {
+            color: var(--dark-gray);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
         }
 
         /* Formulário */
         .form-label {
-          color: var(--primary-blue);
-          font-weight: 600;
-          font-size: 1rem;
+          color: var(--dark-gray);
+          font-weight: 700;
+          font-size: 1.05rem;
           margin-bottom: 0.5rem;
+          display: block;
+          text-align: left;
+        }
+        /* Input com Ícone Aprimorado */
+        .input-icon {
+          position: relative;
+          margin-bottom: 1.5rem;
+        }
+        .input-icon .left-icon {
+          position: absolute;
+          top: 50%;
+          left: 1rem;
+          transform: translateY(-50%);
+          color: var(--accent-blue);
+          font-size: 1.1rem;
+          pointer-events: none;
+          transition: color 0.3s ease;
+          z-index: 10;
         }
         .form-control {
-          border: 2px solid #e2e8f0;
-          border-radius: 8px;
-          padding: 0.75rem 1rem 0.75rem 2.5rem;
+          border: 1px solid #d1d5db;
+          border-radius: 10px;
+          padding: 1rem 1rem 1rem 3rem;
           font-size: 1rem;
+          width: 100%;
           transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .form-control:focus {
-          border-color: var(--light-blue);
-          box-shadow: 0 0 0 0.2rem rgba(77, 171, 247, 0.25);
+          border-color: var(--primary-blue);
+          box-shadow: 0 0 0 3px rgba(0, 48, 135, 0.2);
           outline: none;
         }
-        .form-control::placeholder {
-          color: #9ca3af;
+        .form-control:focus + .left-icon {
+            color: var(--primary-blue);
         }
+        .form-control::placeholder {
+          color: #a0aec0;
+        }
+        
+        /* Botão de Submit com Gradiente */
         .submit-btn {
-          background-color: var(--success-green);
+          background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
           color: var(--white);
-          font-weight: 600;
-          padding: 0.75rem;
-          border-radius: 8px;
+          font-weight: 700;
+          padding: 1rem;
+          border-radius: 10px;
           transition: all 0.3s ease;
           border: none;
           width: 100%;
+          font-size: 1.15rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          box-shadow: 0 4px 15px rgba(0, 48, 135, 0.3);
+          margin-top: 0.5rem;
         }
         .submit-btn:hover {
-          background-color: #218838;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+          background: linear-gradient(135deg, var(--accent-blue), var(--primary-blue));
+          transform: translateY(-3px);
+          box-shadow: 0 6px 20px rgba(0, 48, 135, 0.4);
         }
         .submit-btn:disabled {
-          background-color: #6c757d;
+          background: #ccc;
+          color: var(--dark-gray);
           cursor: not-allowed;
-          opacity: 0.7;
+          opacity: 0.8;
+          transform: none;
+          box-shadow: none;
         }
 
         /* Mensagens de erro e sucesso */
         .alert-danger {
-          background-color: #f8d7da;
-          color: #721c24;
-          border: 1px solid #f5c6cb;
+          background-color: #fcebeb;
+          color: var(--danger-red);
+          border: 1px solid #f9d7da;
           padding: 1rem;
           border-radius: 8px;
-          margin-bottom: 1rem;
+          margin-top: 1.5rem;
           text-align: center;
-          font-weight: 500;
+          font-weight: 600;
         }
         .alert-success {
           background-color: #d4edda;
-          color: #155724;
+          color: var(--success-green);
           border: 1px solid #c3e6cb;
           padding: 1rem;
           border-radius: 8px;
-          margin-bottom: 1rem;
+          margin-top: 1.5rem;
           text-align: center;
-          font-weight: 500;
+          font-weight: 600;
         }
 
         /* Links */
         .link-container {
           display: flex;
           justify-content: center;
-          margin-top: 1rem;
+          margin-top: 1.5rem;
+          padding-top: 1rem;
+          border-top: 1px solid #e2e8f0;
+          font-size: 0.95rem;
         }
         .link-container a {
-          color: var(--light-blue);
-          font-weight: 500;
+          color: var(--accent-blue);
+          font-weight: 600;
           text-decoration: none;
-          transition: color 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
         }
         .link-container a:hover {
           color: var(--primary-blue);
           text-decoration: underline;
         }
 
-        /* Ícones nos inputs */
-        .input-icon {
-          position: relative;
-        }
-        .input-icon svg {
-          position: absolute;
-          top: 50%;
-          left: 0.75rem;
-          transform: translateY(-50%);
-          color: var(--light-blue);
-          font-size: 1.2rem;
-          z-index: 1;
-        }
-
         /* Responsividade */
         @media (max-width: 576px) {
           .forgot-password-card {
-            padding: 1.5rem;
-            margin: 0 1rem;
+            padding: 2rem 1.5rem;
           }
           .forgot-password-card h2 {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
           }
           .form-control {
             font-size: 0.9rem;
-            padding-left: 2.25rem;
+            padding: 0.8rem 0.8rem 0.8rem 2.5rem;
           }
           .submit-btn {
-            font-size: 0.9rem;
+            font-size: 1.05rem;
+            padding: 0.8rem;
           }
-          .input-icon svg {
+          .input-icon .left-icon {
             font-size: 1rem;
-            left: 0.5rem;
+            left: 0.75rem;
           }
         }
       `}</style>
@@ -213,21 +252,24 @@ function ForgotPassword() {
         <div className="forgot-password-container">
           <div className="forgot-password-card">
             <h2>
-              <FaEnvelope /> Recuperar Senha
+              <FaLockOpen /> Redefinir Senha
             </h2>
+            <p>
+                Insira o endereço de e-mail associado à sua conta e enviaremos um link para redefinir sua senha.
+            </p>
             <form onSubmit={handlePasswordRecovery}>
-              <div className="mb-3 input-icon">
+              <div className="input-icon">
                 <label htmlFor="email" className="form-label">
                   E-mail
                 </label>
-                <FaEnvelope />
+                <FaEnvelope className="left-icon" />
                 <input
                   type="email"
                   className="form-control"
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Digite seu e-mail"
+                  placeholder="exemplo@empresa.com"
                   required
                 />
               </div>
@@ -237,17 +279,27 @@ function ForgotPassword() {
                 disabled={loading}
                 aria-label="Enviar link de recuperação de senha"
               >
-                {loading ? "Enviando..." : "Enviar Link de Recuperação"}
+                {loading ? (
+                  <>
+                    <FaSpinner className="fa-spin" /> Enviando...
+                  </>
+                ) : (
+                  "Enviar Link de Recuperação"
+                )}
               </button>
             </form>
-            {error && <div className="alert-danger">{error}</div>}
+
             {success && (
               <div className="alert-success">
-                Link de recuperação enviado! Verifique seu e-mail.
+                Link de recuperação enviado com sucesso! <strong>Verifique sua caixa de entrada</strong> (e spam) para prosseguir.
               </div>
             )}
+            {error && <div className="alert-danger">{error}</div>}
+
             <div className="link-container">
-              <Link to="/login">Voltar ao Login</Link>
+              <Link to="/login">
+                <FaArrowLeft /> Voltar ao Login
+              </Link>
             </div>
           </div>
         </div>

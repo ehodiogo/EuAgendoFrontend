@@ -17,7 +17,20 @@ import { Empresa } from "../interfaces/Empresa";
 import { useFetch } from "../functions/GetData";
 import DashBoardDados from "../components/DashboardDados";
 import { Modal } from "react-bootstrap";
-import { FaChartLine, FaExclamationTriangle, FaClock  } from "react-icons/fa";
+import {
+    FaChartLine,
+    FaExclamationTriangle,
+    FaClock,
+    FaUserCircle,
+    FaMoneyBillWave,
+    FaCalendarAlt,
+    FaCheckSquare,
+    FaEdit,
+    FaSignInAlt,
+    FaChevronDown,
+    FaChevronUp,
+    FaSpinner
+} from "react-icons/fa";
 
 ChartJS.register(
   CategoryScale,
@@ -33,6 +46,7 @@ ChartJS.register(
 function Dashboard() {
 
   const token = localStorage.getItem("access_token");
+  // O token deve ser enviado de forma segura (ex: via cabeçalho Authorization), mas mantendo a lógica atual
   const empresas_usuario = useFetch<Empresa[]>(
     `/api/empresas-usuario/?usuario_token=${token}`
   );
@@ -40,17 +54,14 @@ function Dashboard() {
   const [showModal, setShowModal] = useState(false);
 
   const handleToggleDropdown = async (empresaId: number) => {
-    if (dropdownAberto === empresaId) {
-      setDropdownAberto(null);
-      return;
-    }
-    setDropdownAberto(empresaId);
+    setDropdownAberto(dropdownAberto === empresaId ? null : empresaId);
   };
 
   const isPlanExpired = localStorage.getItem("is_expired_plan");
   const remainingTime = localStorage.getItem("tempo_restante");
 
   const formatTime = (seconds: number) => {
+    if (seconds < 0) seconds = Math.abs(seconds);
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     return `${hours}h ${minutes}m`;
@@ -62,284 +73,256 @@ function Dashboard() {
   const checkIfPlanExpiresTomorrow = () => {
     if (remainingTime) {
       const remainingTimeInSeconds = Number(remainingTime);
-      const remainingTimeInHours = remainingTimeInSeconds / 3600;
-      const remainingTimeInDays = remainingTimeInHours / 24;
-      return remainingTimeInDays < 2;
+      // Considerando que o modal deve aparecer se faltar menos de 2 dias (48 horas)
+      return remainingTimeInSeconds > 0 && remainingTimeInSeconds < (48 * 3600);
     }
     return false;
   };
 
   useEffect(() => {
+    // Exibir modal se expirado ou se faltar menos de 48 horas
     if (isPlanExpired === "true" || checkIfPlanExpiresTomorrow()) {
       handleShowModal();
     }
-  }, []);
+  }, [isPlanExpired, remainingTime]);
+
+  // Estrutura para os botões de navegação
+  const navButtons = [
+    { to: "/perfil", icon: FaUserCircle, label: "Perfil & Pagamentos", description: "Gerencie suas informações, histórico de pagamentos e planos ativos.", variant: "primary" },
+    { to: "/financeiro", icon: FaMoneyBillWave, label: "Relatório Financeiro", description: "Acompanhe seu rendimento, serviços mais e menos rentáveis.", variant: "success" },
+    { to: "/minhas-empresas", icon: FaCalendarAlt, label: "Agendamentos de Hoje", description: "Verifique os agendamentos de suas empresas para o dia atual.", variant: "warning" },
+    { to: "/validar-plano", icon: FaCheckSquare, label: "Verificar Plano", description: "Verifique o status do seu plano se ele ainda não está ativo.", variant: "danger" },
+    { to: "/cadastros-usuario", icon: FaEdit, label: "Cadastros & Serviços", description: "Crie, altere e exclua empresas, serviços e funcionários.", variant: "info" },
+    { to: "/checkin", icon: FaSignInAlt, label: "Gerenciar Checkins", description: "Controle as entradas e saídas de clientes em suas empresas.", variant: "dark" },
+  ];
+
 
   return (
     <div className="min-vh-100">
       <style>{`
         /* Paleta de cores */
         :root {
-          --primary-blue: #003087;
-          --light-blue: #4dabf7;
-          --dark-gray: #2d3748;
-          --light-gray: #f7fafc;
+          --primary-blue: #003087; /* Foco Principal (Azul Escuro) */
+          --accent-blue: #0056b3; /* Destaque (Azul Médio) */
+          --light-blue-bg: #e0f2f7; /* Fundo de Seção (Azul Claro) */
+          --dark-gray: #333333; /* Texto Principal */
+          --medium-gray: #666666; /* Texto Secundário */
+          --light-gray-bg: #f5f7fa; /* Fundo do Corpo (Neutro) */
           --white: #ffffff;
           --accent-yellow: #f6c107;
           --success-green: #28a745;
           --danger-red: #dc3545;
           --warning-orange: #fd7e14;
+          --border-light: #e0e0e0;
         }
 
         /* Estilos gerais */
         .custom-bg {
-          background-color: var(--light-gray);
+          background-color: var(--light-gray-bg);
         }
 
         /* Container */
         .dashboard-container {
-          padding: 3rem 0;
+          padding: 3.5rem 0 5rem 0;
         }
         .dashboard-container h2 {
           color: var(--primary-blue);
-          font-weight: 700;
-          font-size: 2.5rem;
-          margin-bottom: 1rem;
+          font-weight: 800;
+          font-size: 2.8rem;
+          margin-bottom: 0.5rem;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.5rem;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          gap: 0.75rem;
+          text-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
         }
         .dashboard-container .lead {
-          color: var(--dark-gray);
-          font-size: 1.25rem;
-          max-width: 800px;
-          margin: 0 auto 2rem;
+          color: var(--medium-gray);
+          font-size: 1.2rem;
+          max-width: 900px;
+          margin: 0 auto 3rem;
           text-align: center;
         }
 
-        /* Cartão principal */
-        .dashboard-card {
-          background-color: var(--white);
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          padding: 2rem;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        /* Seção de Navegação (Cards de Ação) */
+        .nav-section {
+            background-color: var(--white);
+            border-radius: 18px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Sombra suave */
         }
-        .dashboard-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Botões de navegação */
         .nav-buttons {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
           gap: 1.5rem;
-          margin-bottom: 2rem;
         }
-        .nav-button {
-          flex: 1;
-          min-width: 220px;
-          max-width: 280px;
+        .nav-button-card {
+            display: block;
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            height: 100%;
+            background-color: var(--light-gray-bg);
+            border: 1px solid var(--border-light);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
         }
-        .nav-button .btn {
-          width: 100%;
-          padding: 0.75rem;
-          border-radius: 8px;
-          font-weight: 600;
-          transition: all 0.3s ease;
+        .nav-button-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-blue);
         }
-        .nav-button .btn-primary {
-          background-color: var(--primary-blue);
-          border-color: var(--primary-blue);
+        .nav-button-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-blue); /* Cor padrão dos ícones */
+            transition: color 0.3s ease;
         }
-        .nav-button .btn-success {
-          background-color: var(--success-green);
-          border-color: var(--success-green);
+        .nav-button-card h5 {
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: var(--dark-gray);
+            margin-bottom: 0.5rem;
         }
-        .nav-button .btn-warning {
-          background-color: var(--accent-yellow);
-          border-color: var(--accent-yellow);
-          color: var(--dark-gray);
+        .nav-button-card p {
+            color: var(--medium-gray);
+            font-size: 0.9rem;
+            margin: 0;
+            line-height: 1.4;
         }
-        .nav-button .btn-danger {
-          background-color: var(--danger-red);
-          border-color: var(--danger-red);
-        }
-        .nav-button .btn-info {
-          background-color: var(--light-blue);
-          border-color: var(--light-blue);
-          color: var(--white);
-        }
-        .nav-button .btn-toggle-checkin {
-          color: var(--white);
-        }
-        .nav-button .btn-toggle-checkin.stop {
-          background-color: var(--danger-red);
-          border-color: var(--danger-red);
-        }
-        .nav-button .btn-toggle-checkin.stop:hover {
-          background-color: #c82333;
-          border-color: #c82333;
-        }
-        .nav-button .btn-toggle-checkin.start {
-          background-color: var(--success-green);
-          border-color: var(--success-green);
-        }
-        .nav-button .btn-toggle-checkin.start:hover {
-          background-color: #218838;
-          border-color: #218838;
-        }
-        .nav-button .btn-toggle-checkin:disabled {
-          background-color: #6c757d;
-          border-color: #6c757d;
-          cursor: not-allowed;
-        }
-        .nav-button .btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-        .nav-button p {
-          color: var(--dark-gray);
-          font-size: 0.9rem;
-          margin-top: 0.5rem;
-          text-align: center;
-        }
+        
+        /* Cores dos ícones baseadas no variant (Ajuste o CSS com base nos variants) */
+        .nav-button-card .icon.primary { color: var(--primary-blue); }
+        .nav-button-card .icon.success { color: var(--success-green); }
+        .nav-button-card .icon.warning { color: var(--warning-orange); }
+        .nav-button-card .icon.danger { color: var(--danger-red); }
+        .nav-button-card .icon.info { color: var(--accent-blue); }
+        .nav-button-card .icon.dark { color: var(--dark-gray); }
 
-        /* Cartões de empresa */
+        /* Lista de Empresas para Dashboard de Dados */
+        .empresas-dash-list h3 {
+            color: var(--accent-blue);
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-light);
+        }
         .empresa-card {
           background-color: var(--white);
           border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
           cursor: pointer;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
           margin-bottom: 1.5rem;
           padding: 1.5rem;
+          border-left: 5px solid var(--primary-blue);
         }
         .empresa-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+          transform: translateY(-3px);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+          border-left-color: var(--accent-blue);
+        }
+        .empresa-card.active {
+            border-left: 5px solid var(--warning-orange);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            background-color: var(--light-blue-bg);
+        }
+        .empresa-card .card-header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .empresa-card .card-title {
           color: var(--primary-blue);
-          font-weight: 600;
-          font-size: 1.5rem;
-          margin-bottom: 0.5rem;
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin: 0;
         }
         .empresa-card .card-text {
-          color: var(--dark-gray);
-          font-size: 1rem;
+          color: var(--medium-gray);
+          font-size: 0.95rem;
+          margin-top: 0.25rem;
         }
+        .empresa-card .toggle-icon {
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+            transition: transform 0.2s;
+        }
+        .empresa-card.active .toggle-icon {
+            color: var(--warning-orange);
+        }
+
         .dropdown-card {
-          background-color: var(--light-gray);
+          background-color: var(--white);
           border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          padding: 1.5rem;
+          border: 1px solid var(--border-light);
+          padding: 2rem;
+          margin-top: -1rem; /* Aproxima do card de cima */
           margin-bottom: 1.5rem;
+          animation: fadeIn 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .dropdown-card .btn-primary {
           background-color: var(--primary-blue);
           border-color: var(--primary-blue);
-          padding: 0.75rem;
+          padding: 0.8rem;
           border-radius: 8px;
+          font-weight: 600;
           transition: all 0.3s ease;
         }
         .dropdown-card .btn-primary:hover {
-          background-color: var(--light-blue);
-          border-color: var(--light-blue);
+          background-color: var(--accent-blue);
+          border-color: var(--accent-blue);
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(77, 171, 247, 0.3);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         /* Modal */
-        .modal-content {
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
         .modal-header {
           background-color: var(--primary-blue);
           color: var(--white);
-          border-top-left-radius: 12px;
-          border-top-right-radius: 12px;
         }
-        .modal-title {
-          font-weight: 700;
-          font-size: 1.5rem;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-        .modal-body {
-          padding: 2rem;
-        }
-        .modal-body p {
-          font-size: 1.1rem;
-          margin-bottom: 1rem;
+        .modal-body .text-danger, .modal-body .text-warning {
+            padding: 1rem;
+            border-radius: 8px;
         }
         .modal-body .text-danger {
-          color: var(--danger-red);
-          font-weight: 600;
+            background-color: #fcebeb;
+            color: var(--danger-red);
         }
         .modal-body .text-warning {
-          color: var(--warning-orange);
-          font-weight: 600;
-        }
-        .modal-footer .btn {
-          padding: 0.75rem 1.5rem;
-          border-radius: 8px;
-          font-weight: 600;
-        }
-        .modal-footer .btn-success {
-          background-color: var(--success-green);
-          border-color: var(--success-green);
-        }
-        .modal-footer .btn-danger {
-          background-color: var(--danger-red);
-          border-color: var(--danger-red);
-        }
-        .modal-footer .btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            background-color: #fff8e1;
+            color: var(--warning-orange);
         }
 
         /* Responsividade */
-        @media (max-width: 991px) {
-          .dashboard-container {
-            padding: 2rem 1rem;
-          }
-          .nav-buttons {
-            flex-direction: column;
-            align-items: center;
-          }
-          .nav-button {
-            min-width: 100%;
-            max-width: 100%;
-          }
-          .empresa-card .card-title {
-            font-size: 1.25rem;
-          }
-        }
-        @media (max-width: 576px) {
+        @media (max-width: 768px) {
           .dashboard-container h2 {
-            font-size: 2rem;
+            font-size: 2.2rem;
           }
           .dashboard-container .lead {
             font-size: 1.1rem;
           }
-          .nav-button .btn {
-            font-size: 0.9rem;
+          .nav-section {
+            padding: 1.5rem;
           }
-          .nav-button p {
-            font-size: 0.85rem;
+          .nav-buttons {
+            grid-template-columns: 1fr;
           }
-          .modal-title {
-            font-size: 1.25rem;
+          .empresa-card {
+            padding: 1.2rem;
           }
-          .modal-body p {
-            font-size: 1rem;
+          .empresa-card .card-title {
+            font-size: 1.2rem;
+          }
+          .dropdown-card {
+            padding: 1.5rem;
           }
         }
       `}</style>
@@ -347,131 +330,119 @@ function Dashboard() {
         <Navbar />
         <div className="dashboard-container container">
           <h2 >
-            <FaChartLine /> Painel do Usuário
+            <FaChartLine /> Painel Administrativo
           </h2>
           <p className="lead">
-            Bem-vindo ao seu painel! Aqui você pode gerenciar suas configurações e
-            visualizar seus dados.
+            Bem-vindo à sua central de gerenciamento. Utilize os atalhos para
+            administrar suas empresas, finanças e cadastros.
           </p>
-          <div className="dashboard-card">
+
+          {/* Seção 1: Atalhos de Navegação */}
+          <section className="nav-section">
+            <h3 className="text-center text-secondary mb-4" style={{fontWeight: 600}}>Ações Rápidas</h3>
             <div className="nav-buttons">
-              <div className="nav-button">
-                <Link to="/perfil" className="btn btn-primary">
-                  Perfil e Pagamentos
+              {navButtons.map((button, index) => (
+                <Link to={button.to} className="nav-button-card" key={index}>
+                    <button.icon className={`icon ${button.variant}`} />
+                    <h5>{button.label}</h5>
+                    <p>{button.description}</p>
                 </Link>
-                <p>Gerencie suas informações pessoais, histórico de pagamentos e planos ativos.</p>
-              </div>
-              <div className="nav-button">
-                <Link to="/financeiro" className="btn btn-success">
-                  Relatório Financeiro
-                </Link>
-                <p>Acompanhe seu rendimento, serviços mais e menos rentáveis.</p>
-              </div>
-              <div className="nav-button">
-                <Link to="/minhas-empresas" className="btn btn-warning">
-                  Agendamentos de Hoje
-                </Link>
-                <p>Verifique os agendamentos de suas empresas para hoje.</p>
-              </div>
-              <div className="nav-button">
-                <Link to="/validar-plano" className="btn btn-danger">
-                  Verificar Plano
-                </Link>
-                <p>Verifique o status do seu plano se ele ainda não está ativo.</p>
-              </div>
-              <div className="nav-button">
-                <Link to="/cadastros-usuario" className="btn btn-info">
-                  Cadastros
-                </Link>
-                <p>Crie, altere e exclua empresas, serviços e funcionários.</p>
-              </div>
-              <div className="nav-button">
-                <Link to="/checkin" className="btn btn-dark">
-                  Checkins
-                </Link>
-                <p>Gerencie os checkins das suas empresas.</p>
-              </div>
+              ))}
             </div>
-            <p className="lead">
-              Selecione uma empresa para ver seus dados de Dashboard.
-            </p>
+          </section>
+
+          {/* Seção 2: Dashboards por Empresa */}
+          <section className="empresas-dash-list">
+             <h3>Dashboards Detalhados por Empresa</h3>
+             <p className="text-muted mb-4">
+                Selecione uma empresa para visualizar em tempo real suas métricas de agendamento e desempenho financeiro.
+             </p>
+
             <div className="row justify-content-center">
+              {empresas_usuario.loading && (
+                 <div className="text-center p-5">
+                    <FaSpinner className="fa-spin text-primary" size={30} />
+                    <p className="text-muted mt-2">Carregando empresas...</p>
+                 </div>
+              )}
+
               {empresas_usuario.data?.map((empresa: Empresa) => (
-                <div
-                  className="col-12 mb-4"
-                  key={empresa.id}
-                >
+                <div className="col-12" key={empresa.id}>
                   <div
-                    className="empresa-card"
+                    className={`empresa-card ${dropdownAberto === empresa.id ? 'active' : ''}`}
                     onClick={() => handleToggleDropdown(empresa.id)}
                   >
-                    <div className="card-body text-center">
-                      <h4 className="card-title">{empresa.nome}</h4>
-                      <p className="card-text">{empresa.cnpj}</p>
+                    <div className="card-header-content">
+                        <div>
+                            <h4 className="card-title">{empresa.nome}</h4>
+                            <p className="card-text">CNPJ: {empresa.cnpj}</p>
+                        </div>
+                        <span className="toggle-icon">
+                            {dropdownAberto === empresa.id ? <FaChevronUp /> : <FaChevronDown />}
+                        </span>
                     </div>
                   </div>
                   {dropdownAberto === empresa.id && (
-                    <div
-                      className="dropdown-card"
-                    >
+                    <div className="dropdown-card">
                       <DashBoardDados empresa_id={empresa.id} />
                       <Link
                         to={`/empresas/${empresa.nome}`}
-                        className="btn btn-primary mt-3 w-100"
+                        className="btn btn-primary mt-4 w-100"
                       >
-                        Ver Detalhes da Empresa
+                        Acessar Página de Gerenciamento da Empresa
                       </Link>
                     </div>
                   )}
                 </div>
               ))}
+              {empresas_usuario.data?.length === 0 && !empresas_usuario.loading && (
+                <div className="alert alert-info text-center mt-3">
+                    Você ainda não possui empresas cadastradas. <Link to="/cadastros-usuario">Cadastre sua primeira empresa!</Link>
+                </div>
+              )}
             </div>
-          </div>
+          </section>
         </div>
+
+        {/* Modal de Status de Plano */}
         <Modal
-          show={
-            (isPlanExpired === "true" || checkIfPlanExpiresTomorrow()) &&
-            showModal
-          }
+          show={showModal}
           onHide={handleCloseModal}
           centered
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              <FaExclamationTriangle /> Status do Plano
+              <FaExclamationTriangle /> Alerta de Plano
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             {isPlanExpired === "true" ? (
               <div className="text-center">
                 <p className="text-danger">
-                  <FaExclamationTriangle className="me-1" /> Seu plano expirou há{" "}
-                  <span className="fw-bold">
-                    {formatTime(Math.abs(Number(remainingTime)))}
-                  </span>
-                  . Renovação necessária!
+                  <FaExclamationTriangle className="me-1" /> Seu plano expirou há cerca de
+                  <span className="fw-bold"> {formatTime(Number(remainingTime))}</span>.
+                  A renovação é essencial para manter todas as funcionalidades!
                 </p>
-                <p className="text-warning">
-                  Não se preocupe! Você ainda pode acessar o painel, mas algumas
-                  funcionalidades podem estar limitadas. Renove seu plano para
-                  continuar usando a plataforma. Agendamentos seguem permitidos
-                  para hoje e amanhã.
+                <p className="text-muted mt-3">
+                  <strong>Atenção:</strong> Algumas funcionalidades podem estar limitadas. No entanto, agendamentos já marcados e essenciais permanecem ativos por um período de carência.
                 </p>
               </div>
             ) : checkIfPlanExpiresTomorrow() ? (
               <div className="text-center">
                 <p className="text-warning">
-                  <FaClock className="me-1" /> Seu plano vencerá amanhã. Por
-                  favor, renove-o em breve.
+                  <FaClock className="me-1" /> Seu plano está programado para vencer em menos de <span className="fw-bold">48 horas</span>.
+                </p>
+                <p className="text-muted mt-3">
+                    O tempo restante estimado é de <strong>{formatTime(Number(remainingTime))}</strong>. Renove seu plano agora para evitar interrupções nos serviços.
                 </p>
               </div>
             ) : null}
           </Modal.Body>
           <Modal.Footer>
             <Link to="/planos" className="btn btn-success">
-              Renovar Plano
+              Renovar Plano Agora
             </Link>
-            <button className="btn btn-danger" onClick={handleCloseModal}>
+            <button className="btn btn-secondary" onClick={handleCloseModal}>
               Fechar
             </button>
           </Modal.Footer>

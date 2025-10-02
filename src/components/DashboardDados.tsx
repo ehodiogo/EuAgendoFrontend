@@ -1,6 +1,6 @@
 import { useFetch } from "../functions/GetData";
 import { Dashboard } from "../interfaces/DashboardEarnings";
-import { FaUsers, FaBriefcase, FaCalendarCheck, FaCalendarAlt, FaChartLine, FaSpinner} from "react-icons/fa";
+import { FaUserTag, FaUserGroup, FaBriefcase, FaCalendarCheck, FaCalendarDays, FaChartLine, FaSpinner} from "react-icons/fa6"; // Atualizado para Fa6
 
 interface DashBoardDadosProps {
   empresa_id: number;
@@ -11,143 +11,197 @@ const DashBoardDados = ({ empresa_id }: DashBoardDadosProps) => {
     `/api/dashboard/?empresa_id=${empresa_id}`
   );
 
+  // Mapeamento dos dados para exibição em cards KPI
+  const kpiItems = dadosDashboard.data ? [
+    {
+      icon: FaBriefcase,
+      title: "Serviços Prestados",
+      value: dadosDashboard.data.total_servicos,
+      color: "#0056b3", // Accent Blue
+      bg: "#e0e7ff",
+    },
+    {
+      icon: FaUserTag,
+      title: "Total de Clientes",
+      value: dadosDashboard.data.total_clientes,
+      color: "#28a745", // Success Green
+      bg: "#d4edda",
+    },
+    {
+      icon: FaUserGroup,
+      title: "Total de Funcionários",
+      value: dadosDashboard.data.total_funcionarios,
+      color: "#fd7e14", // Warning Orange
+      bg: "#fff3cd",
+    },
+    {
+      icon: FaCalendarCheck,
+      title: "Agendamentos Hoje",
+      value: dadosDashboard.data.agendamentos_hoje,
+      color: "#003087", // Primary Blue
+      bg: "#f0f4f8",
+    },
+    {
+      icon: FaCalendarDays,
+      title: "Agendamentos Futuros",
+      value: dadosDashboard.data.agendamentos_pendentes,
+      color: "#dc3545", // Danger Red
+      bg: "#fcebeb",
+    },
+  ] : [];
+
   return (
-    <div>
+    <div className="dashboard-dados-wrapper">
       <style>{`
-        /* Paleta de cores */
+        /* Paleta de cores (Consistente) */
         :root {
           --primary-blue: #003087;
-          --light-blue: #4dabf7;
-          --dark-gray: #2d3748;
-          --light-gray: #f7fafc;
+          --accent-blue: #0056b3;
+          --dark-gray: #212529;
           --white: #ffffff;
-          --accent-yellow: #f6c107;
-          --success-green: #28a745;
+          --shadow-color: rgba(0, 0, 0, 0.1);
           --danger-red: #dc3545;
         }
 
-        /* Cartão de dados */
-        .dashboard-dados-card {
+        .dashboard-dados-wrapper {
+            padding: 1rem 0;
+            width: 100%;
+        }
+
+        /* Título */
+        .dashboard-header {
+            color: var(--dark-gray);
+            font-weight: 800;
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 3px solid #e2e8f0;
+            padding-bottom: 0.75rem;
+        }
+        .dashboard-header svg {
+            color: var(--primary-blue);
+        }
+
+        /* Grade de KPIs */
+        .kpi-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 1.5rem;
+        }
+
+        /* Cartão KPI individual */
+        .kpi-card {
           background-color: var(--white);
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          padding: 2rem;
+          border-radius: 16px;
+          padding: 1.5rem;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+          display: flex;
+          flex-direction: column;
           transition: transform 0.3s ease, box-shadow 0.3s ease;
+          border-left: 5px solid var(--kpi-color, var(--primary-blue));
         }
-        .dashboard-dados-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        .kpi-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
         }
-        .dashboard-dados-card h4 {
-          color: var(--primary-blue);
-          font-weight: 700;
-          font-size: 1.5rem;
-          margin-bottom: 1.5rem;
+
+        .kpi-icon-wrapper {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.5rem;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          background-color: var(--kpi-bg, #f0f4f8);
+          margin-bottom: 0.75rem;
+        }
+        .kpi-icon-wrapper svg {
+          color: var(--kpi-color, var(--primary-blue));
+          font-size: 1.5rem;
         }
 
-        /* Lista de itens */
-        .dashboard-item {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 0.75rem 0;
-          border-bottom: 1px solid #e2e8f0;
-          transition: background-color 0.3s ease;
-        }
-        .dashboard-item:last-child {
-          border-bottom: none;
-        }
-        .dashboard-item:hover {
-          background-color: rgba(77, 171, 247, 0.05);
-        }
-        .dashboard-item svg {
-          color: var(--light-blue);
-          font-size: 1.2rem;
-        }
-        .dashboard-item strong {
+        .kpi-title {
+          font-size: 0.95rem;
           color: var(--dark-gray);
           font-weight: 600;
-          font-size: 1rem;
+          margin-bottom: 0.25rem;
+          opacity: 0.8;
         }
-        .dashboard-item span {
+
+        .kpi-value {
+          font-size: 2rem;
+          font-weight: 900;
           color: var(--dark-gray);
-          font-size: 1rem;
+          line-height: 1.1;
         }
 
         /* Loading e erro */
-        .loading-container, .error-container {
+        .message-status {
           text-align: center;
-          color: var(--dark-gray);
-          font-size: 1.1rem;
-          padding: 1rem;
+          font-size: 1.2rem;
+          padding: 1.5rem;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          font-weight: 600;
+        }
+        .loading-container {
+          color: var(--primary-blue);
+          background-color: #e0e7ff;
         }
         .error-container {
           color: var(--danger-red);
-          font-weight: 500;
+          background-color: #fcebeb;
+          border: 1px solid var(--danger-red);
+          font-weight: 700;
         }
 
         /* Responsividade */
         @media (max-width: 576px) {
-          .dashboard-dados-card {
-            padding: 1.5rem;
+          .kpi-grid {
+            grid-template-columns: 1fr;
           }
-          .dashboard-dados-card h4 {
-            font-size: 1.25rem;
+          .kpi-value {
+            font-size: 1.75rem;
           }
-          .dashboard-item {
-            font-size: 0.9rem;
+          .dashboard-header {
+            font-size: 1.5rem;
           }
-          .dashboard-item svg {
-            font-size: 1rem;
+          .kpi-card {
+            padding: 1.25rem;
           }
         }
       `}</style>
-      <div className="dashboard-dados-card">
-        <h4>
-          <FaChartLine /> Informações da Empresa
-        </h4>
-        {dadosDashboard.loading ? (
-          <div className="loading-container">
-            <FaSpinner className="fa-spin me-2" /> Carregando dados...
-          </div>
-        ) : !dadosDashboard.data ? (
-          <div className="error-container">
-            Nenhum dado disponível para esta empresa.
-          </div>
-        ) : (
-          <div className="list-group list-group-flush">
-            <div className="dashboard-item">
-              <FaBriefcase />
-              <strong>Total de Serviços Prestados:</strong>
-              <span>{dadosDashboard.data.total_servicos}</span>
+
+      <h4 className="dashboard-header">
+        <FaChartLine /> Painel de Métricas
+      </h4>
+
+      {dadosDashboard.loading ? (
+        <div className="loading-container message-status">
+          <FaSpinner className="fa-spin me-2" /> Carregando dados do painel...
+        </div>
+      ): (
+        <div className="kpi-grid">
+          {kpiItems.map((item) => (
+            <div
+              key={item.title}
+              className="kpi-card"
+              style={{
+                "--kpi-color": item.color,
+                "--kpi-bg": item.bg,
+              } as React.CSSProperties}
+            >
+              <div className="kpi-icon-wrapper">
+                <item.icon aria-hidden="true" />
+              </div>
+              <div className="kpi-title">{item.title}</div>
+              <div className="kpi-value">{item.value}</div>
             </div>
-            <div className="dashboard-item">
-              <FaUsers />
-              <strong>Total de Clientes:</strong>
-              <span>{dadosDashboard.data.total_clientes}</span>
-            </div>
-            <div className="dashboard-item">
-              <FaUsers />
-              <strong>Total de Funcionários:</strong>
-              <span>{dadosDashboard.data.total_funcionarios}</span>
-            </div>
-            <div className="dashboard-item">
-              <FaCalendarCheck />
-              <strong>Agendamentos para Hoje:</strong>
-              <span>{dadosDashboard.data.agendamentos_hoje}</span>
-            </div>
-            <div className="dashboard-item">
-              <FaCalendarAlt />
-              <strong>Agendamentos Futuros:</strong>
-              <span>{dadosDashboard.data.agendamentos_pendentes}</span>
-            </div>
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

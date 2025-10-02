@@ -1,8 +1,8 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "../components/Navbar";
-import { FaGithub, FaInstagram, FaLinkedin, FaRoad, FaUser } from "react-icons/fa";
-import { BsFillFileLockFill } from "react-icons/bs";
+import { FaGithub, FaInstagram, FaLinkedin, FaRoad, FaUser, FaBuilding, FaClipboardCheck, FaClock, FaRocket, FaStar, FaMobileScreenButton, FaChartLine } from "react-icons/fa6";
+import { BsFillFileLockFill, BsPatchCheckFill } from "react-icons/bs";
 import { useEffect, useState } from "react";
 import { useFetch } from "../functions/GetData.tsx";
 import { Plano } from "../interfaces/Plano.tsx";
@@ -32,8 +32,11 @@ function Home() {
             features: [
               `Até ${plano.quantidade_empresas} empresa${plano.quantidade_empresas > 1 ? "s" : ""}`,
               `Até ${plano.quantidade_funcionarios} funcionário${plano.quantidade_funcionarios > 1 ? "s" : ""} por empresa`,
-            ],
-            descricao: plano.descricao || "Plano ideal para seu negócio",
+              "Agendamento Online 24/7",
+              "Lembretes Automáticos",
+              "Gestão de Clientes",
+            ].filter(Boolean),
+            descricao: plano.descricao || "Plano ideal para o crescimento do seu negócio",
           }));
         setPlanos(mapped);
       }
@@ -42,258 +45,271 @@ function Home() {
 
   const getPlanColor = (nome: string) => {
     switch (nome.toLowerCase()) {
-      case "free trial":
-        return "#6c757d";
       case "plano básico":
-        return "#28a745";
+        return "#28a745"; // Success Green
       case "plano profissional":
-        return "#dc3545";
+        return "#fd7e14"; // Warning Orange (Destaque)
       case "plano corporativo":
-        return "#003087";
+        return "#003087"; // Primary Blue
       default:
-        return "#6c757d";
+        return "#6c757d"; // Secondary Gray
+    }
+  };
+
+  const getBenefitIcon = (title: string) => {
+    switch (title.toLowerCase()) {
+      case "para empresas":
+        return <FaBuilding />;
+      case "para clientes":
+        return <FaUser />;
+      case "para gestores":
+        return <FaChartLine />;
+      default:
+        return <FaClipboardCheck />;
     }
   };
 
   return (
     <div className="min-vh-100">
       <style>{`
-        /* Paleta de cores */
+        /* Paleta de cores (Consistente) */
         :root {
           --primary-blue: #003087;
-          --light-blue: #4dabf7;
-          --dark-gray: #2d3748;
-          --light-gray: #f7fafc;
+          --accent-blue: #0056b3;
+          --dark-gray: #212529;
+          --medium-gray: #6c757d;
+          --light-gray-bg: #f5f7fa;
           --white: #ffffff;
           --accent-yellow: #f6c107;
+          --success-green: #28aa45;
+          --warning-orange: #fd7e14;
+          --danger-red: #dc3545; /* Adicionado para preço cheio */
+          --gradient-blue: linear-gradient(135deg, #003087, #0056b3);
+          --border-light: #e0e0e0;
         }
 
         /* Estilos gerais */
         .custom-bg {
-          background-color: var(--light-gray);
+          background-color: var(--light-gray-bg);
         }
 
-        /* Header */
+        /* Header (Hero Section) */
         .custom-header {
-          background: linear-gradient(135deg, var(--primary-blue) 60%, var(--light-blue) 100%);
-          padding: 4rem 0;
+          background: var(--gradient-blue);
+          padding: 6rem 0;
           color: var(--white);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
         }
         .custom-header h1 {
-          font-size: 2.75rem;
-          font-weight: 700;
-          margin-bottom: 1rem;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          font-size: 3.5rem;
+          font-weight: 800;
+          margin-bottom: 1.5rem;
+          text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
         }
         .custom-header p {
-          font-size: 1.25rem;
-          opacity: 0.9;
-          max-width: 600px;
-          margin: 0 auto 1.5rem;
+          font-size: 1.4rem;
+          opacity: 0.95;
+          max-width: 700px;
+          margin: 0 auto 2.5rem;
+          font-weight: 300;
         }
         .custom-header img {
-          max-width: 320px;
-          filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+          max-width: 400px;
+          filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
           border-radius: 12px;
+          border: 5px solid var(--white);
         }
-        .custom-btn {
+        .custom-btn-hero {
           background-color: var(--accent-yellow);
           color: var(--dark-gray);
-          font-weight: 600;
-          padding: 0.75rem 2rem;
-          border-radius: 8px;
+          font-weight: 700;
+          padding: 1rem 3rem;
+          border-radius: 10px;
+          font-size: 1.25rem;
           transition: all 0.3s ease;
+          border: none;
         }
-        .custom-btn:hover {
+        .custom-btn-hero:hover {
           background-color: #e0a800;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          transform: translateY(-3px);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
         }
 
         /* Seções */
         .custom-section {
-          padding: 4rem 0;
+          padding: 5rem 0;
         }
         .custom-section h2 {
           color: var(--primary-blue);
-          font-weight: 700;
-          font-size: 2rem;
-          margin-bottom: 1.5rem;
+          font-weight: 800;
+          font-size: 2.5rem;
+          margin-bottom: 2rem;
         }
-        .custom-section p.text-muted {
-          color: var(--dark-gray) !important;
-          font-size: 1.1rem;
-          max-width: 700px;
-          margin: 0 auto;
+        .custom-section p.text-muted-lg {
+          color: var(--medium-gray) !important;
+          font-size: 1.2rem;
+          max-width: 800px;
+          margin: 0 auto 3rem;
         }
 
         /* Benefícios */
         .benefit-card {
-          border: none;
+          border: 1px solid var(--border-light);
           border-radius: 12px;
           background-color: var(--white);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
           padding: 2rem;
-          position: relative;
-          padding-top: 3rem;
+          text-align: center;
+          height: 100%;
         }
         .benefit-card:hover {
           transform: translateY(-5px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        }
-        .benefit-card h3 {
-          color: var(--primary-blue);
-          font-size: 1.5rem;
-          font-weight: 600;
-        }
-        .benefit-card p {
-          color: var(--dark-gray);
-          font-size: 1rem;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
         .benefit-icon {
-          position: absolute;
-          top: -30px;
-          left: 50%;
-          transform: translateX(-50%);
-          background-color: var(--light-blue);
+          background-color: var(--accent-blue);
           color: var(--white);
           border-radius: 50%;
-          padding: 1rem;
-          font-size: 1.5rem;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Avaliações */
-        .review-card {
-          border: none;
-          border-radius: 12px;
-          background-color: var(--white);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-          padding: 2rem;
-        }
-        .review-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        }
-        .review-card .avatar {
-          width: 48px;
-          height: 48px;
-          background-color: var(--light-blue);
-          color: var(--white);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.5rem;
+          padding: 1.25rem;
+          font-size: 1.8rem;
           margin: 0 auto 1rem;
+          display: inline-flex;
         }
-        .review-card p {
-          font-style: italic;
+        .benefit-card h3 {
           color: var(--dark-gray);
-        }
-        .review-card .text-warning {
           font-size: 1.5rem;
+          font-weight: 700;
         }
-        .review-card h5 {
-          color: var(--dark-gray);
+        .benefit-card p {
+          color: var(--medium-gray);
           font-size: 1rem;
-          font-weight: 500;
         }
 
-        /* Planos */
+        /* Planos - REVISADO */
         .plan-row {
           display: flex;
-          flex-wrap: nowrap;
+          flex-wrap: wrap;
           gap: 1.5rem;
           justify-content: center;
         }
         .plan-card {
-          border: none;
           border-radius: 12px;
           background-color: var(--white);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
-          padding: 2rem;
+          padding: 2.5rem;
           position: relative;
           display: flex;
           flex-direction: column;
           height: 100%;
           flex: 1;
-          max-width: 280px;
+          max-width: 320px;
+          border-top: 5px solid var(--primary-blue);
+          text-align: center;
         }
         .plan-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+          transform: translateY(-5px);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
-        .plan-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 4px;
-          background: linear-gradient(90deg, var(--light-blue), var(--primary-blue));
-          border-radius: 12px 12px 0 0;
+        
+        /* Destaque para o Plano Profissional */
+        .plan-card.highlight {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            border-top: 5px solid var(--warning-orange);
+            z-index: 10;
         }
+        .plan-card.highlight .ribbon {
+            position: absolute;
+            top: 0;
+            right: 15px;
+            background-color: var(--warning-orange);
+            color: var(--white);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+
         .plan-card h4 {
-          color: var(--primary-blue);
-          font-size: 1.5rem;
-          font-weight: 600;
-          margin-bottom: 1rem;
+          font-size: 1.8rem;
+          font-weight: 700;
+          margin-bottom: 0.5rem;
+          color: var(--dark-gray);
+        }
+        .plan-card .plan-price-group {
+            margin-bottom: 1.5rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-light);
         }
         .plan-card .plan-price {
-          font-size: 2rem;
-          font-weight: 700;
+          font-size: 3.5rem; /* Maior destaque */
+          font-weight: 800;
           color: var(--primary-blue);
-          margin-bottom: 0.5rem;
+          line-height: 1;
+        }
+        .plan-card .plan-price small {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--medium-gray);
+            margin-left: 0.25rem;
         }
         .plan-card .full-price {
-          font-size: 1.25rem;
-          color: #6c757d;
+          font-size: 1.2rem;
+          color: var(--danger-red);
           text-decoration: line-through;
-          margin-left: 0.5rem;
+          margin-top: 0.25rem;
+          display: block;
         }
         .plan-card .discount {
-          font-size: 1rem;
-          color: #dc3545;
-          font-weight: 600;
-          margin-bottom: 1rem;
+          font-size: 1.1rem;
+          color: var(--success-green);
+          font-weight: 700;
+          margin-bottom: 0.5rem;
         }
         .plan-card ul {
           list-style: none;
           padding: 0;
-          margin-bottom: 1.5rem;
-          color: var(--dark-gray);
+          margin-bottom: 2rem;
+          color: var(--medium-gray);
           flex-grow: 1;
+          text-align: left;
         }
         .plan-card ul li {
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.75rem;
           display: flex;
           align-items: center;
+          font-size: 1rem;
         }
-        .plan-card ul li::before {
-          content: "✔";
-          color: var(--light-blue);
-          margin-right: 0.5rem;
+        .plan-card ul li svg {
+          color: var(--success-green);
+          margin-right: 0.75rem;
+          flex-shrink: 0;
         }
         .plan-card .plan-desc {
-          color: var(--dark-gray);
-          font-size: 1rem;
-          margin-bottom: 1.5rem;
+            color: var(--dark-gray);
+            font-style: italic;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
         }
 
-        /* Lançamentos Futuros */
+        /* Roadmap */
         .roadmap-section {
-          background: linear-gradient(135deg, var(--light-gray) 60%, var(--white) 100%);
-          padding: 4rem 0;
+          background-color: var(--primary-blue);
+          color: var(--white);
+          padding: 5rem 0;
+        }
+        .roadmap-section h2 {
+            color: var(--accent-yellow);
         }
         .roadmap-card {
-          background-color: var(--white);
+          background-color: rgba(255, 255, 255, 0.95);
+          color: var(--dark-gray);
           border-radius: 12px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          padding: 2rem;
+          padding: 2.5rem;
           margin-top: 2rem;
         }
         .roadmap-card ul {
@@ -303,29 +319,42 @@ function Home() {
         }
         .roadmap-card ul li {
           margin-bottom: 1rem;
-          color: var(--dark-gray);
+          font-weight: 500;
           display: flex;
           align-items: center;
+          font-size: 1.1rem;
         }
-        .roadmap-card ul li::before {
-          content: "→";
-          color: var(--light-blue);
-          margin-right: 0.5rem;
+        .roadmap-card ul li svg {
+          color: var(--primary-blue);
+          margin-right: 0.75rem;
+          flex-shrink: 0;
+        }
+        .custom-btn-roadmap {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .custom-btn-roadmap:hover {
+            background-color: var(--accent-blue);
         }
 
         /* Footer */
         .custom-footer {
-          background-color: var(--primary-blue);
+          background-color: var(--dark-gray);
           color: var(--white);
           padding: 3rem 0;
         }
         .custom-footer a {
           color: var(--white);
-          font-weight: 500;
+          opacity: 0.8;
           transition: color 0.3s ease;
         }
         .custom-footer a:hover {
-          color: var(--light-blue);
+          color: var(--accent-yellow);
+          opacity: 1;
         }
         .custom-footer .social-links {
           gap: 1.5rem;
@@ -333,26 +362,21 @@ function Home() {
 
         /* Responsividade */
         @media (max-width: 1200px) {
-          .plan-row {
-            flex-wrap: wrap;
-          }
           .plan-card {
-            max-width: 45%;
-            flex: 1 1 45%;
+            max-width: 48%;
+            flex: 1 1 48%;
           }
         }
         @media (max-width: 991px) {
           .custom-header {
-            flex-direction: column;
-            text-align: center;
-            padding: 2rem 0;
+            padding: 4rem 0;
+          }
+          .custom-header h1 {
+            font-size: 2.5rem;
           }
           .custom-header img {
-            margin-top: 2rem;
-            max-width: 250px;
-          }
-          .custom-section {
-            padding: 2rem 0;
+            margin-top: 3rem;
+            max-width: 80%;
           }
           .plan-card {
             max-width: 100%;
@@ -362,120 +386,92 @@ function Home() {
         }
         @media (max-width: 576px) {
           .custom-header h1 {
-            font-size: 1.75rem;
+            font-size: 2rem;
           }
           .custom-header p {
-            font-size: 1rem;
+            font-size: 1.1rem;
+          }
+          .custom-btn-hero {
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
           }
           .custom-section h2 {
-            font-size: 1.5rem;
-          }
-          .plan-card h4 {
-            font-size: 1.25rem;
-          }
-          .plan-card .plan-price {
-            font-size: 1.75rem;
-          }
-          .plan-card .full-price {
-            font-size: 1rem;
-          }
-          .plan-card .discount {
-            font-size: 0.9rem;
+            font-size: 2rem;
           }
         }
       `}</style>
       <div className="custom-bg min-vh-100">
         <Navbar />
 
+        {/* 1. HERO SECTION (DESTAQUE) */}
         <header className="custom-header d-flex align-items-center text-white">
-          <div className="container d-flex align-items-center flex-wrap justify-content-center">
-            <div className="text-center">
-              <h1 className="display-4 fw-bold">Gerencie seus Agendamentos com Facilidade</h1>
-              <p className="lead">Organize compromissos, reduza faltas e aumente sua produtividade.</p>
+          <div className="container d-flex align-items-center flex-wrap-reverse justify-content-center">
+            <div className="text-center text-lg-start col-lg-7 me-lg-4">
+              <h1 className="fw-bold">A Nova Era da Gestão de Agendamentos</h1>
+              <p className="lead">
+                Otimize sua agenda, reduza <strong>no-shows</strong> e liberte sua equipe. O <strong>VemAgendar</strong> é a ferramenta inteligente para o sucesso do seu negócio.
+              </p>
               <button
-                className="custom-btn btn btn-lg px-4 shadow-sm fw-semibold"
+                className="custom-btn-hero btn px-4 shadow-lg fw-semibold"
                 onClick={() => navigate("/empresas")}
               >
-                Comece agora
+                Começar a Organizar Agora
               </button>
+              <p className="mt-3 small text-white-50">Sem cartão de crédito. Teste grátis em todos os planos.</p>
             </div>
-            <div className="ms-lg-5 mt-4 mt-lg-0">
+            <div className="ms-lg-5 col-lg-4 mt-4 mt-lg-0 text-center">
               <img
                 src={"vem-agendar.png"}
-                alt="Imagem do VemAgendar"
+                alt="Interface do Sistema VemAgendar"
                 className="img-fluid"
               />
             </div>
           </div>
         </header>
 
+        {/* 2. BENEFÍCIOS */}
         <section className="custom-section container text-center">
-          <h2 className="fw-bold">O que é o VemAgendar?</h2>
-          <p className="text-muted mx-auto">
-            O VemAgendar é uma plataforma inteligente que simplifica o agendamento de compromissos para empresas e clientes. Nossa ferramenta permite um gerenciamento eficiente, envio de lembretes automáticos e maior organização.
+          <h2 className="fw-bold">Para quem o VemAgendar foi criado?</h2>
+          <p className="text-muted-lg">
+            Nossa plataforma é modular e pensada para atender às necessidades específicas de todos os envolvidos no processo de agendamento.
           </p>
-        </section>
-
-        <section className="custom-section container text-center">
-          <h2 className="fw-bold">Benefícios para Você</h2>
-          <div className="row mt-4">
-            {[
-              {
-                title: "Para Empresas",
-                desc: "Otimize sua agenda, automatize lembretes e elimine falhas na organização dos serviços.",
-                icon: <FaUser size={24} />,
-              },
-              {
-                title: "Para Clientes",
-                desc: "Reserve horários em poucos cliques com confirmações instantâneas e notificações.",
-                icon: <FaUser size={24} />,
-              },
-              {
-                title: "Para Gestores",
-                desc: "Maximize a produtividade com uma visão clara dos horários e relatórios detalhados.",
-                icon: <FaUser size={24} />,
-              },
-            ].map((item, index) => (
+          <div className="row mt-5 justify-content-center">
+            {["Para Empresas", "Para Clientes", "Para Gestores"].map((title, index) => (
               <div key={index} className="col-md-4 d-flex mb-4">
                 <div className="benefit-card d-flex flex-column h-100">
-                  <div className="benefit-icon">{item.icon}</div>
-                  <h3>{item.title}</h3>
-                  <p>{item.desc}</p>
+                  <div className="benefit-icon">{getBenefitIcon(title)}</div>
+                  <h3>{title}</h3>
+                  <p>
+                    {title === "Para Empresas" && "Organize horários de funcionários, serviços e utilize lembretes automáticos para diminuir drasticamente as faltas."}
+                    {title === "Para Clientes" && "Agende serviços em poucos cliques, 24 horas por dia, 7 dias por semana, e receba notificações instantâneas."}
+                    {title === "Para Gestores" && "Obtenha uma visão macro da operação, maximize a produtividade da equipe e tome decisões baseadas em dados com nossos relatórios."}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="custom-section bg-light">
+        {/* 3. AVALIAÇÕES */}
+        <section className="custom-section bg-light" style={{paddingTop: '3rem', paddingBottom: '3rem'}}>
           <div className="container">
             <h2 className="fw-bold text-center">O que nossos clientes dizem</h2>
             <div className="row mt-4 justify-content-center">
               {[
-                {
-                  name: "Helena D.",
-                  review: "O VemAgendar revolucionou meu negócio! Nunca foi tão fácil organizar meus clientes.",
-                  stars: "⭐⭐⭐⭐⭐",
-                },
-                {
-                  name: "Paulo B.",
-                  review: "Reduziu o tempo de organizar meus atendimentos em 90% com a facilidade para visualizar horários disponíveis!",
-                  stars: "⭐⭐⭐⭐⭐",
-                },
-                {
-                  name: "Luciana D.",
-                  review: "Prático, eficiente e muito intuitivo. Recomendo para todos os autônomos!",
-                  stars: "⭐⭐⭐⭐⭐",
-                },
+                { name: "Helena D. (CEO, Salão)", review: "O VemAgendar revolucionou meu negócio! Nunca foi tão fácil organizar meus clientes.", stars: 5 },
+                { name: "Paulo B. (Consultor)", review: "Reduziu o tempo de organizar meus atendimentos em 90% com a facilidade para visualizar horários.", stars: 5 },
+                { name: "Luciana D. (Esteticista)", review: "Prático, eficiente e muito intuitivo. A melhor ferramenta para autônomos!", stars: 5 },
               ].map((item, index) => (
                 <div key={index} className="col-md-4 d-flex mb-4">
                   <div className="review-card d-flex flex-column h-100 p-4">
                     <div className="avatar">
                       <FaUser />
                     </div>
-                    <p className="fw-semibold">"{item.review}"</p>
-                    <p className="text-warning fs-4">{item.stars}</p>
-                    <h5>- {item.name}</h5>
+                    <p className="fw-semibold text-dark-gray fst-italic">"{item.review}"</p>
+                    <p className="text-warning fs-4">
+                        {[...Array(item.stars)].map((_, i) => <FaStar key={i} className="me-1" size={18} style={{color: '#ffc107'}} />)}
+                    </p>
+                    <h5 className="text-dark-gray">- {item.name}</h5>
                   </div>
                 </div>
               ))}
@@ -483,36 +479,60 @@ function Home() {
           </div>
         </section>
 
+        {/* 4. PLANOS DE PREÇO - REVISADO */}
         <section className="custom-section container text-center">
-          <h2 className="fw-bold">Escolha seu Plano</h2>
+          <h2 className="fw-bold">Escolha seu Plano Ideal</h2>
+          <p className="text-muted-lg">
+            Planos flexíveis que se ajustam ao tamanho do seu negócio. Comece com o que é essencial e cresça conosco.
+          </p>
           {loading ? (
-            <p>Carregando planos...</p>
+            <p className="fw-bold text-primary-blue">Carregando planos...</p>
           ) : (
             <div className="plan-row">
               {planos.map((plano: Plano, index: number) => (
-                <div key={index} className="plan-card">
-                  <h4>{plano.nome}</h4>
-                  <div className="plan-price">
-                    R${plano.valor.toFixed(2)}
+                <div
+                    key={index}
+                    className={`plan-card ${plano.nome.toLowerCase().includes('profissional') ? 'highlight' : ''}`}
+                >
+                  {plano.nome.toLowerCase().includes('profissional') && (
+                      <div className="ribbon">MAIS POPULAR</div>
+                  )}
+
+                  <h4 style={{ color: plano.cor }}>{plano.nome}</h4>
+                  <p className="plan-desc">{plano.descricao}</p>
+
+                  <div className="plan-price-group">
+                    <div className="plan-price">
+                      R${plano.valor.toFixed(2)}
+                      <small>/mês</small>
+                    </div>
                     {plano.is_promo && (
                       <span className="full-price">
-                        R${plano.valor_cheio.toFixed(2)}
+                        De R${plano.valor_cheio.toFixed(2)}
                       </span>
                     )}
+                    {plano.is_promo && (
+                      <div className="discount">
+                        <BsPatchCheckFill className="me-2" style={{color: plano.cor}} /> Economize <strong>{plano.porcentagem_promo}%</strong>!
+                      </div>
+                    )}
                   </div>
-                  {plano.is_promo && (
-                    <div className="discount">
-                      {plano.porcentagem_promo}% de desconto!
-                    </div>
-                  )}
-                  <p className="plan-desc">{plano.descricao}</p>
+
                   <ul>
                     {plano.features.map((feature, idx) => (
-                      <li key={idx}>{feature}</li>
+                      <li key={idx}>
+                        <BsPatchCheckFill size={18} />
+                        {feature}
+                      </li>
                     ))}
                   </ul>
                   <button
-                    className="custom-btn"
+                    className="custom-btn-hero btn"
+                    style={{
+                        backgroundColor: plano.nome.toLowerCase().includes('profissional') ? 'var(--warning-orange)' : 'var(--primary-blue)',
+                        color: 'var(--white)',
+                        fontWeight: 700
+                    }}
                     onClick={() => navigate("/planos")}
                   >
                     Assine agora
@@ -523,76 +543,51 @@ function Home() {
           )}
         </section>
 
-        <section className="custom-section roadmap-section">
+        {/* 5. ROADMAP */}
+        <section className="roadmap-section">
           <div className="container text-center">
-            <h2 className="fw-bold">Lançamentos Futuros</h2>
-            <p className="text-muted">Descubra as próximas inovações do VemAgendar.</p>
+            <h2 className="fw-bold">Junte-se à Nossa Jornada</h2>
+            <p className="text-muted-lg text-white-50">Estamos em constante evolução. Veja o que está por vir!</p>
             <div className="row justify-content-center">
               <div className="col-md-8">
                 <div className="roadmap-card">
+                  <h4 className="fw-bold text-primary-blue mb-4">Próximos Lançamentos (Roadmap)</h4>
                   <ul>
-                    <li>Integração com Google Calendar e Outlook para sincronização de eventos.</li>
-                    <li>Aplicativo móvel para iOS e Android com notificações push.</li>
-                    <li>Relatórios analíticos avançados com insights de agendamento.</li>
-                    <li>Personalização de temas para a interface de agendamento.</li>
+                    <li><FaClock /> Integração com Google Calendar e Outlook.</li>
+                    <li><FaMobileScreenButton /> Aplicativo móvel nativo para iOS e Android.</li>
+                    <li><FaChartLine /> Relatórios e análises de desempenho avançados.</li>
+                    <li><FaRocket /> Personalização avançada da página de agendamento.</li>
                   </ul>
-                  <button
-                    className="custom-btn btn mt-3 px-4 fw-semibold"
-                    onClick={() => navigate("/roadmap")}
+                  <Link
+                    to="/roadmap"
+                    className="custom-btn-roadmap btn mt-3 px-4 fw-semibold"
                   >
-                    Ver Roadmap Completo
-                  </button>
+                    <FaRoad className="me-2" /> Ver Roadmap Completo
+                  </Link>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <footer className="custom-footer text-white text-center py-5">
+        {/* 6. FOOTER */}
+        <footer className="custom-footer text-center py-5">
           <div className="container">
-            <p className="mb-0">&copy; 2025 VemAgendar. Todos os direitos reservados.</p>
-            <div className="d-flex justify-content-center social-links mt-3">
-              <a
-                href="/termos"
-                className="text-white text-decoration-none d-flex align-items-center"
-              >
-                <BsFillFileLockFill className="me-2" />
-                Termos de Serviço
-              </a>
-              <a
-                href="https://www.github.com/ehodiogo"
-                className="text-white text-decoration-none d-flex align-items-center"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FaGithub className="me-2" />
-                GitHub
-              </a>
-              <a
-                href="https://www.instagram.com/ehodiogo"
-                className="text-white text-decoration-none d-flex align-items-center"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FaInstagram className="me-2" />
-                Instagram
-              </a>
-              <a
-                href="https://www.linkedin.com/in/dabpereira"
-                className="text-white text-decoration-none d-flex align-items-center"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FaLinkedin className="me-2" />
-                LinkedIn
-              </a>
-              <a
-                href="/roadmap"
-                className="text-white text-decoration-none d-flex align-items-center"
-              >
-                <FaRoad className="me-2" />
-                Roadmap
-              </a>
+            <h5 className="fw-bold mb-3">VemAgendar | Simplificando o futuro.</h5>
+            <p className="mb-4">&copy; 2025 VemAgendar. Todos os direitos reservados.</p>
+            <div className="d-flex justify-content-center social-links">
+                <Link to="/termos" className="text-decoration-none d-flex align-items-center me-3">
+                    <BsFillFileLockFill className="me-2" /> Termos de Serviço
+                </Link>
+                <a href="https://www.github.com/ehodiogo" target="_blank" rel="noopener noreferrer" className="text-decoration-none d-flex align-items-center me-3">
+                    <FaGithub className="me-2" /> GitHub
+                </a>
+                <a href="https://www.instagram.com/ehodiogo" target="_blank" rel="noopener noreferrer" className="text-decoration-none d-flex align-items-center me-3">
+                    <FaInstagram className="me-2" /> Instagram
+                </a>
+                <a href="https://www.linkedin.com/in/dabpereira" target="_blank" rel="noopener noreferrer" className="text-decoration-none d-flex align-items-center">
+                    <FaLinkedin className="me-2" /> LinkedIn
+                </a>
             </div>
           </div>
         </footer>

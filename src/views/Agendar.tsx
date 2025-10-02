@@ -4,7 +4,10 @@ import { useParams } from "react-router-dom";
 import { useState } from "react";
 import HorariosTabela from "../components/TabelaHorario";
 import Navbar from "../components/Navbar";
-import { FaCalendar, FaUserTie, FaSpinner, FaExclamationCircle, FaTimes } from "react-icons/fa";
+import {
+  FaCalendarAlt, FaUserTie, FaSpinner, FaExclamationCircle, FaTimesCircle,
+  FaChevronRight, FaClock, FaDollarSign
+} from "react-icons/fa";
 
 const Agendar = () => {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
@@ -13,6 +16,8 @@ const Agendar = () => {
   );
   const [funcionarioSelecionado, setFuncionarioSelecionado] = useState<number | null>(null);
 
+  const empresaDetalhes = empresasData.data ? empresasData.data[0] : null;
+
   const handleClearSelection = () => {
     setFuncionarioSelecionado(null);
   };
@@ -20,332 +25,326 @@ const Agendar = () => {
   return (
     <div className="min-vh-100">
       <style>{`
-        /* Reset global styles to prevent white bar */
-        body {
-          margin: 0;
-          padding: 0;
-        }
-
-        /* Paleta de cores */
+        /* Paleta de cores Corporativas */
         :root {
-          --primary-blue: #003087;
-          --light-blue: #4dabf7;
-          --dark-gray: #2d3748;
-          --light-gray: #f7fafc;
-          --white: #ffffff;
-          --success-green: #28a745;
-          --danger-red: #dc3545;
-          --warning-orange: #fd7e14;
+          --primary-blue: #004c99; /* Azul Profundo */
+          --secondary-bg: #f7f9fc; /* Fundo Leve */
+          --card-bg: #ffffff;
+          --text-dark: #333333;
+          --text-muted: #888888;
+          --accent-green: #10b981; /* Destaque Sucesso */
+          --warning-orange: #f39c12; /* Atenção */
+          --border-light: #e0e6ed;
+          --selection-border: #3498db; /* Azul de seleção */
         }
 
         /* Estilos gerais */
         .custom-bg {
-          background-color: var(--light-gray);
-          margin: 0;
-          padding: 0;
+          background-color: var(--secondary-bg);
+          min-height: 100vh;
         }
 
         /* Container */
         .agendar-container {
           padding: 0 0 3rem 0;
-          margin-top: 0;
         }
 
-        /* Header */
+        /* Header (Barra Superior de Título) */
         .agendar-header {
           background-color: var(--primary-blue);
-          color: var(--white);
-          padding: 3rem 0;
+          color: var(--card-bg);
+          padding: 2rem 0; /* Mais compacto */
           text-align: center;
-          margin-top: 0;
-          border-top: none;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
         .agendar-header h1 {
           font-weight: 700;
-          font-size: 2.5rem;
-          margin-bottom: 1rem;
+          font-size: 2rem; 
+          margin-bottom: 0.5rem;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.5rem;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          gap: 0.75rem;
         }
         .agendar-header .lead {
-          font-size: 1.25rem;
-          max-width: 800px;
-          margin: 0 auto;
+          font-size: 1.1rem;
+          opacity: 0.9;
         }
 
-        /* Funcionários Section */
-        .funcionarios-section {
-          padding: 3rem 0;
-          text-align: center;
+        /* Section Headings (Etapas) */
+        .section-heading {
+            color: var(--primary-blue);
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            text-align: center;
+            padding-top: 2rem;
         }
-        .funcionarios-section h2 {
-          color: var(--primary-blue);
-          font-weight: 700;
-          font-size: 1.75rem;
-          margin-bottom: 1.5rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
+        .section-heading span {
+            font-size: 1.2em;
+        }
+
+
+        /* Funcionários Cards */
+        .funcionarios-section {
+          padding-bottom: 1.5rem;
         }
         .funcionarios-section .card {
-          background-color: var(--white);
+          background-color: var(--card-bg);
           border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+          border: 1px solid var(--border-light);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+          transition: all 0.3s ease;
           cursor: pointer;
           height: 100%;
+          text-align: center;
         }
         .funcionarios-section .card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+          transform: translateY(-3px);
+          box-shadow: 0 6px 15px rgba(0, 76, 153, 0.1);
+          border-color: var(--selection-border);
         }
         .funcionarios-section .card.selected {
-          border: 2px solid blue;
+          border: 3px solid var(--selection-border); /* Borda mais grossa ao selecionar */
+          box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
         }
         .funcionarios-section .card-img-top {
-          width: 120px;
-          height: 120px;
+          width: 100px;
+          height: 100px;
           object-fit: cover;
           border-radius: 50%;
-          margin: 1rem auto;
+          border: 3px solid var(--border-light);
+          margin: 1.5rem auto 0.5rem;
         }
         .funcionarios-section .card-title {
-          color: var(--primary-blue);
+          color: var(--text-dark);
           font-weight: 700;
-          font-size: 1.25rem;
-          margin-bottom: 1rem;
+          font-size: 1.2rem;
+          margin-bottom: 0.5rem;
         }
-        .funcionarios-section .card-body h6 {
-          color: var(--danger-red);
-          font-weight: 600;
-          font-size: 1rem;
-          margin-bottom: 0.75rem;
+        .funcionarios-section .card-body {
+            padding: 1rem;
         }
-        .funcionarios-section .list-unstyled {
-          font-size: 1rem;
-          color: var(--dark-gray);
+
+        /* Lista de Serviços dentro do Card */
+        .servicos-list {
+          font-size: 0.95rem;
+          color: var(--text-dark);
+          text-align: left;
+          border-top: 1px solid var(--border-light);
+          padding-top: 1rem;
+          margin-top: 1rem;
         }
-        .funcionarios-section .badge {
-          background-color: var(--light-blue);
-          color: var(--dark-gray);
-          font-size: 0.9rem;
-          padding: 0.5rem;
-          border-radius: 6px;
+        .servicos-list li {
+            padding: 0.25rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
+        .servicos-info {
+            display: flex;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .servicos-info span {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
 
         /* Horários Section */
         .horarios-section {
+          padding-top: 3rem;
           padding-bottom: 3rem;
           text-align: center;
         }
-        .horarios-section .btn-clear {
-          background-color: var(--warning-orange);
-          border-color: var(--warning-orange);
+        .horarios-content {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+        }
+
+        /* Botão Limpar Seleção */
+        .btn-clear-selection {
+          background: none;
+          border: 1px solid var(--warning-orange);
+          color: var(--warning-orange);
           padding: 0.75rem 1.5rem;
           font-weight: 600;
           border-radius: 8px;
-          color: var(--white);
           transition: all 0.3s ease;
+          margin-top: 1rem;
         }
-        .horarios-section .btn-clear:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        .btn-clear-selection:hover {
+          background-color: var(--warning-orange);
+          color: var(--card-bg);
+          box-shadow: 0 4px 10px rgba(243, 156, 18, 0.4);
         }
 
-        /* Mensagens */
+        /* Mensagens de Status/Guia */
         .message {
           font-size: 1.1rem;
           padding: 1.5rem;
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          max-width: 600px;
-          margin: 0 auto;
+          max-width: 800px;
+          margin: 3rem auto;
           text-align: center;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
+          background-color: var(--card-bg);
+          border: 1px solid var(--border-light);
         }
         .message.loading {
-          color: var(--dark-gray);
-          background-color: var(--white);
+          color: var(--primary-blue);
+          border-color: var(--primary-blue);
         }
         .message.error {
           color: var(--danger-red);
-          background-color: var(--white);
+          border-color: var(--danger-red);
         }
         .message.warning {
           color: var(--warning-orange);
-          background-color: var(--white);
+          border-color: var(--warning-orange);
         }
 
         /* Footer */
         .agendar-footer {
           background-color: var(--primary-blue);
-          color: var(--white);
-          padding: 1.5rem 0;
+          color: var(--card-bg);
+          padding: 1rem 0;
           text-align: center;
-        }
-        .agendar-footer p {
-          margin: 0;
-          font-size: 1rem;
-        }
-
-        /* Responsividade */
-        @media (max-width: 991px) {
-          .agendar-container, .funcionarios-section, .horarios-section {
-            padding: 2rem 1rem;
-          }
-          .agendar-header h1 {
-            font-size: 2rem;
-          }
-          .agendar-header .lead {
-            font-size: 1.1rem;
-          }
-          .funcionarios-section h2 {
-            font-size: 1.5rem;
-          }
-        }
-        @media (max-width: 576px) {
-          .agendar-header h1 {
-            font-size: 1.75rem;
-          }
-          .funcionarios-section .card {
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
-          }
-          .funcionarios-section .card-img-top {
-            width: 100px;
-            height: 100px;
-          }
-          .funcionarios-section .card-title {
-            font-size: 1.1rem;
-          }
-          .funcionarios-section .list-unstyled, .funcionarios-section .badge {
-            font-size: 0.9rem;
-          }
-          .message {
-            font-size: 1rem;
-            padding: 1rem;
-          }
-          .horarios-section .btn-clear {
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-          }
+          font-size: 0.9rem;
         }
       `}</style>
       <div className="custom-bg min-vh-100">
         <Navbar />
         <div className="agendar-container">
-          {empresasData.loading ? (
-            <div className="message loading" data-aos="fade-up">
-              <FaSpinner className="fa-spin me-2" /> Carregando dados da empresa...
+
+          <header className="agendar-header">
+            <div className="container">
+              <h1>
+                <FaCalendarAlt /> Agendamento Online
+              </h1>
+              <p className="lead">
+                {empresaNome ? `Agende seu serviço com ${empresaNome} em duas etapas simples.` : "Agende seu serviço em duas etapas simples."}
+              </p>
             </div>
-          ) : !empresasData.data || empresasData.data.length === 0 ? (
-            <div className="message error" data-aos="fade-up">
-              <FaExclamationCircle /> Empresa não encontrada.
+          </header>
+
+          {/* === Mensagens de Carregamento/Erro === */}
+          {empresasData.loading ? (
+            <div className="message loading">
+              <FaSpinner className="fa-spin me-2" /> Carregando dados de agendamento...
+            </div>
+          ) : !empresaDetalhes || empresaDetalhes.funcionarios.length === 0 ? (
+            <div className="message error">
+              <FaExclamationCircle /> Não foi possível carregar os dados de agendamento ou nenhum profissional encontrado.
             </div>
           ) : (
             <>
-              <header className="agendar-header" data-aos="fade-down">
-                <div className="container">
-                  <h1>
-                    <FaCalendar /> Agendamento de Serviços
-                  </h1>
-                  <p className="lead">
-                    Escolha um funcionário e marque seu horário facilmente.
-                  </p>
-                </div>
-              </header>
-              <section className="funcionarios-section container" data-aos="fade-up">
-                <h2>
-                  <FaUserTie /> Escolha um Funcionário
+              {/* === ETAPA 1: Escolha do Funcionário === */}
+              <section className="funcionarios-section container">
+                <h2 className="section-heading">
+                  <span className="me-2 text-primary-blue">1.</span> <FaUserTie /> Escolha o Profissional
                 </h2>
-                <div className="row justify-content-center mt-4">
-                  {empresasData.data[0].funcionarios.length > 0 ? (
-                    empresasData.data[0].funcionarios.map((funcionario, index) => (
+                <div className="row justify-content-center g-4">
+                  {empresaDetalhes.funcionarios.map((funcionario) => (
+                    <div
+                      key={funcionario.id}
+                      className="col-12 col-sm-6 col-md-4 col-lg-3"
+                    >
                       <div
-                        key={index}
-                        className="col-md-4 mb-4"
-                        data-aos="zoom-in"
-                        data-aos-delay={index * 100}
+                        className={`card ${funcionarioSelecionado === funcionario.id ? "selected" : ""}`}
+                        onClick={() => setFuncionarioSelecionado(funcionario.id)}
                       >
-                        <div
-                          className={`card ${funcionarioSelecionado === funcionario.id ? "selected" : ""}`}
-                          onClick={() => setFuncionarioSelecionado(funcionario.id)}
-                        >
-                          <img
-                            src={funcionario.foto_url || "https://via.placeholder.com/120x120?text=Sem+Foto"}
-                            alt={funcionario.nome}
-                            className="card-img-top"
-                          />
-                          <div className="card-body">
-                            <h5 className="card-title">{funcionario.nome}</h5>
-                            <h6>Serviços:</h6>
-                            <ul className="list-unstyled">
-                              {funcionario.servicos && funcionario.servicos.length > 0 ? (
-                                funcionario.servicos.map((servico, i) => (
-                                  <li
-                                    key={i}
-                                    className="d-flex justify-content-between align-items-center"
-                                  >
-                                    <span>{servico.nome}</span>
-                                    <span className="badge">
-                                      R${servico.preco} | {servico.duracao}min
-                                    </span>
-                                  </li>
-                                ))
-                              ) : (
-                                <li className="text-muted">Nenhum serviço disponível</li>
-                              )}
-                            </ul>
-                          </div>
+                        <img
+                          src={funcionario.foto_url || "https://via.placeholder.com/100x100?text=USR"}
+                          alt={funcionario.nome}
+                          className="card-img-top"
+                        />
+                        <div className="card-body">
+                          <h5 className="card-title">{funcionario.nome}</h5>
+
+                          <ul className="list-unstyled servicos-list">
+                            <h6 className="fw-bold mb-2">Serviços Elegíveis:</h6>
+                            {funcionario.servicos && funcionario.servicos.length > 0 ? (
+                              funcionario.servicos.map((servico, i) => (
+                                <li key={i}>
+                                  <span>{servico.nome}</span>
+                                  <div className="servicos-info">
+                                    <span><FaDollarSign /> {servico.preco}</span>
+                                    <span><FaClock /> {servico.duracao}min</span>
+                                  </div>
+                                </li>
+                              ))
+                            ) : (
+                              <li className="text-muted text-center">Nenhum serviço disponível</li>
+                            )}
+                          </ul>
                         </div>
+                        {/* Indicador de Seleção */}
+                        {funcionarioSelecionado === funcionario.id && (
+                             <div className="p-2 bg-success text-white fw-bold" style={{borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px'}}>
+                                SELECIONADO <FaChevronRight />
+                             </div>
+                        )}
                       </div>
-                    ))
-                  ) : (
-                    <div className="message warning" data-aos="fade-up">
-                      <FaExclamationCircle /> Nenhum funcionário disponível no momento.
                     </div>
-                  )}
+                  ))}
                 </div>
               </section>
-              <section className="horarios-section container" data-aos="fade-up">
-                {funcionarioSelecionado ? (
-                  <>
-                    <HorariosTabela
-                      funcionario_id={funcionarioSelecionado}
-                      servicos={
-                        empresasData.data[0].funcionarios.find(
-                          (f) => f.id === funcionarioSelecionado
-                        )?.servicos || []
-                      }
-                      key={funcionarioSelecionado}
-                    />
-                    <button
-                      className="btn-clear mt-3"
-                      onClick={handleClearSelection}
-                    >
-                      <FaTimes /> Limpar Seleção
-                    </button>
-                  </>
-                ) : (
-                  <div className="message warning">
-                    <FaExclamationCircle /> Selecione um funcionário para ver os horários disponíveis.
-                  </div>
-                )}
+
+              {/* === ETAPA 2: Horários === */}
+              <section className="horarios-section container">
+                <h2 className="section-heading">
+                  <span className="me-2 text-primary-blue">2.</span> <FaCalendarAlt /> Selecione o Horário
+                </h2>
+
+                <div className="horarios-content">
+                    {funcionarioSelecionado ? (
+                      <>
+                        <HorariosTabela
+                          funcionario_id={funcionarioSelecionado}
+                          servicos={
+                            empresaDetalhes.funcionarios.find(
+                              (f) => f.id === funcionarioSelecionado
+                            )?.servicos || []
+                          }
+                          key={funcionarioSelecionado}
+                        />
+                        <button
+                          className="btn-clear-selection"
+                          onClick={handleClearSelection}
+                        >
+                          <FaTimesCircle className="me-1" /> Mudar Profissional
+                        </button>
+                      </>
+                    ) : (
+                      <div className="message warning">
+                        <FaExclamationCircle /> Utilize a Etapa 1 para selecionar o profissional e ver os horários disponíveis.
+                      </div>
+                    )}
+                </div>
               </section>
-              <footer className="agendar-footer">
-                <p>&copy; 2025 VemAgendar. Todos os direitos reservados.</p>
-              </footer>
             </>
           )}
         </div>
+        <footer className="agendar-footer">
+          <p>
+            {empresaNome ? `© ${new Date().getFullYear()} Agendamento para ${empresaNome}.` : `© ${new Date().getFullYear()} Agendamento Online.`} Todos os direitos reservados.
+          </p>
+        </footer>
       </div>
     </div>
   );

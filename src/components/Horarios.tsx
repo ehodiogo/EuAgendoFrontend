@@ -4,8 +4,9 @@ import { useFetch } from "../functions/GetData";
 import { useState } from "react";
 import { Modal, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Servicos } from "../interfaces/ServicosFuncionarios";
-import "bootstrap/dist/css/bootstrap.min.css"; // Ensure Bootstrap CSS is included
-import { FaCheckCircle, FaTimesCircle, FaUtensils, FaSpinner, FaCalendarCheck, FaExclamationCircle } from "react-icons/fa";
+import "bootstrap/dist/css/bootstrap.min.css";
+// Removida a FaEnvelope e FaPhone para corresponder ao último código fornecido, mantendo o FaUser e FaTools
+import { FaCheckCircle, FaTimesCircle, FaCoffee, FaSpinner, FaCalendarCheck, FaExclamationCircle, FaUser, FaTools, FaTag } from "react-icons/fa";
 
 interface HorariosDoDiaProps {
   empresa: Empresa;
@@ -13,6 +14,10 @@ interface HorariosDoDiaProps {
   funcionario_id: number;
   servicos: Servicos[];
 }
+
+// Constante para definir o número inicial de cards visíveis (Se você usou a versão anterior, é bom mantê-la ou reintroduzi-la)
+// const HORARIOS_INICIAIS = 16;
+// const HORARIOS_POR_PAGINA = 12;
 
 const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: HorariosDoDiaProps) => {
   const dataString = data_selecionada.toISOString().split("T")[0];
@@ -23,23 +28,33 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
   const [clienteEmail, setClienteEmail] = useState<string>("");
   const [clienteNumero, setClienteNumero] = useState<string>("");
   const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [horariosVisiveis, setHorariosVisiveis] = useState(HORARIOS_INICIAIS); // Removido para simplificar com base no código fornecido
 
   const agendamentosResponse = useFetch<Agendamento[]>(
     `/api/agendamentos_funcionario/?id_funcionario=${funcionario_id}&data=${dataString}`
   );
   const agendamentos = agendamentosResponse.data;
 
+  // FUNÇÃO PARA FORMATAR A DATA NO PADRÃO BRASILEIRO
+  const formatarDataBR = (dataIso: string): string => {
+    // dataIso é 'YYYY-MM-DD'
+    const [ano, mes, dia] = dataIso.split('-');
+    return `${dia}/${mes}/${ano}`;
+  };
+
   const gerarHorarios = (inicio: string, fim: string) => {
     const horarios: string[] = [];
     let [hora, minuto] = inicio.split(":").map(Number);
     const [horaFim, minutoFim] = fim.split(":").map(Number);
     const menorDuracaoServico = Math.min(...servicos.map((servico) => servico.duracao as number));
+    const intervaloMinutos = menorDuracaoServico > 0 ? menorDuracaoServico : 30;
 
     while (hora < horaFim || (hora === horaFim && minuto < minutoFim)) {
       horarios.push(`${String(hora).padStart(2, "0")}:${String(minuto).padStart(2, "0")}`);
-      minuto += menorDuracaoServico;
+      minuto += intervaloMinutos;
       if (minuto >= 60) {
-        minuto = 0;
+        minuto -= 60;
         hora++;
       }
     }
@@ -109,22 +124,31 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
   };
 
   const confirmarAgendamento = async () => {
+    setIsSubmitting(true);
+    setFormError(null);
+
     if (!servicoSelecionado) {
       setFormError("Por favor, selecione um serviço.");
+      setIsSubmitting(false);
       return;
     }
     if (!clienteNome.trim()) {
       setFormError("Por favor, informe o nome do cliente.");
+      setIsSubmitting(false);
       return;
     }
     if (!clienteEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clienteEmail)) {
       setFormError("Por favor, informe um e-mail válido.");
+      setIsSubmitting(false);
       return;
     }
     if (!clienteNumero.trim()) {
       setFormError("Por favor, informe o número de telefone.");
+      setIsSubmitting(false);
       return;
     }
+
+    const servicoInfo = servicos.find(s => s.nome === servicoSelecionado);
 
     const agendamentoData = {
       id_funcionario: funcionario_id,
@@ -134,7 +158,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
       cliente_nome: clienteNome,
       cliente_email: clienteEmail,
       cliente_numero: clienteNumero,
-      duracao_minima: Math.min(...servicos.map((servico) => servico.duracao)),
+      duracao_minima: servicoInfo?.duracao || Math.min(...servicos.map((servico) => servico.duracao)),
     };
 
     try {
@@ -147,7 +171,8 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
       });
 
       if (!response.ok) {
-        throw new Error(`Erro ao agendar: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(`Erro: ${errorData.detail || 'Falha na comunicação com a API.'}`);
       }
 
       if (response.status === 201) {
@@ -156,7 +181,9 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
       }
     } catch (error) {
       // @ts-ignore
-      setFormError(`Erro ao agendar: ${error.message}`);
+      setFormError(`Falha ao agendar: ${error.message}`);
+    } finally {
+        setIsSubmitting(false);
     }
   };
 
@@ -167,248 +194,232 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
       .toLowerCase();
   };
 
-  console.log("Data selecionada:", data_selecionada);
+  // VARIÁVEIS DE FORMATO BR
+  const dataFormatada = formatarDataBR(dataString);
+  const horaFormatada = horarioSelecionado?.substring(0, 5);
+
 
   return (
     <div className="horarios-do-dia">
       <style>{`
-        /* Paleta de cores */
+        /* Paleta de cores Corporativas */
         :root {
-          --primary-blue: #003087;
-          --light-blue: #4dabf7;
-          --dark-gray: #2d3748;
-          --light-gray: #f7fafc;
-          --white: #ffffff;
-          --pastel-green: #b8e2c8;
-          --pastel-red: #f4c7c3;
-          --warning-orange: #fd7e14;
-        }
-
-        /* Container */
-        .horarios-do-dia {
-          background-color: var(--light-gray);
-          padding: 2rem 0;
-          margin: 0;
+          --primary-blue: #004c99; 
+          --secondary-bg: #f7f9fc;
+          --card-bg: #ffffff;
+          --text-dark: #333333;
+          --text-muted: #888888;
+          --accent-green: #10b981; 
+          --warning-orange: #f39c12; 
+          --danger-red: #e74c3c; 
+          --break-time: #2d3748; 
+          --border-light: #e0e6ed;
         }
 
         /* Grid de Horários */
         .horarios-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
           gap: 1rem;
           max-width: 900px;
           margin: 0 auto;
         }
         .horario-card {
-          background-color: var(--white);
           border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
           padding: 1rem;
           text-align: center;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          transition: all 0.2s ease;
+          border: 1px solid var(--border-light);
         }
         .horario-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        .horario-card.disponivel {
-          background-color: var(--pastel-green);
-          color: var(--dark-gray);
-          cursor: pointer;
-        }
-        .horario-card.agendado {
-          background-color: var(--warning-orange);
-          color: var(--white);
-        }
-        .horario-card.indisponivel {
-          background-color: var(--pastel-red);
-          color: var(--dark-gray);
-        }
-        .horario-card.intervalo {
-          background-color: var(--dark-gray);
-          color: var(--white);
-        }
+        
+        /* Cores e Status */
         .horario-card h5 {
           font-size: 1.25rem;
           margin-bottom: 0.5rem;
+          font-weight: 700;
         }
         .horario-card p {
-          font-size: 1rem;
+          font-size: 0.9rem;
           margin: 0;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.5rem;
+          gap: 0.4rem;
+          font-weight: 600;
         }
+        
+        /* Disponível */
+        .horario-card.disponivel {
+          background-color: #e6fff3; 
+          color: var(--accent-green);
+          border-color: var(--accent-green);
+          cursor: pointer;
+        }
+        .horario-card.disponivel:hover {
+            background-color: var(--accent-green);
+            color: var(--card-bg);
+            border-color: var(--accent-green);
+        }
+
+        /* Agendado */
+        .horario-card.agendado {
+          background-color: var(--warning-orange);
+          color: var(--card-bg);
+          border-color: var(--warning-orange);
+          cursor: not-allowed;
+        }
+
+        /* Indisponível */
+        .horario-card.indisponivel {
+          background-color: var(--danger-red);
+          color: var(--card-bg);
+          border-color: var(--danger-red);
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        /* Intervalo */
+        .horario-card.intervalo {
+          background-color: var(--break-time);
+          color: var(--card-bg);
+          border-color: var(--break-time);
+          opacity: 0.8;
+          cursor: not-allowed;
+        }
+
 
         /* Modal */
         .horarios-modal .modal-content {
           border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
         .horarios-modal .modal-header {
           background-color: var(--primary-blue);
-          color: var(--white);
-          border-top-left-radius: 12px;
-          border-top-right-radius: 12px;
+          color: var(--card-bg);
         }
         .horarios-modal .modal-title {
           font-weight: 700;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
         }
         .horarios-modal .modal-body {
-          padding: 1.5rem;
+          padding: 2rem;
         }
         .horarios-modal .form-label {
           color: var(--primary-blue);
           font-weight: 600;
-          font-size: 1rem;
-          margin-bottom: 0.5rem;
+          font-size: 0.95rem;
+          margin-bottom: 0.25rem;
         }
         .horarios-modal .form-control,
         .horarios-modal .form-select {
-          border: 1px solid var(--light-blue);
-          border-radius: 8px;
-          padding: 0.75rem;
+          border: 1px solid var(--border-light);
+          border-radius: 6px;
+          padding: 0.6rem 0.75rem;
           font-size: 1rem;
-          color: var(--dark-gray);
         }
         .horarios-modal .form-control:focus,
         .horarios-modal .form-select:focus {
           border-color: var(--primary-blue);
-          box-shadow: 0 0 5px rgba(0, 48, 135, 0.3);
+          box-shadow: 0 0 5px rgba(0, 76, 153, 0.3);
         }
-        .horarios-modal .radio-group {
+
+        /* Serviço Radio Group */
+        .radio-group {
+          padding: 1rem;
+          border: 1px solid var(--border-light);
+          border-radius: 8px;
           margin-bottom: 1.5rem;
         }
-        .horarios-modal .radio-group label {
-          margin-left: 0.5rem;
-          color: var(--dark-gray);
+        .radio-group h5 {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
         }
+        .radio-group .form-check-label {
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            margin-left: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .radio-group .form-check {
+            margin-bottom: 0.5rem;
+        }
+        .radio-group .form-check-input:checked {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        .radio-group .tooltip-trigger {
+            cursor: help;
+        }
+        .radio-group .service-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+
         .horarios-modal .error-message {
-          color: var(--pastel-red);
-          font-size: 0.9rem;
-          margin-top: 0.5rem;
+          color: var(--danger-red);
+          font-weight: 600;
+          padding: 0.5rem;
+          background-color: #ffeeee;
+          border-radius: 4px;
+          margin-top: 1rem;
           text-align: center;
         }
         .horarios-modal .btn-primary {
-          background-color: var(--primary-blue);
-          border-color: var(--primary-blue);
-          font-weight: 600;
+          background-color: var(--accent-green);
+          border-color: var(--accent-green);
+          font-weight: 700;
           padding: 0.75rem 1.5rem;
-          border-radius: 8px;
-          transition: all 0.3s ease;
+          transition: background-color 0.3s ease;
         }
-        .horarios-modal .btn-primary:hover {
-          background-color: var(--light-blue);
-          border-color: var(--light-blue);
-          transform: translateY(-2px);
+        .horarios-modal .btn-primary:hover:not(:disabled) {
+          background-color: #0d9472;
+          border-color: #0d9472;
         }
-        .horarios-modal .btn-secondary {
-          background-color: var(--dark-gray);
-          border-color: var(--dark-gray);
-          font-weight: 600;
-          padding: 0.75rem 1.5rem;
-          border-radius: 8px;
-          transition: all 0.3s ease;
-        }
-        .horarios-modal .btn-secondary:hover {
-          background-color: var(--light-blue);
-          border-color: var(--light-blue);
-          transform: translateY(-2px);
+        .horarios-modal .btn-primary:disabled {
+            opacity: 0.6;
         }
 
-        /* Tooltip Styling */
-        .tooltip-inner {
-          background-color: var(--primary-blue);
-          color: var(--white);
-          border-radius: 8px;
-          padding: 0.5rem;
-          font-size: 0.9rem;
-        }
-        .tooltip .tooltip-arrow::before {
-          border-right-color: var(--primary-blue);
-        }
-
-        /* Mensagens */
-        .message {
-          font-size: 1.1rem;
-          padding: 1.5rem;
-          border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          max-width: 600px;
-          margin: 0 auto;
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          background-color: var(--white);
-          color: var(--pastel-red);
-          border: 1px solid var(--pastel-red);
-        }
-
-        /* Responsividade */
-        @media (max-width: 991px) {
-          .horarios-do-dia {
-            padding: 1.5rem 1rem;
-          }
+        /* === RESPONSIVIDADE PARA CELULAR (Telas Pequenas) === */
+        @media (max-width: 576px) {
           .horarios-grid {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            /* Força os cards a ocuparem a largura total, ficando em uma coluna */
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            padding: 0 1rem; /* Adiciona um padding nas laterais do grid */
+          }
+          .horario-card {
+            padding: 0.75rem;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05); /* Sombra mais sutil */
           }
           .horario-card h5 {
             font-size: 1.1rem;
           }
           .horario-card p {
-            font-size: 0.9rem;
-          }
-        }
-        @media (max-width: 576px) {
-          .horarios-grid {
-            grid-template-columns: 1fr;
-          }
-          .horario-card {
-            padding: 0.75rem;
-          }
-          .horario-card h5 {
-            font-size: 1rem;
-          }
-          .horario-card p {
             font-size: 0.85rem;
           }
           .horarios-modal .modal-body {
-            padding: 1rem;
-          }
-          .horarios-modal .form-label {
-            font-size: 0.9rem;
-          }
-          .horarios-modal .form-control,
-          .horarios-modal .form-select {
-            font-size: 0.9rem;
-            padding: 0.5rem;
-          }
-          .horarios-modal .btn-primary,
-          .horarios-modal .btn-secondary {
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-          }
-          .message {
-            font-size: 1rem;
-            padding: 1rem;
+            padding: 1.5rem; /* Ajusta o padding do modal */
           }
         }
       `}</style>
       <div className="horarios-do-dia">
         {agendamentosResponse.loading ? (
-          <div className="message">
-            <FaSpinner className="fa-spin me-2" /> Carregando horários...
+          <div className="message info">
+            <FaSpinner className="fa-spin me-2" /> Carregando horários disponíveis...
           </div>
         ) : Object.keys(horariosDisponiveis).length === 0 ? (
-          <div className="message">
-            <FaExclamationCircle /> Nenhum horário disponível para este dia.
+          <div className="message info">
+            <FaExclamationCircle /> Nenhum horário gerado para este dia.
           </div>
         ) : (
           <div className="horarios-grid">
@@ -423,25 +434,34 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
                   {status === "Disponível" && <FaCheckCircle />}
                   {status === "Agendado" && <FaCalendarCheck />}
                   {status === "Indisponível" && <FaTimesCircle />}
-                  {status === "Intervalo" && <FaUtensils />}
+                  {status === "Intervalo" && <FaCoffee />}
                   {status}
                 </p>
               </div>
             ))}
           </div>
         )}
-        <Modal show={modalAberto} onHide={() => setModalAberto(false)} className="horarios-modal">
+
+        {/* === MODAL DE CONFIRMAÇÃO === */}
+        <Modal
+            show={modalAberto}
+            onHide={() => !isSubmitting && setModalAberto(false)}
+            className="horarios-modal"
+            centered
+        >
           <Modal.Header closeButton>
             <Modal.Title>
-              <FaCalendarCheck /> Confirmar Agendamento
+              <FaCalendarCheck /> Agendar Serviço
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <p>
-              Agendar para <strong>{dataString}</strong> às <strong>{horarioSelecionado}</strong>?
+            <p className="mb-3">
+              Agendamento: <strong>{dataFormatada}</strong> às <strong>{horaFormatada}</strong>
             </p>
+
+            {/* GRUPO DE SERVIÇOS */}
             <div className="radio-group">
-              <h5>Escolha o serviço:</h5>
+              <h5><FaTag className="me-1" /> Escolha o Serviço</h5>
               {servicos.map((servico) => (
                 <div key={servico.id} className="form-check">
                   <input
@@ -453,68 +473,87 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
                     onChange={() => setServicoSelecionado(servico.nome)}
                     className="form-check-input"
                   />
-                  <OverlayTrigger
-                    placement="right"
-                    overlay={
-                      <Tooltip id={`tooltip-${servico.id}`}>
-                        {servico.descricao || "Sem descrição disponível"}
-                      </Tooltip>
-                    }
-                  >
-                    <label htmlFor={`servico-${servico.id}`} className="form-check-label">
-                      {servico.nome} (R${servico.preco} | {servico.duracao}min)
-                    </label>
-                  </OverlayTrigger>
+                  <label htmlFor={`servico-${servico.id}`} className="form-check-label">
+                      {servico.nome}
+                      <span className="service-info">
+                        (R$ {servico.preco} | {servico.duracao}min)
+                      </span>
+                      {/* CORREÇÃO DO TOOLTIP: O OverlayTrigger deve envolver APENAS o ícone, não o label inteiro.
+                         O label já era clicável. O Tooltip deve ser acionado pelo ícone para mostrar a descrição. */}
+                      <OverlayTrigger
+                          placement="right"
+                          overlay={
+                            <Tooltip id={`tooltip-${servico.id}`}>
+                              {servico.descricao || "Sem descrição disponível"}
+                            </Tooltip>
+                          }
+                      >
+                         <FaTools className="ms-1 tooltip-trigger" style={{fontSize: '0.8em', cursor: 'pointer'}}/>
+                      </OverlayTrigger>
+                  </label>
                 </div>
               ))}
             </div>
-            <div>
-              <h5>Informações do Cliente</h5>
-              <div className="mb-2">
-                <label htmlFor="clienteNome" className="form-label">
-                  Nome:
-                </label>
+
+            {/* INFORMAÇÕES DO CLIENTE */}
+            <div className="row g-2">
+              <h5 className="mb-3 mt-0"><FaUser className="me-1" /> Informações do Cliente</h5>
+              <div className="col-12">
+                <label htmlFor="clienteNome" className="form-label">Nome Completo:</label>
                 <input
                   type="text"
                   id="clienteNome"
                   className="form-control"
                   value={clienteNome}
                   onChange={(e) => setClienteNome(e.target.value)}
+                  disabled={isSubmitting}
                 />
               </div>
-              <div className="mb-2">
-                <label htmlFor="clienteEmail" className="form-label">
-                  E-mail:
-                </label>
+              <div className="col-md-6">
+                <label htmlFor="clienteEmail" className="form-label">E-mail:</label>
                 <input
                   type="email"
                   id="clienteEmail"
                   className="form-control"
                   value={clienteEmail}
                   onChange={(e) => setClienteEmail(e.target.value)}
+                  disabled={isSubmitting}
                 />
               </div>
-              <div className="mb-2">
-                <label htmlFor="clienteNumero" className="form-label">
-                  Telefone:
-                </label>
+              <div className="col-md-6">
+                <label htmlFor="clienteNumero" className="form-label">Telefone/WhatsApp:</label>
                 <input
                   type="tel"
                   id="clienteNumero"
                   className="form-control"
                   value={clienteNumero}
                   onChange={(e) => setClienteNumero(e.target.value)}
+                  disabled={isSubmitting}
                 />
               </div>
-              {formError && <div className="error-message">{formError}</div>}
             </div>
+            {formError && <div className="error-message">{formError}</div>}
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setModalAberto(false)}>
+            <Button
+                variant="secondary"
+                onClick={() => setModalAberto(false)}
+                disabled={isSubmitting}
+            >
               Cancelar
             </Button>
-            <Button variant="primary" onClick={confirmarAgendamento}>
-              Confirmar
+            <Button
+                variant="primary"
+                onClick={confirmarAgendamento}
+                disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                    <FaSpinner className="fa-spin me-2" /> Agendando...
+                </>
+              ) : (
+                "Confirmar Agendamento"
+              )}
             </Button>
           </Modal.Footer>
         </Modal>

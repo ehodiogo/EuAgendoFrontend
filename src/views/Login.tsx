@@ -2,7 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { FaKey, FaEnvelope } from "react-icons/fa";
+import { FaKey, FaEnvelope, FaSpinner } from "react-icons/fa6"; // Atualizado para Fa6
+import {FaSignInAlt} from "react-icons/fa";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -29,12 +30,13 @@ function Login() {
       localStorage.setItem("access_token", access);
       localStorage.setItem("refresh_token", refresh);
       localStorage.setItem("ultimo_acesso", new Date().getTime().toString());
-      localStorage.setItem("is_expired_plan", is_expired_plan);
-      localStorage.setItem("tempo_restante", tempo_restante);
+      // A API retorna strings para estes, é bom manter consistência
+      localStorage.setItem("is_expired_plan", is_expired_plan.toString());
+      localStorage.setItem("tempo_restante", tempo_restante.toString());
 
       navigate("/dashboard");
     } catch (err) {
-      setError("Credenciais inválidas ou erro ao autenticar.");
+      setError("Credenciais inválidas. Verifique seu e-mail e senha.");
       console.error("Erro no login", err);
     } finally {
       setIsLoading(false);
@@ -44,17 +46,21 @@ function Login() {
   return (
     <div className="min-vh-100">
       <style>{`
+        /* Cores Aprimoradas */
         :root {
           --primary-blue: #003087;
-          --light-blue: #4dabf7;
-          --dark-gray: #2d3748;
-          --light-gray: #f7fafc;
+          --accent-blue: #0056b3;
+          --dark-gray: #212529;
+          --light-gray-bg: #f5f7fa;
           --white: #ffffff;
           --success-green: #28a745;
+          --danger-red: #dc3545;
+          --shadow-color: rgba(0, 0, 0, 0.15);
         }
 
         .custom-bg {
-          background-color: var(--light-gray);
+          background-color: var(--light-gray-bg);
+          background-image: linear-gradient(135deg, var(--light-gray-bg) 0%, var(--white) 100%);
         }
 
         .login-container {
@@ -62,111 +68,138 @@ function Login() {
           justify-content: center;
           align-items: center;
           min-height: calc(100vh - 70px);
+          padding: 2rem 1rem;
         }
 
+        /* Cartão de Login */
         .login-card {
           background-color: var(--white);
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          padding: 2.5rem;
-          max-width: 450px;
+          border-radius: 20px;
+          box-shadow: 0 10px 30px var(--shadow-color);
+          padding: 3rem;
+          max-width: 420px;
           width: 100%;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          transition: transform 0.4s ease, box-shadow 0.4s ease;
+          border-top: 5px solid var(--primary-blue); /* Linha de destaque */
         }
         .login-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+          transform: translateY(-8px);
+          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
         }
         .login-card h2 {
-          color: var(--primary-blue);
-          font-weight: 700;
-          font-size: 2rem;
-          margin-bottom: 1.5rem;
+          color: var(--dark-gray);
+          font-weight: 800;
+          font-size: 2.25rem;
+          margin-bottom: 2rem;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.5rem;
+          gap: 0.75rem;
+          letter-spacing: -0.04em;
+        }
+        .login-card h2 svg {
+            color: var(--primary-blue);
+            font-size: 2.5rem;
         }
 
         .form-label {
-          color: var(--primary-blue);
-          font-weight: 600;
-          font-size: 1rem;
+          color: var(--dark-gray);
+          font-weight: 700;
+          font-size: 1.05rem;
           margin-bottom: 0.5rem;
+          display: block;
+          text-align: left;
         }
 
-        /* Wrapper para ícone + input */
+        /* Input com Ícone Aprimorado */
         .input-icon {
           position: relative;
           display: flex;
           align-items: center;
+          margin-bottom: 1.5rem;
         }
         .input-icon svg {
           position: absolute;
-          left: 0.75rem;
-          color: var(--light-blue);
-          font-size: 1.2rem;
+          left: 1rem;
+          color: var(--accent-blue);
+          font-size: 1.1rem;
           pointer-events: none;
+          transition: color 0.3s ease;
         }
         .form-control {
-          border: 2px solid #e2e8f0;
-          border-radius: 8px;
-          padding: 0.75rem 1rem 0.75rem 2.5rem;
+          border: 1px solid #d1d5db;
+          border-radius: 10px;
+          padding: 1rem 1rem 1rem 3rem;
           font-size: 1rem;
           width: 100%;
           transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .form-control:focus {
-          border-color: var(--light-blue);
-          box-shadow: 0 0 0 0.2rem rgba(77, 171, 247, 0.25);
+          border-color: var(--primary-blue);
+          box-shadow: 0 0 0 3px rgba(0, 48, 135, 0.2);
           outline: none;
         }
-        .form-control::placeholder {
-          color: #9ca3af;
+        .form-control:focus + svg {
+            color: var(--primary-blue);
         }
-
+        .form-control::placeholder {
+          color: #a0aec0;
+        }
+        
+        /* Botão de Submit com Gradiente */
         .submit-btn {
-          background-color: var(--success-green);
+          background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
           color: var(--white);
-          font-weight: 600;
-          padding: 0.75rem;
-          border-radius: 8px;
+          font-weight: 700;
+          padding: 1rem;
+          border-radius: 10px;
           transition: all 0.3s ease;
           border: none;
           width: 100%;
+          font-size: 1.15rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          box-shadow: 0 4px 15px rgba(0, 48, 135, 0.3);
         }
         .submit-btn:hover {
-          background-color: #218838;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+          background: linear-gradient(135deg, var(--accent-blue), var(--primary-blue));
+          transform: translateY(-3px);
+          box-shadow: 0 6px 20px rgba(0, 48, 135, 0.4);
         }
         .submit-btn:disabled {
-          background-color: #6c757d;
+          background: #ccc;
+          color: var(--dark-gray);
           cursor: not-allowed;
-          opacity: 0.7;
+          opacity: 0.8;
+          transform: none;
+          box-shadow: none;
         }
 
         .alert-danger {
-          background-color: #f8d7da;
-          color: #721c24;
-          border: 1px solid #f5c6cb;
+          background-color: #fcebeb;
+          color: var(--danger-red);
+          border: 1px solid #f9d7da;
           padding: 1rem;
           border-radius: 8px;
-          margin-bottom: 1rem;
+          margin-bottom: 1.5rem;
           text-align: center;
-          font-weight: 500;
+          font-weight: 600;
         }
 
         .link-container {
           display: flex;
           justify-content: space-between;
-          margin-top: 1rem;
+          margin-top: 1.5rem;
+          padding-top: 1rem;
+          border-top: 1px solid #e2e8f0;
+          font-size: 0.95rem;
         }
         .link-container a {
-          color: var(--light-blue);
-          font-weight: 500;
+          color: var(--accent-blue);
+          font-weight: 600;
           text-decoration: none;
-          transition: color 0.3s ease;
         }
         .link-container a:hover {
           color: var(--primary-blue);
@@ -175,27 +208,22 @@ function Login() {
 
         @media (max-width: 576px) {
           .login-card {
-            padding: 1.5rem;
-            margin: 0 1rem;
+            padding: 2rem 1.5rem;
           }
           .login-card h2 {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
           }
           .form-control {
             font-size: 0.9rem;
-            padding-left: 2.25rem;
+            padding: 0.8rem 0.8rem 0.8rem 2.5rem;
           }
           .submit-btn {
-            font-size: 0.9rem;
-          }
-          .link-container {
-            flex-direction: column;
-            gap: 0.5rem;
-            text-align: center;
+            font-size: 1.05rem;
+            padding: 0.8rem;
           }
           .input-icon svg {
+            left: 0.75rem;
             font-size: 1rem;
-            left: 0.5rem;
           }
         }
       `}</style>
@@ -205,7 +233,7 @@ function Login() {
         <div className="login-container">
           <div className="login-card">
             <h2>
-              <FaKey /> VemAgendar - Login
+              <FaSignInAlt /> Acesso ao Sistema
             </h2>
             <form onSubmit={handleLogin}>
               <div className="mb-3">
@@ -220,7 +248,7 @@ function Login() {
                     id="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Digite seu e-mail"
+                    placeholder="exemplo@empresa.com"
                     required
                   />
                 </div>
@@ -237,7 +265,7 @@ function Login() {
                     id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Digite sua senha"
+                    placeholder="Sua senha secreta"
                     required
                   />
                 </div>
@@ -250,11 +278,17 @@ function Login() {
                 className="submit-btn"
                 disabled={isLoading}
               >
-                {isLoading ? "Entrando..." : "Entrar"}
+                {isLoading ? (
+                  <>
+                    <FaSpinner className="fa-spin" /> Entrando...
+                  </>
+                ) : (
+                  "Entrar"
+                )}
               </button>
             </form>
             <div className="link-container">
-              <Link to="/cadastro">Criar conta</Link>
+              <Link to="/cadastro">Criar uma nova conta</Link>
               <Link to="/esqueci-senha">Esqueci minha senha</Link>
             </div>
           </div>

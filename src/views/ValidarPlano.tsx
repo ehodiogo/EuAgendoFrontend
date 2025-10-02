@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { FaSpinner, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
+import { FaSpinner, FaCheckCircle, FaCircleExclamation, FaHourglassHalf, FaCircleCheck } from "react-icons/fa6"; // Atualizado para Fa6
 
 const ValidarPlano = () => {
   const [loading, setLoading] = useState(false);
@@ -10,227 +10,272 @@ const ValidarPlano = () => {
   const [statusPagamento, setStatusPagamento] = useState<string | null>(null);
 
   useEffect(() => {
-    verificarPagamento();
+    // Função de limpeza para evitar a chamada duplicada no modo Strict Mode
+    let isMounted = true;
+
+    // Pequena função para introduzir backoff simples ou delay para UX
+    const timer = setTimeout(() => {
+      if (isMounted) {
+        verificarPagamento();
+      }
+    }, 500); // Dá um pequeno tempo para o usuário perceber a tela de loading
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
   }, []);
 
   const verificarPagamento = async () => {
     const usuario_token = localStorage.getItem("access_token");
 
     if (!usuario_token) {
-      setStatusPagamento("Erro: usuário não autenticado.");
+      setStatusPagamento("Erro: usuário não autenticado. Faça login novamente.");
       console.error("Erro: usuário não autenticado.");
       return;
     }
 
     setLoading(true);
     try {
+      // NOTE: Usando a variável de ambiente VITE_API_URL, conforme o código original
       const url = import.meta.env.VITE_API_URL;
 
       const response = await axios.post(url + "/api/payment-success/", {
         usuario_token: usuario_token,
       });
 
-      if (response.data.status === "approved") {
+      const status = response.data.status;
+
+      if (status === "approved") {
         setVerified(true);
-        setStatusPagamento("Pagamento aprovado! Você pode acessar seus recursos.");
-      } else if (response.data.status === "pending") {
-        setStatusPagamento("Pagamento pendente. Aguarde a confirmação.");
+        setStatusPagamento("Pagamento <strong>Aprovado</strong>! Acesso liberado aos recursos premium.");
+      } else if (status === "pending" || status === "in_process") {
+        setStatusPagamento("Pagamento <strong>Pendente</strong>. Aguarde a confirmação do banco/emissor.");
       } else {
-        setStatusPagamento("Pagamento não aprovado. Tente novamente mais tarde.");
+        setStatusPagamento("Pagamento <strong>Não Aprovado</strong>. Verifique seus dados ou tente outro método.");
       }
     } catch (error) {
       console.error("Erro ao verificar pagamento:", error);
-      setStatusPagamento("Erro ao verificar pagamento. Tente novamente.");
+      setStatusPagamento("Erro de Conexão. Tente verificar o status novamente.");
     } finally {
       setLoading(false);
     }
   };
 
+  const getStatusClass = () => {
+    if (loading) return "loading";
+    if (verified) return "success";
+    if (statusPagamento?.includes("Pendente")) return "warning";
+    if (statusPagamento) return "danger";
+    return "";
+  };
+
+  const getStatusIcon = () => {
+      if (loading) return <FaSpinner className="animate-spin" />;
+      if (verified) return <FaCircleCheck />;
+      if (statusPagamento?.includes("Pendente")) return <FaHourglassHalf />;
+      return <FaCircleExclamation />;
+  };
+
   return (
-    <div className="min-vh-100">
+    <div className="min-vh-100 plano-validation-wrapper">
       <style>{`
-        /* Paleta de cores */
+        /* Paleta de cores (Consistente VemAgendar) */
         :root {
           --primary-blue: #003087;
-          --light-blue: #4dabf7;
-          --dark-gray: #2d3748;
-          --light-gray: #f7fafc;
+          --accent-blue: #0056b3;
+          --dark-gray: #212529;
+          --light-gray-bg: #f0f4f8; /* Fundo suave */
           --white: #ffffff;
-          --accent-yellow: #f6c107;
           --success-green: #28a745;
           --danger-red: #dc3545;
           --warning-orange: #fd7e14;
         }
 
         /* Estilos gerais */
-        .custom-bg {
-          background-color: var(--light-gray);
+        .plano-validation-wrapper {
+          background-color: var(--light-gray-bg);
         }
 
-        /* Container */
+        /* Container Principal */
         .validar-plano-container {
           display: flex;
-          flex-direction: column;
           align-items: center;
           justify-content: center;
-          min-height: calc(100vh - 70px); /* Ajusta para o Navbar */
+          min-height: calc(100vh - 70px);
           padding: 3rem 1rem;
         }
-        .validar-plano-container .card {
+        
+        /* Card Central */
+        .validar-plano-container .card-verification {
           background-color: var(--white);
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          max-width: 500px;
+          border-radius: 16px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+          max-width: 550px;
           width: 100%;
-          padding: 2rem;
+          padding: 2.5rem;
           text-align: center;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          border-top: 6px solid var(--primary-blue);
         }
-        .validar-plano-container .card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        }
-        .validar-plano-container h1 {
+        
+        .card-verification h1 {
           color: var(--primary-blue);
-          font-weight: 700;
-          font-size: 2rem;
+          font-weight: 800;
+          font-size: 2.25rem;
           margin-bottom: 1rem;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.5rem;
+          gap: 0.75rem;
         }
-        .validar-plano-container .lead {
+        .card-verification h1 svg {
+            color: var(--accent-blue);
+        }
+        .card-verification .lead {
           color: var(--dark-gray);
           font-size: 1.1rem;
           margin-bottom: 2rem;
         }
 
-        /* Status message */
+        /* Status Message */
         .status-message {
-          font-size: 1.1rem;
-          margin-bottom: 2rem;
+          font-size: 1.15rem;
+          font-weight: 700;
+          margin-bottom: 2.5rem;
+          padding: 1rem;
+          border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.5rem;
+          gap: 0.75rem;
+          border: 1px solid transparent;
         }
+        
         .status-message.success {
           color: var(--success-green);
+          background-color: #e6f8ee;
+          border-color: var(--success-green);
         }
         .status-message.danger {
           color: var(--danger-red);
+          background-color: #fcebeb;
+          border-color: var(--danger-red);
         }
         .status-message.warning {
           color: var(--warning-orange);
+          background-color: #fff7e6;
+          border-color: var(--warning-orange);
         }
         .status-message.loading {
-          color: var(--dark-gray);
+          color: var(--primary-blue);
+          background-color: #f0f4f8;
+        }
+        .status-message strong {
+            font-weight: 900;
+            margin-right: 0.25rem;
+        }
+        .status-message svg {
+            font-size: 1.5rem;
         }
 
         /* Botões */
-        .btn {
-          padding: 0.75rem;
-          border-radius: 8px;
-          font-weight: 600;
+        .btn-custom {
+          padding: 0.8rem;
+          border-radius: 10px;
+          font-weight: 700;
           font-size: 1rem;
           transition: all 0.3s ease;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .btn-success {
+        .btn-success-custom {
           background-color: var(--success-green);
           border-color: var(--success-green);
+          color: var(--white);
         }
-        .btn-outline-success {
-          border-color: var(--success-green);
-          color: var(--success-green);
-        }
-        .btn:hover {
+        .btn-success-custom:hover:not(:disabled) {
+          background-color: #1e8736;
+          border-color: #1e8736;
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 6px 16px rgba(40, 167, 69, 0.3);
         }
-        .btn:disabled {
-          background-color: #6c757d;
-          border-color: #6c757d;
+        .btn-outline-custom {
+          border: 2px solid var(--success-green);
+          color: var(--success-green);
+          background-color: var(--white);
+        }
+        .btn-outline-custom:hover:not(:disabled) {
+          background-color: #e6f8ee;
+          color: var(--success-green);
+          transform: translateY(-1px);
+        }
+        .btn-custom:disabled {
+          background-color: #adb5bd !important;
+          border-color: #adb5bd !important;
           cursor: not-allowed;
-          opacity: 0.7;
+          box-shadow: none;
         }
 
         /* Responsividade */
         @media (max-width: 576px) {
-          .validar-plano-container {
-            padding: 2rem 1rem;
-          }
-          .validar-plano-container .card {
+          .card-verification {
             padding: 1.5rem;
           }
-          .validar-plano-container h1 {
-            font-size: 1.75rem;
-          }
-          .validar-plano-container .lead {
-            font-size: 1rem;
+          .card-verification h1 {
+            font-size: 1.8rem;
           }
           .status-message {
             font-size: 1rem;
-          }
-          .btn {
-            font-size: 0.9rem;
-            padding: 0.5rem;
           }
         }
       `}</style>
       <div className="custom-bg min-vh-100">
         <Navbar />
         <div className="validar-plano-container">
-          <div className="card">
+          <div className="card-verification">
             <div className="card-body">
               <h1>
-                <FaCheckCircle /> Verificação de Pagamento
+                <FaCircleCheck /> Verificação do Plano
               </h1>
               <p className="lead">
-                Verifique o status do pagamento de seu plano abaixo.
+                Estamos processando seu pagamento. Por favor, aguarde alguns
+                instantes ou verifique o status novamente.
               </p>
               <div className="mb-4">
+                {/* Mensagem de Status Dinâmica */}
                 {loading ? (
                   <p className="status-message loading">
-                    <FaSpinner className="fa-spin me-2" /> Verificando status...
+                    <FaSpinner className="animate-spin" /> Verificando status...
                   </p>
                 ) : statusPagamento ? (
                   <p
-                    className={`status-message ${
-                      verified
-                        ? "success"
-                        : statusPagamento.includes("pendente")
-                        ? "warning"
-                        : "danger"
-                    }`}
+                    className={`status-message ${getStatusClass()}`}
                   >
-                    {verified ? (
-                      <FaCheckCircle />
-                    ) : statusPagamento.includes("pendente") ? (
-                      <FaExclamationCircle />
-                    ) : (
-                      <FaExclamationCircle />
-                    )}
-                    {statusPagamento}
+                    {getStatusIcon()}
+                    {/* Renderiza o texto do status, substituindo <strong> por tags <strong> */}
+                    <span dangerouslySetInnerHTML={{ __html: statusPagamento.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
                   </p>
                 ) : null}
               </div>
+
+              {/* Botão de Ação Principal */}
               <button
                 onClick={verificarPagamento}
-                className="btn btn-success w-100 mb-3"
+                className="btn-custom btn-success-custom w-100 mb-3"
                 disabled={loading || verified}
               >
                 {loading
                   ? "Verificando..."
                   : verified
-                  ? "Pagamento Confirmado!"
+                  ? "Acesso Liberado!"
                   : "Verificar Status do Pagamento"}
               </button>
+
+              {/* Link de Retorno */}
               <Link
                 to="/"
-                className="btn btn-outline-success w-100"
+                className="btn-custom btn-outline-custom w-100"
               >
-                Voltar ao Início
+                Voltar à Página Principal
               </Link>
             </div>
           </div>

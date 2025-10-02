@@ -3,333 +3,381 @@ import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import { Funcionario } from "../interfaces/Funcionario";
 import Navbar from "../components/Navbar";
-import { FaBuilding, FaInfoCircle, FaTools, FaUserTie, FaCalendar, FaSpinner, FaExclamationCircle } from "react-icons/fa";
+import {
+FaTools, FaCalendarAlt, FaSpinner,
+  FaMapMarkerAlt, FaEnvelope, FaPhoneAlt, FaRegAddressCard,
+  FaClipboardList, FaUsers, FaEye
+} from "react-icons/fa";
 
 function EmpresaDetails() {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
-  const empresas = useFetch<Empresa[]>(`/api/empresa/?q=${empresaNome}`);
-  const funcionarios = useFetch<Funcionario[]>(`/api/funcionario/?empresa_nome=${empresaNome}`);
+  const { data: empresasData, loading: empresasLoading } = useFetch<Empresa[]>(`/api/empresa/?q=${empresaNome}`);
+  const { data: funcionariosData, loading: funcionariosLoading } = useFetch<Funcionario[]>(`/api/funcionario/?empresa_nome=${empresaNome}`);
 
-  const empresa = empresas.data?.find(
+  const empresa = empresasData?.find(
     (e) => e.nome.toLowerCase() === empresaNome?.toLowerCase()
   );
+
+  if (!empresa) {
+      return <>SEM</>
+  }
 
   return (
     <div className="min-vh-100">
       <style>{`
-        /* Paleta de cores */
+        /* Paleta de Cores e Tipografia */
         :root {
-          --primary-blue: #003087;
-          --light-blue: #4dabf7;
-          --dark-gray: #2d3748;
-          --light-gray: #f7fafc;
-          --white: #ffffff;
-          --success-green: #28a745;
-          --danger-red: #dc3545;
-          --warning-orange: #fd7e14;
+          --primary-blue: #004c99; /* Azul Profundo e Sóbrio */
+          --secondary-color: #f7f9fc; /* Fundo Leve */
+          --card-bg: #ffffff;
+          --text-dark: #333333;
+          --text-muted: #888888;
+          --accent-green: #10b981; /* Verde de Ação / Sucesso */
+          --border-light: #e0e6ed;
+          --danger-red: #e74c3c; /* Cor de erro */
         }
 
-        /* Estilos gerais */
+        /* Estilos Gerais */
         .custom-bg {
-          background-color: var(--light-gray);
+          background-color: var(--secondary-color);
         }
 
-        /* Container */
+        /* Container Principal com Padding e Sombra */
         .empresa-details-container {
-          padding: 3rem 0;
+          padding: 3rem 1.5rem;
+          max-width: 1400px;
+          margin: 0 auto;
         }
 
-        /* Cabeçalho */
-        .empresa-header {
-          text-align: center;
-          margin-bottom: 2rem;
-        }
-        .empresa-header h1 {
-          color: var(--primary-blue);
-          font-weight: 700;
-          font-size: 2.5rem;
-          margin-bottom: 1rem;
+        /* Layout de Duas Colunas (Lateral e Conteúdo) */
+        .main-content-wrapper {
           display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          gap: 1.5rem; 
         }
-        .empresa-header .text-muted {
-          color: var(--dark-gray);
-          font-size: 1.1rem;
+        .sidebar {
+          flex: 0 0 320px; 
+        }
+        .content {
+          flex-grow: 1;
+        }
+        @media (max-width: 992px) {
+          .main-content-wrapper {
+            flex-direction: column;
+          }
+          .sidebar {
+            flex: 0 0 auto;
+          }
         }
 
-        /* Imagem */
-        .empresa-image {
-          text-align: center;
-          margin-bottom: 2rem;
+        /* Cards em Geral - APLICANDO BORDA E REFORÇANDO A SOMBRA */
+        .identity-card, .cta-box, .info-card {
+            border: 1px solid var(--border-light); /* Borda sutil */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Sombra mais discreta no geral */
         }
-        .empresa-image img {
-          max-width: 400px;
+        
+        /* Header e Logo na Sidebar (Card de Identidade) */
+        .identity-card {
+          background-color: var(--card-bg);
           border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          padding: 2rem;
+          text-align: center;
+          margin-bottom: 1rem; 
         }
-
-        /* Informações e Serviços */
-        .info-section, .servicos-section {
-          margin-bottom: 2rem;
-        }
-        .info-section h4, .servicos-section h4 {
+        .identity-card h1 {
           color: var(--primary-blue);
           font-weight: 700;
-          font-size: 1.5rem;
-          margin-bottom: 1.5rem;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
+          font-size: 1.8rem;
+          margin-top: 1rem;
+          margin-bottom: 0.25rem;
         }
-        .info-section .list-group-item, .servicos-section .list-group-item {
-          border: none;
-          border-bottom: 1px solid var(--light-blue);
-          padding: 0.75rem 0;
+        .identity-card p {
+          color: var(--text-muted);
+          font-style: italic;
           font-size: 1rem;
-          color: var(--dark-gray);
-          background-color: transparent;
         }
-
-        /* Funcionários */
-        .funcionarios-section {
-          margin-bottom: 2rem;
-          text-align: center;
-        }
-        .funcionarios-section h4 {
-          color: var(--primary-blue);
-          font-weight: 700;
-          font-size: 1.5rem;
-          margin-bottom: 1.5rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-        }
-        .funcionarios-section .card {
-          background-color: var(--white);
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          width: 250px;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .funcionarios-section .card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        }
-        .funcionarios-section .card-img-top {
-          width: 80px;
-          height: 80px;
-          object-fit: cover;
+        .empresa-logo {
+          width: 150px;
+          height: 150px;
           border-radius: 50%;
-          margin: 1rem auto;
-        }
-        .funcionarios-section .card-title {
-          color: var(--primary-blue);
-          font-weight: 600;
-          font-size: 1.1rem;
+          border: 4px solid var(--primary-blue);
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          object-fit: cover;
+          margin: 0 auto;
         }
 
-        /* Botões */
-        .btn {
-          padding: 0.75rem 1.5rem;
+        /* CTA Fixo/Destaque */
+        .cta-box {
+          background-color: var(--primary-blue);
+          color: var(--card-bg);
+          padding: 1.5rem;
           border-radius: 8px;
-          font-weight: 600;
-          font-size: 1rem;
+          box-shadow: 0 6px 15px rgba(0, 76, 153, 0.4); 
+          text-align: center;
+          margin-bottom: 1rem; 
+          border: none;
+        }
+        .cta-box .btn-cta {
+          background-color: var(--accent-green);
+          border-color: var(--accent-green);
+          font-size: 1.15rem;
+          font-weight: 700;
+          padding: 0.75rem 2rem;
           transition: all 0.3s ease;
         }
-        .btn-success {
-          background-color: var(--success-green) !important;
-          border-color: var(--success-green) !important;
-          color: #fff !important;
-        }
-        .btn-primary {
-          background-color: var(--primary-blue);
-          border-color: var(--primary-blue);
-        }
-        .btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        .cta-box .btn-cta:hover {
+          background-color: #0d9472;
+          border-color: #0d9472;
+          transform: scale(1.02);
         }
 
-        /* Mensagens */
+        /* Cards de Conteúdo (Visão Geral, Detalhes, Serviços) */
+        .info-card {
+          background-color: var(--card-bg);
+          border-radius: 12px;
+          padding: 2rem;
+          margin-bottom: 1.5rem; 
+          /* REMOVIDO: height: 100%; para que os cards cresçam dinamicamente */
+        }
+        .info-card h4 {
+          color: var(--primary-blue);
+          font-weight: 700;
+          font-size: 1.5rem;
+          margin-bottom: 1.5rem;
+          padding-bottom: 0.5rem;
+          border-bottom: 2px solid var(--border-light);
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+        
+        /* Ajustes na Visão Geral/Contato para ser mais compacta */
+        .contact-item {
+          padding: 0.5rem 0; /* Menos padding */
+          display: flex;
+          align-items: center;
+          font-size: 0.95rem; /* Fonte um pouco menor */
+          color: var(--text-dark);
+        }
+        .contact-item strong {
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-right: 0.5rem;
+        }
+        .contact-item a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        /* Serviços */
+        .servicos-list {
+            list-style: none;
+            padding: 0;
+        }
+        .servicos-list li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-dark);
+            border-bottom: 1px dashed var(--border-light);
+        }
+        .servicos-list li:last-child {
+            border-bottom: none;
+        }
+        .servicos-list .service-icon {
+            color: var(--accent-green);
+            font-size: 1.1rem;
+        }
+
+
+        /* Funcionários (Equipe) */
+        .funcionarios-card .member-card {
+          border: 1px solid var(--border-light); 
+          transition: all 0.3s ease;
+          overflow: hidden;
+          height: 100%;
+          text-align: center;
+          box-shadow: none;
+        }
+        .funcionarios-card .member-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .funcionarios-card .member-img {
+          width: 90px;
+          height: 90px;
+          border: 3px solid var(--accent-green);
+          padding: 2px;
+          margin: 1rem auto 0.5rem;
+          object-fit: cover;
+        }
+        .funcionarios-card .card-title {
+          color: var(--primary-blue);
+          font-weight: 600;
+          font-size: 1.1rem;
+        }
+
+        /* Mensagens de Status */
         .message {
           font-size: 1.1rem;
           padding: 1.5rem;
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          max-width: 600px;
-          margin: 0 auto;
+          max-width: 700px;
+          margin: 4rem auto;
           text-align: center;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
+          background-color: var(--card-bg);
+          border: 1px solid var(--border-light);
         }
         .message.loading {
-          color: var(--dark-gray);
-          background-color: var(--white);
+          color: var(--primary-blue);
+          border-color: var(--primary-blue);
         }
         .message.error {
           color: var(--danger-red);
-          background-color: var(--white);
-        }
-
-        /* Responsividade */
-        @media (max-width: 991px) {
-          .empresa-details-container {
-            padding: 2rem 1rem;
-          }
-          .empresa-header h1 {
-            font-size: 2rem;
-          }
-          .empresa-image img {
-            max-width: 300px;
-          }
-          .info-section h4, .servicos-section h4, .funcionarios-section h4 {
-            font-size: 1.25rem;
-          }
-        }
-        @media (max-width: 576px) {
-          .empresa-header h1 {
-            font-size: 1.75rem;
-          }
-          .empresa-header .text-muted {
-            font-size: 1rem;
-          }
-          .empresa-image img {
-            max-width: 250px;
-          }
-          .info-section .list-group-item, .servicos-section .list-group-item {
-            font-size: 0.9rem;
-          }
-          .funcionarios-section .card {
-            width: 200px;
-          }
-          .funcionarios-section .card-img-top {
-            width: 60px;
-            height: 60px;
-          }
-          .funcionarios-section .card-title {
-            font-size: 1rem;
-          }
-          .btn {
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-          }
-          .message {
-            font-size: 1rem;
-            padding: 1rem;
-          }
+          border-color: var(--danger-red);
         }
       `}</style>
       <div className="custom-bg min-vh-100">
         <Navbar />
         <div className="empresa-details-container container">
-          {empresas.loading ? (
+          {empresasLoading || funcionariosLoading ? (
             <div className="message loading">
-              <FaSpinner className="fa-spin me-2" /> Carregando dados da empresa...
-            </div>
-          ) : !empresa ? (
-            <div className="message error">
-              <FaExclamationCircle /> Empresa não encontrada.
-              <Link to="/" className="btn btn-primary mt-3 ms-3">
-                Voltar para Home
-              </Link>
+              <FaSpinner className="fa-spin me-2" /> Carregando informações empresariais...
             </div>
           ) : (
-            <>
-              <div className="empresa-header">
-                <h1>
-                  <FaBuilding /> {empresa.nome}
-                </h1>
-                <p className="text-muted">
-                  {empresa.endereco} | {empresa.telefone}
-                </p>
-              </div>
-              <div className="empresa-image">
-                <img
-                  src={empresa.logo || "https://via.placeholder.com/400x200?text=Sem+Logo"}
-                  alt={empresa.nome}
-                  className="img-fluid"
-                />
-              </div>
-              <div className="row">
-                <div className="col-lg-6 info-section">
-                  <h4>
-                    <FaInfoCircle /> Informações
-                  </h4>
-                  <ul className="list-group">
-                    <li className="list-group-item">
-                      <strong>CNPJ:</strong> {empresa.cnpj}
-                    </li>
-                    <li className="list-group-item">
-                      <strong>Email:</strong> {empresa.email}
-                    </li>
-                  </ul>
+            <div className="main-content-wrapper">
+
+              {/* === BARRA LATERAL: Identidade e CTA === */}
+              <aside className="sidebar">
+                {/* Card de Identidade */}
+                <div className="identity-card">
+                  <img
+                    src={empresa.logo || "https://via.placeholder.com/150x150?text=LOGO"}
+                    alt={`Logo da ${empresa.nome}`}
+                    className="empresa-logo"
+                  />
+                  <h1>{empresa.nome}</h1>
+                  <p className="text-muted">Detalhes e Agendamento</p>
                 </div>
-                <div className="col-lg-6 servicos-section">
-                  <h4>
-                    <FaTools /> Serviços Disponíveis
-                  </h4>
-                  <ul className="list-group">
-                    {empresa.servicos && empresa.servicos.length > 0 ? (
-                      empresa.servicos.map((servico, index) => (
-                        <li key={index} className="list-group-item">
-                          {servico.nome}
+
+                {/* Card CTA (Chamada para Ação) */}
+                <div className="cta-box">
+                    <p className="mb-3 fw-bold">Pronto para começar?</p>
+                    <Link
+                        to={`/agendar/${empresa.nome}`}
+                        className="btn btn-cta"
+                    >
+                        <FaCalendarAlt className="me-2" /> Agendar Serviço
+                    </Link>
+                </div>
+
+                {/* Card Detalhes Corporativos */}
+                <div className="info-card">
+                    <h4>
+                        <FaRegAddressCard /> Detalhes Corporativos
+                    </h4>
+                    <ul className="list-group info-list">
+                        <li className="list-group-item">
+                            <strong>CNPJ:</strong> <span className="text-end">{empresa.cnpj || "Não Informado"}</span>
                         </li>
-                      ))
+                    </ul>
+                </div>
+              </aside>
+
+              {/* === CONTEÚDO PRINCIPAL === */}
+              <div className="content">
+
+                {/* Visão Geral (Contato e Localização) - Layout Compactado */}
+                <div className="info-card">
+                    <h4>
+                        <FaEye /> Visão Geral e Contato
+                    </h4>
+                    <div className="row g-2"> {/* g-2 para reduzir o espaçamento entre colunas */}
+
+                        {/* Email e Telefone */}
+                        <div className="col-lg-6">
+                            <div className="contact-item">
+                                <strong><FaEnvelope className="me-1" /> Email:</strong>
+                                <a href={`mailto:${empresa.email}`} className="text-truncate">{empresa.email || "N/I"}</a>
+                            </div>
+                            <div className="contact-item">
+                                <strong><FaPhoneAlt className="me-1" /> Telefone:</strong>
+                                <a href={`tel:${empresa.telefone}`}>{empresa.telefone || "N/I"}</a>
+                            </div>
+                        </div>
+
+                        {/* Endereço */}
+                        <div className="col-lg-6">
+                            <div className="contact-item">
+                                <strong><FaMapMarkerAlt className="me-1" /> Endereço:</strong>
+                                <span className="text-end">{empresa.endereco || "Não Informado"}</span>
+                            </div>
+                            {/* Um espaço vazio para preencher a coluna, se necessário */}
+                            <div className="contact-item invisible">.</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Serviços Oferecidos */}
+                <div className="info-card">
+                    <h4>
+                        <FaClipboardList /> Escopo de Serviços
+                    </h4>
+                    <ul className="servicos-list">
+                        {empresa.servicos && empresa.servicos.length > 0 ? (
+                          empresa.servicos.map((servico, index) => (
+                            <li key={index}>
+                              <FaTools className="service-icon" />
+                              {servico.nome}
+                            </li>
+                          ))
+                        ) : (
+                          <li className="text-muted">Nenhum serviço fundamental cadastrado no momento.</li>
+                        )}
+                    </ul>
+                </div>
+
+                {/* Equipe (Funcionários) */}
+                <div className="info-card funcionarios-card">
+                    <h4>
+                        <FaUsers /> Nossos Profissionais
+                    </h4>
+                    {funcionariosData && funcionariosData.length > 0 ? (
+                      <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+                        {funcionariosData.slice(0, 8).map((funcionario) => (
+                          <div
+                            key={funcionario.id}
+                            className="col"
+                          >
+                            <div className="card member-card">
+                              <img
+                                src={funcionario.foto || "https://via.placeholder.com/90x90?text=USR"}
+                                alt={funcionario.nome}
+                                className="card-img-top rounded-circle member-img"
+                              />
+                              <div className="card-body">
+                                <h5 className="card-title">{funcionario.nome}</h5>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        {funcionariosData.length > 8 && (
+                            <div className="col-12 text-center mt-4">
+                                <p className="text-muted">E mais {funcionariosData.length - 8} profissionais...</p>
+                            </div>
+                        )}
+                      </div>
                     ) : (
-                      <li className="list-group-item text-muted">
-                        Nenhum serviço cadastrado.
-                      </li>
+                      <p className="text-muted">Nenhum profissional listado para esta unidade.</p>
                     )}
-                  </ul>
                 </div>
               </div>
-              <div className="funcionarios-section">
-                <h4>
-                  <FaUserTie /> Funcionários
-                </h4>
-                {funcionarios.loading ? (
-                  <div className="message loading">
-                    <FaSpinner className="fa-spin me-2" /> Carregando funcionários...
-                  </div>
-                ) : funcionarios.data && funcionarios.data.length > 0 ? (
-                  <div className="row justify-content-center">
-                    {funcionarios.data.map((funcionario, index) => (
-                      <div
-                        key={funcionario.id}
-                        className="col-md-4 col-sm-6 mb-3"
-                      >
-                        <div className="card">
-                          <img
-                            src={funcionario.foto || "https://via.placeholder.com/80x80?text=Sem+Foto"}
-                            alt={funcionario.nome}
-                            className="card-img-top"
-                          />
-                          <div className="card-body">
-                            <h5 className="card-title">{funcionario.nome}</h5>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-muted">Nenhum funcionário cadastrado.</p>
-                )}
-              </div>
-              <div className="text-center mt-5">
-                <Link
-                  to={`/agendar/${empresa.nome}`}
-                  className="btn btn-success"
-                >
-                  <FaCalendar /> Agendar Agora
-                </Link>
-              </div>
-            </>
+            </div>
           )}
         </div>
       </div>
