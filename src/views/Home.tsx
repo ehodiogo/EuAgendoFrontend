@@ -3,9 +3,57 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "../components/Navbar";
 import { FaGithub, FaInstagram, FaLinkedin, FaRoad, FaUser } from "react-icons/fa";
 import { BsFillFileLockFill } from "react-icons/bs";
+import { useEffect, useState } from "react";
+import { useFetch } from "../functions/GetData.tsx";
+import { Plano } from "../interfaces/Plano.tsx";
 
 function Home() {
   const navigate = useNavigate();
+  const { data, loading } = useFetch<Plano[]>("/api/planos");
+  const [planos, setPlanos] = useState<Plano[]>([]);
+
+  useEffect(() => {
+    if (!loading && data) {
+      // @ts-ignore
+      const rawPlanos = Array.isArray(data) ? data : data.results;
+      if (Array.isArray(rawPlanos)) {
+        const mapped = rawPlanos
+          .filter((plano: Plano) => plano.nome.toLowerCase() !== "free trial")
+          .map((plano: Plano) => ({
+            nome: plano.nome,
+            valor: plano.valor,
+            valor_cheio: plano.valor_cheio,
+            is_promo: plano.is_promo,
+            porcentagem_promo: plano.porcentagem_promo,
+            duracao_em_dias: plano.duracao_em_dias,
+            quantidade_empresas: plano.quantidade_empresas,
+            quantidade_funcionarios: plano.quantidade_funcionarios,
+            cor: getPlanColor(plano.nome),
+            features: [
+              `Até ${plano.quantidade_empresas} empresa${plano.quantidade_empresas > 1 ? "s" : ""}`,
+              `Até ${plano.quantidade_funcionarios} funcionário${plano.quantidade_funcionarios > 1 ? "s" : ""} por empresa`,
+            ],
+            descricao: plano.descricao || "Plano ideal para seu negócio",
+          }));
+        setPlanos(mapped);
+      }
+    }
+  }, [loading, data]);
+
+  const getPlanColor = (nome: string) => {
+    switch (nome.toLowerCase()) {
+      case "free trial":
+        return "#6c757d";
+      case "plano básico":
+        return "#28a745";
+      case "plano profissional":
+        return "#dc3545";
+      case "plano corporativo":
+        return "#003087";
+      default:
+        return "#6c757d";
+    }
+  };
 
   return (
     <div className="min-vh-100">
@@ -78,32 +126,30 @@ function Home() {
           max-width: 700px;
           margin: 0 auto;
         }
-        .custom-card {
+
+        /* Benefícios */
+        .benefit-card {
           border: none;
           border-radius: 12px;
           background-color: var(--white);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
           padding: 2rem;
+          position: relative;
+          padding-top: 3rem;
         }
-        .custom-card:hover {
+        .benefit-card:hover {
           transform: translateY(-5px);
           box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
-        .custom-card h3 {
+        .benefit-card h3 {
           color: var(--primary-blue);
           font-size: 1.5rem;
           font-weight: 600;
         }
-        .custom-card p {
+        .benefit-card p {
           color: var(--dark-gray);
           font-size: 1rem;
-        }
-
-        /* Benefícios */
-        .benefit-card {
-          position: relative;
-          padding-top: 3rem;
         }
         .benefit-icon {
           position: absolute;
@@ -120,8 +166,16 @@ function Home() {
 
         /* Avaliações */
         .review-card {
-          position: relative;
+          border: none;
+          border-radius: 12px;
+          background-color: var(--white);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
           padding: 2rem;
+        }
+        .review-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
         .review-card .avatar {
           width: 48px;
@@ -149,36 +203,85 @@ function Home() {
         }
 
         /* Planos */
+        .plan-row {
+          display: flex;
+          flex-wrap: nowrap;
+          gap: 1.5rem;
+          justify-content: center;
+        }
         .plan-card {
-          position: relative;
-          padding: 3rem 2rem 2rem;
+          border: none;
+          border-radius: 12px;
+          background-color: var(--white);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
+          padding: 2rem;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          flex: 1;
+          max-width: 280px;
         }
         .plan-card:hover {
           transform: translateY(-8px);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        .plan-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 4px;
+          background: linear-gradient(90deg, var(--light-blue), var(--primary-blue));
+          border-radius: 12px 12px 0 0;
+        }
+        .plan-card h4 {
+          color: var(--primary-blue);
+          font-size: 1.5rem;
+          font-weight: 600;
+          margin-bottom: 1rem;
         }
         .plan-card .plan-price {
           font-size: 2rem;
           font-weight: 700;
           color: var(--primary-blue);
+          margin-bottom: 0.5rem;
+        }
+        .plan-card .full-price {
+          font-size: 1.25rem;
+          color: #6c757d;
+          text-decoration: line-through;
+          margin-left: 0.5rem;
+        }
+        .plan-card .discount {
+          font-size: 1rem;
+          color: #dc3545;
+          font-weight: 600;
           margin-bottom: 1rem;
         }
-        .plan-card .plan-features {
+        .plan-card ul {
           list-style: none;
           padding: 0;
           margin-bottom: 1.5rem;
           color: var(--dark-gray);
+          flex-grow: 1;
         }
-        .plan-card .plan-features li {
+        .plan-card ul li {
           margin-bottom: 0.5rem;
           display: flex;
           align-items: center;
         }
-        .plan-card .plan-features li::before {
+        .plan-card ul li::before {
           content: "✔";
           color: var(--light-blue);
           margin-right: 0.5rem;
+        }
+        .plan-card .plan-desc {
+          color: var(--dark-gray);
+          font-size: 1rem;
+          margin-bottom: 1.5rem;
         }
 
         /* Lançamentos Futuros */
@@ -229,6 +332,15 @@ function Home() {
         }
 
         /* Responsividade */
+        @media (max-width: 1200px) {
+          .plan-row {
+            flex-wrap: wrap;
+          }
+          .plan-card {
+            max-width: 45%;
+            flex: 1 1 45%;
+          }
+        }
         @media (max-width: 991px) {
           .custom-header {
             flex-direction: column;
@@ -242,7 +354,9 @@ function Home() {
           .custom-section {
             padding: 2rem 0;
           }
-          .custom-card, .plan-card, .roadmap-card {
+          .plan-card {
+            max-width: 100%;
+            flex: 1 1 100%;
             margin-bottom: 1.5rem;
           }
         }
@@ -255,6 +369,18 @@ function Home() {
           }
           .custom-section h2 {
             font-size: 1.5rem;
+          }
+          .plan-card h4 {
+            font-size: 1.25rem;
+          }
+          .plan-card .plan-price {
+            font-size: 1.75rem;
+          }
+          .plan-card .full-price {
+            font-size: 1rem;
+          }
+          .plan-card .discount {
+            font-size: 0.9rem;
           }
         }
       `}</style>
@@ -311,7 +437,7 @@ function Home() {
               },
             ].map((item, index) => (
               <div key={index} className="col-md-4 d-flex mb-4">
-                <div className="custom-card benefit-card d-flex flex-column h-100">
+                <div className="benefit-card d-flex flex-column h-100">
                   <div className="benefit-icon">{item.icon}</div>
                   <h3>{item.title}</h3>
                   <p>{item.desc}</p>
@@ -343,7 +469,7 @@ function Home() {
                 },
               ].map((item, index) => (
                 <div key={index} className="col-md-4 d-flex mb-4">
-                  <div className="custom-card review-card d-flex flex-column h-100 p-4">
+                  <div className="review-card d-flex flex-column h-100 p-4">
                     <div className="avatar">
                       <FaUser />
                     </div>
@@ -359,47 +485,42 @@ function Home() {
 
         <section className="custom-section container text-center">
           <h2 className="fw-bold">Escolha seu Plano</h2>
-          <div className="row mt-4">
-            {[
-              {
-                title: "Básico",
-                price: "R$ 19.99/mês",
-                desc: "Ideal para pequenos negócios",
-                features: ["1 empresa", "5 funcionários por empresa"],
-              },
-              {
-                title: "Profissional",
-                price: "R$ 89.99/mês",
-                desc: "Perfeito para negócios em crescimento",
-                features: ["5 empresas", "15 funcionários por empresa"],
-              },
-              {
-                title: "Corporativo",
-                price: "R$ 149.99/mês",
-                desc: "Para grandes empresas",
-                features: ["20 empresas", "1000 funcionários por empresa"],
-              },
-            ].map((plano, index) => (
-              <div key={index} className="col-md-4 d-flex mb-4">
-                <div className="custom-card plan-card d-flex flex-column h-100">
-                  <h3>{plano.title}</h3>
-                  <div className="plan-price">{plano.price}</div>
-                  <p className="text-muted">{plano.desc}</p>
-                  <ul className="plan-features">
+          {loading ? (
+            <p>Carregando planos...</p>
+          ) : (
+            <div className="plan-row">
+              {planos.map((plano: Plano, index: number) => (
+                <div key={index} className="plan-card">
+                  <h4>{plano.nome}</h4>
+                  <div className="plan-price">
+                    R${plano.valor.toFixed(2)}
+                    {plano.is_promo && (
+                      <span className="full-price">
+                        R${plano.valor_cheio.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+                  {plano.is_promo && (
+                    <div className="discount">
+                      {plano.porcentagem_promo}% de desconto!
+                    </div>
+                  )}
+                  <p className="plan-desc">{plano.descricao}</p>
+                  <ul>
                     {plano.features.map((feature, idx) => (
                       <li key={idx}>{feature}</li>
                     ))}
                   </ul>
                   <button
-                    className="custom-btn btn px-4 fw-semibold"
+                    className="custom-btn"
                     onClick={() => navigate("/planos")}
                   >
                     Assine agora
                   </button>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="custom-section roadmap-section">

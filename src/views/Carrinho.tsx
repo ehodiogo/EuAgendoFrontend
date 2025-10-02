@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 function Carrinho() {
   interface Plano {
     nome: string;
-    preco: number;
+    valor: number;
   }
 
   const [carrinho, setCarrinho] = useState<Plano[]>([]);
@@ -19,7 +19,7 @@ function Carrinho() {
     setCarrinho(itensCarrinho);
   }, []);
 
-  const total = carrinho.reduce((acc, plano) => acc + plano.preco, 0);
+  const total = carrinho.reduce((acc, plano) => acc + plano.valor, 0);
 
   const removerItem = (index: number) => {
     const carrinhoAtualizado = carrinho.filter((_, i) => i !== index);
@@ -50,6 +50,8 @@ function Carrinho() {
       });
 
       if (response.data.url) {
+        localStorage.removeItem("carrinho");
+        setCarrinho([]);
         window.location.href = response.data.url;
       }
       // @ts-ignore
@@ -268,7 +270,7 @@ function Carrinho() {
                     <div key={index} className="cart-item">
                       <div>
                         <h6>{plano.nome}</h6>
-                        <small>R${plano.preco.toFixed(2)}</small>
+                        <small>R${plano.valor.toFixed(2)}</small>
                       </div>
                       <button
                         className="btn-remove"
