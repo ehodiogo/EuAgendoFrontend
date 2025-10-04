@@ -4,7 +4,7 @@ import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import AgendamentoDados from "../components/AgendamentoDados";
 import FiltrosAgendamento from "../components/FiltrosAgendamentos";
-import { FaTableList, FaCalendarDays, FaSpinner, FaPlus } from "react-icons/fa6"; // Atualizado para Fa6
+import { FaTableList, FaCalendarDays, FaSpinner, FaPlus } from "react-icons/fa6";
 
 interface AgendamentosHojeProps {
   empresa: Empresa;
@@ -16,16 +16,23 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
     `/api/agendamentos-hoje/?empresa_id=${empresa.id}`
   );
 
+  const isLocacao = empresa.tipo === "Locação";
+
   const alternarVisualizacao = (tipo: "tabela" | "quadro") => {
     setVisualizacao(tipo);
   };
 
-  // Constante de escala: 2px por minuto (1 hora = 120px)
   const MINUTE_SCALE = 2;
-  const HOUR_HEIGHT = 60 * MINUTE_SCALE; // 120px
+  const HOUR_HEIGHT = 60 * MINUTE_SCALE;
 
-    if(!agendamentosHoje.data) {
-        return <></>;
+    if(agendamentosHoje.loading || !agendamentosHoje.data) {
+        return (
+            <div className="agendamentos-view-wrapper">
+                <div className="loading-container status-message">
+                    <FaSpinner className="fa-spin me-3" /> Carregando agendamentos...
+                </div>
+            </div>
+        );
     }
 
   return (
@@ -284,17 +291,15 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
         }
       `}</style>
 
-      {/* Cabeçalho */}
       <div className="agendamentos-header">
           <h4>
             <FaCalendarDays /> Agendamentos de Hoje
           </h4>
           <p>
-            Agenda diária para a empresa <strong>{empresa.nome}</strong>.
+            Agenda diária para a empresa <strong>{empresa.nome}</strong> ({isLocacao ? "Locação" : "Serviços"}).
           </p>
       </div>
 
-      {/* Botões de Alternância */}
       <div className="view-toggle-buttons">
         <button
           className={`btn ${visualizacao === "tabela" ? "btn-primary active" : "btn-outline-primary"}`}
@@ -312,12 +317,7 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
         </button>
       </div>
 
-      {/* Conteúdo (Loading/Erro/Dados) */}
-      {agendamentosHoje.loading ? (
-        <div className="loading-container status-message">
-          <FaSpinner className="fa-spin me-3" /> Carregando agendamentos...
-        </div>
-      ) : !agendamentosHoje.data || agendamentosHoje.data.length === 0 ? (
+      {agendamentosHoje.data.length === 0 ? (
         <div className="empty-container status-message">
           Não há agendamentos para hoje na empresa {empresa.nome}.
           <br />
@@ -342,8 +342,7 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
                   {agendamentosHoje.data.map((agendamento: Agendamento) => (
                     <tr key={agendamento.id}>
                       <td>
-                        {/* AgendamentoDados é renderizado com o estilo padrão de lista/tabela */}
-                        <AgendamentoDados agendamento={agendamento} />
+                        <AgendamentoDados agendamento={agendamento} empresaTipo={empresa.tipo} />
                       </td>
                     </tr>
                   ))}
@@ -355,27 +354,30 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
               {[...Array(24)].map((_, hour) => {
                 const horaLabel = hour.toString().padStart(2, "0") + ":00";
 
-                // Filtra os agendamentos que iniciam nesta hora
-                const agendamentosHora = agendamentosHoje.data.filter(ag => {
+                // @ts-ignore
+                  const agendamentosHora = agendamentosHoje.data.filter(ag => {
                     const [agHour] = ag.hora.split(":");
                     return parseInt(agHour, 10) === hour;
                 });
 
                 return (
                   <div key={hour} className="hora-bloco">
-                    {/* Rótulo da Hora (apenas no topo do bloco) */}
                     {hour % 1 === 0 && <div className="hora-label">{horaLabel}</div>}
 
                     {agendamentosHora.length > 0 &&
                       agendamentosHora.map(ag => {
                         const [ , startMin] = ag.hora.split(":").map(Number);
-
-                        // Cálculo da duração em minutos. Assume que ag.duracao_servico já é em minutos.
                         const duracao = Number(ag.duracao_servico);
-
-                        // Posição vertical dentro do bloco de 1 hora
                         const topOffsetPx = startMin * MINUTE_SCALE;
                         const alturaPx = duracao * MINUTE_SCALE;
+
+                        const detalhePrincipal = isLocacao
+                            ? ag.locacao_nome
+                            : ag.servico_nome;
+
+                        const detalheSecundario = isLocacao
+                            ? ""
+                            : `com ${ag.funcionario_nome}`;
 
                         return (
                           <div
@@ -384,17 +386,13 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
                             style={{
                               top: `${topOffsetPx}px`,
                               height: `${alturaPx}px`,
-                              // Cores variadas para melhor diferenciação visual
                               backgroundColor: `hsl(${ag.id % 360}, 50%, 45%)`,
                             }}
                           >
-                            {/* Renderiza AgendamentoDados, mas o estilo do card-agendamento deve
-                                garantir que ele seja legível no espaço limitado. */}
                             <div className="agendamento-dados-inline">
                                 <strong>{ag.hora.slice(0, 5)} - {ag.cliente_nome}</strong>
-                                <div>{ag.servico_nome} com {ag.funcionario.nome}</div>
+                                <div>{detalhePrincipal} {detalheSecundario}</div>
                             </div>
-
                           </div>
                         );
                       })}

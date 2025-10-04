@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { useFetch } from "../functions/GetData.tsx";
 import { Plano } from "../interfaces/Plano.tsx";
 
-// Define os tipos de empresa possíveis
 type CompanyType = 'servico' | 'locacao';
 
 function Home() {
@@ -15,8 +14,6 @@ function Home() {
   const { data, loading } = useFetch<Plano[]>("/api/planos");
   const [planos, setPlanos] = useState<Plano[]>([]);
 
-  // 1. Estado para o Tipo de Empresa (Mockado)
-  // **Atenção:** Em produção, você DEVE buscar e definir o tipo real da empresa logada.
   const [companyType, setCompanyType] = useState<CompanyType>('servico');
 
   useEffect(() => {
@@ -28,7 +25,6 @@ function Home() {
           .filter((plano: Plano) => plano.nome.toLowerCase() !== "free trial")
           .map((plano: Plano) => {
 
-            // 2. Lógica Condicional para a Feature de Capacidade
             let capacityFeature = '';
             if (companyType === 'servico') {
                 const count = plano.quantidade_funcionarios;
@@ -62,7 +58,7 @@ function Home() {
         setPlanos(mapped);
       }
     }
-  }, [loading, data, companyType]); // 3. Adicionar companyType como dependência
+  }, [loading, data, companyType]);
 
   const getPlanColor = (nome: string) => {
     switch (nome.toLowerCase()) {
@@ -424,7 +420,6 @@ function Home() {
       <div className="custom-bg min-vh-100">
         <Navbar />
 
-        {/* 1. HERO SECTION (DESTAQUE) */}
         <header className="custom-header d-flex align-items-center text-white">
           <div className="container d-flex align-items-center flex-wrap-reverse justify-content-center">
             <div className="text-center text-lg-start col-lg-7 me-lg-4">
@@ -450,7 +445,6 @@ function Home() {
           </div>
         </header>
 
-        {/* 2. BENEFÍCIOS */}
         <section className="custom-section container text-center">
           <h2 className="fw-bold">Para quem o VemAgendar foi criado?</h2>
           <p className="text-muted-lg">
@@ -473,7 +467,6 @@ function Home() {
           </div>
         </section>
 
-        {/* 3. AVALIAÇÕES */}
         <section className="custom-section bg-light" style={{paddingTop: '3rem', paddingBottom: '3rem'}}>
           <div className="container">
             <h2 className="fw-bold text-center">O que nossos clientes dizem</h2>
@@ -578,7 +571,6 @@ function Home() {
           )}
         </section>
 
-        {/* 5. ROADMAP */}
         <section className="roadmap-section">
           <div className="container text-center">
             <h2 className="fw-bold">Junte-se à Nossa Jornada</h2>

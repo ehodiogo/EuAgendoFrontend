@@ -3,12 +3,11 @@ import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import AgendamentosHoje from "./AgendamentosHoje";
 import Navbar from "../components/Navbar";
-import { FaChevronDown, FaSpinner, FaBuilding } from "react-icons/fa6"; // Atualizado para Fa6
+import { FaChevronDown, FaSpinner, FaBuilding } from "react-icons/fa6";
 import React from "react";
 
 const EmpresasUsuario = () => {
   const token = localStorage.getItem("access_token");
-  // Assumindo que useFetch pode lidar com o token no cabeçalho ou URL
   const empresas = useFetch<Empresa[]>(
     `/api/empresas-usuario/?usuario_token=${token}`
   );
@@ -249,7 +248,6 @@ const EmpresasUsuario = () => {
                       {dropdownAberto === empresa.id && (
                         <tr>
                           <td colSpan={3} className="agendamentos-dropdown">
-                            {/* O componente AgendamentosHoje deve ser o único conteúdo desta célula */}
                             <AgendamentosHoje empresa={empresa} />
                           </td>
                         </tr>

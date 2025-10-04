@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { FaCircleXmark, FaRotateLeft, FaCircleExclamation } from "react-icons/fa6"; // Atualizado para Fa6
+import { FaCircleXmark, FaRotateLeft, FaCircleExclamation } from "react-icons/fa6";
 
 const FailurePage = () => {
   return (

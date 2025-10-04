@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
-import { FaStar, FaSpinner } from "react-icons/fa6"; // Atualizado para Fa6
+import { FaStar, FaSpinner } from "react-icons/fa6";
 import {FaCheckCircle, FaExclamationCircle, FaUserCircle as FaUserCircleSolid} from "react-icons/fa";
 import { AvaliacaoAgendamento } from "../interfaces/AvaliacaoAgendamento";
 import Navbar from "../components/Navbar";
 import axios from "axios";
 
-// Interface para o componente de Avaliação
 const AvaliacaoAgendamentoView = () => {
   const { identificador } = useParams<{ identificador: string }>();
   const [nota, setNota] = useState<number>(0);
@@ -15,12 +14,10 @@ const AvaliacaoAgendamentoView = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
 
-  // Busca de dados
   const { data: agendamentoData, loading } = useFetch<AvaliacaoAgendamento>(
     `/api/agendamento-avaliar/${identificador}`
   );
 
-  // Preenche estados iniciais com dados existentes, se houver
   useEffect(() => {
     if (agendamentoData && agendamentoData.avaliacao_existente) {
       setNota(agendamentoData.nota_avaliacao || 0);
@@ -29,13 +26,13 @@ const AvaliacaoAgendamentoView = () => {
   }, [agendamentoData]);
 
   const handleStarClick = (valor: number) => {
-    if (agendamentoData?.avaliacao_existente) return; // Impede alteração se já avaliado
+    if (agendamentoData?.avaliacao_existente) return;
     setNota(valor);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (nota === 0 || agendamentoData?.avaliacao_existente) return; // Impede submissão sem nota ou se já avaliado
+    if (nota === 0 || agendamentoData?.avaliacao_existente) return;
 
     setIsSubmitting(true);
     setSubmitStatus(null);
@@ -48,7 +45,7 @@ const AvaliacaoAgendamentoView = () => {
         {
           nota_avaliacao: nota,
           descricao_avaliacao: descricao,
-          compareceu_agendamento: true, // Assumimos que o cliente avaliando compareceu
+          compareceu_agendamento: true,
         },
         {
           headers: { "Content-Type": "application/json" },
@@ -67,11 +64,9 @@ const AvaliacaoAgendamentoView = () => {
     }
   };
 
-  // Determina se a avaliação já existe para desabilitar a edição
   const avaliacaoExistente = agendamentoData?.avaliacao_existente || false;
   const isDisabled = isSubmitting || avaliacaoExistente;
 
-  // Função para renderizar as estrelas (usando FaStar Solid)
   const renderStars = () => {
     const isEditing = !avaliacaoExistente;
     return (

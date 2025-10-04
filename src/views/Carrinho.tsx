@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import {FaTrash, FaArrowRight, FaCreditCard, FaLock } from "react-icons/fa6"; // Atualizado para Fa6
+import {FaTrash, FaArrowRight, FaCreditCard, FaLock } from "react-icons/fa6";
 import {FaShoppingCart} from "react-icons/fa";
 import { Link } from "react-router-dom";
 
@@ -34,14 +34,10 @@ function Carrinho() {
       return;
     }
 
-    // Nota: Seu backend parece esperar apenas um plano, pois você envia apenas carrinho[0].nome.
-    // Para um carrinho real, você enviaria um array de IDs/Nomes de planos.
-    // Mantendo sua lógica original por enquanto.
     const planoParaCheckout = carrinho[0];
 
     const usuario_token = localStorage.getItem("access_token");
     if (!usuario_token) {
-      // Redirecionamento para login é uma UX melhor aqui
       alert("Você precisa estar logado para finalizar a compra.");
       return;
     }
@@ -52,7 +48,7 @@ function Carrinho() {
       const url = import.meta.env.VITE_API_URL;
 
       const response = await axios.post(url + "/api/pagamento-plano/", {
-        plano_nome: planoParaCheckout.nome, // Enviando apenas o primeiro item
+        plano_nome: planoParaCheckout.nome,
         usuario_token: usuario_token,
       });
 
@@ -315,7 +311,6 @@ function Carrinho() {
           ) : (
             <div className="cart-grid">
 
-              {/* COLUNA ESQUERDA: ITENS DO CARRINHO */}
               <div className="cart-card">
                 <div className="item-list">
                   {carrinho.map((plano, index) => (
@@ -339,7 +334,6 @@ function Carrinho() {
                 </div>
               </div>
 
-              {/* COLUNA DIREITA: RESUMO E CHECKOUT */}
               <div className="cart-card summary-card">
                 <h3>Resumo do Pedido</h3>
 

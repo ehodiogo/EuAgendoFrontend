@@ -12,7 +12,6 @@ import { FaSpinner, FaCircleCheck, FaCircleXmark } from "react-icons/fa6";
 import {FaEdit} from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-// Tipo auxiliar para a lista consolidada
 interface ConsolidatedUsageItem {
     empresa: string;
     tipo: 'Serviço' | 'Locação';
@@ -47,12 +46,10 @@ const Profile = () => {
     }
   }, [user.data]);
 
-  // Efeito para consolidar os dados de uso
   useEffect(() => {
     if (usage.data) {
         const { limite_funcionarios, limite_locacoes, funcionarios_por_empresa, locacoes_por_empresa } = usage.data;
 
-        // 1. Consolidar Locações
         const locacaoItems: ConsolidatedUsageItem[] = locacoes_por_empresa.map(item => ({
             empresa: item.empresa,
             tipo: 'Locação',
@@ -60,7 +57,6 @@ const Profile = () => {
             max: limite_locacoes,
         }));
 
-        // 2. Consolidar Serviços/Funcionários
         const servicoItems: ConsolidatedUsageItem[] = funcionarios_por_empresa.map(item => ({
             empresa: item.empresa,
             tipo: 'Serviço',
@@ -68,10 +64,9 @@ const Profile = () => {
             max: limite_funcionarios,
         }));
 
-        // 3. Juntar e atualizar o estado
         setConsolidatedUsage([...locacaoItems, ...servicoItems]);
     }
-  }, [usage.data]); // Depende apenas dos dados de uso
+  }, [usage.data]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserData({ ...userData!, [e.target.name]: e.target.value });
@@ -86,7 +81,6 @@ const Profile = () => {
     setError(null);
     setSuccess(null);
 
-    // Validação mínima para não salvar com campos vazios (opcional, mas profissional)
     if (!userData.first_name || !userData.username || !userData.email) {
         setError("Todos os campos do perfil são obrigatórios.");
         setLoading(false);
@@ -191,7 +185,6 @@ const Profile = () => {
     }
   };
 
-  // Se estiver carregando, mostra apenas o spinner com Navbar
   if (user.loading || usage.loading || payments.loading) {
     return (
         <div className="min-vh-100 custom-bg">
@@ -206,7 +199,6 @@ const Profile = () => {
     );
   }
 
-  // Verifica se usage.data existe antes de prosseguir
   if (!usage.data) {
     return (
         <div className="min-vh-100 custom-bg">
@@ -221,7 +213,6 @@ const Profile = () => {
     );
   }
 
-  // --- Funções de Renderização de Uso Condicional ---
   const renderUsageProgress = (item: ConsolidatedUsageItem) => {
     const { current, max, tipo } = item;
     const percentage = calculateProgress(current, max);
@@ -246,8 +237,6 @@ const Profile = () => {
         </>
     );
   };
-  // ---------------------------------------------------
-
 
   return (
     <div className="min-vh-100">
@@ -480,7 +469,6 @@ const Profile = () => {
           </h1>
 
           <div className="profile-grid">
-            {/* COLUNA 1: DADOS DO PERFIL E SENHA */}
             <div className="profile-form-column">
                 <div className="base-card">
                     <h4><FaUser /> Dados Pessoais e Acesso</h4>
@@ -532,7 +520,6 @@ const Profile = () => {
                         />
                         </div>
 
-                        {/* Seção de Troca de Senha */}
                         <h5 className="text-primary mt-4 mb-3" style={{fontWeight: 600}}>Alterar Senha</h5>
                         <div className="mb-3 input-icon">
                         <label htmlFor="currentPassword" className="form-label">Senha Atual</label>
@@ -595,7 +582,6 @@ const Profile = () => {
                         </button>
                         </div>
 
-                        {/* Botões de Ação */}
                         <div className="d-grid gap-2">
                             {!isEditing ? (
                                 <button

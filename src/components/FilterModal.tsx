@@ -57,7 +57,6 @@ const FilterModal: React.FC<FilterModalProps> = ({
                             ))}
                         </select>
                     </div>
-                    {/* FIM DO NOVO CAMPO */}
 
                     <div className="row">
                         <div className="col-md-6 form-group">

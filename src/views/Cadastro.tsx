@@ -23,14 +23,13 @@ function Register() {
       const url = import.meta.env.VITE_API_URL;
 
       const response = await axios.post(url + "/api/register/", {
-        username: email, // Usando email como username, conforme sua API
+        username: email,
         first_name: name,
         email: email,
         password: password,
         codigo_usado: referralCode || null,
       });
 
-      // Redireciona para login após o registro bem-sucedido
       navigate("/login");
     } catch (err: any) {
       setError(

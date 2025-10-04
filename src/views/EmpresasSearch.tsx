@@ -7,7 +7,6 @@ import Navbar from "../components/Navbar";
 import FilterModal from "../components/FilterModal";
 import { FaSearch, FaSpinner, FaExclamationCircle, FaFilter, FaMapMarkerAlt, FaPhoneAlt, FaDollarSign, FaBuilding, FaTags } from "react-icons/fa";
 
-// Componente Auxiliar para Lista de Serviços (Refatorado)
 interface Servico {
   nome: string;
   preco: number;
@@ -36,7 +35,6 @@ const ListaServicos: React.FC<{ servicos?: Servico[] }> = ({ servicos }) => (
     </div>
 );
 
-// Componente Auxiliar para Lista de Locações (NOVO)
 const ListaLocacoes: React.FC<{ locacoes?: Locacao[] }> = ({ locacoes }) => (
     <div className="list-servicos">
         <h6><FaTags /> Locações oferecidas:</h6>
@@ -549,7 +547,6 @@ function EmpresasSearch() {
           </div>
         </section>
 
-        {/* Renderiza o Modal de Filtros (Componente Separado) */}
         <FilterModal
           show={showModal}
           onClose={() => setShowModal(false)}
@@ -607,7 +604,6 @@ function EmpresasSearch() {
                           )}
                       </div>
 
-                      {/* LÓGICA CONDICIONAL: Mostra Locações se for 'Locação', senão mostra Serviços */}
                       {empresa.tipo === "Locação" ? (
                           <ListaLocacoes locacoes={empresa.locacoes} />
                       ) : (

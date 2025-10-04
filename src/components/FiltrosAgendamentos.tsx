@@ -7,7 +7,6 @@ const FiltrosAgendamento: React.FC = () => {
   const [filtroHorario, setFiltroHorario] = useState<string>("todos");
   const [filtroServico, setFiltroServico] = useState<string>("todos");
 
-  // Funções para alterar os filtros
   const handleFiltroFuncionario = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -148,7 +147,6 @@ const FiltrosAgendamento: React.FC = () => {
       </p>
 
       <div className="row">
-        {/* Filtro por Funcionário */}
         <div className="col-md-3 mb-2">
           <label htmlFor="filtroFuncionario" className="form-label">
             Funcionário
@@ -166,7 +164,6 @@ const FiltrosAgendamento: React.FC = () => {
           </select>
         </div>
 
-        {/* Filtro por Cliente */}
         <div className="col-md-3 mb-2">
           <label htmlFor="filtroCliente" className="form-label">
             Cliente
@@ -184,7 +181,6 @@ const FiltrosAgendamento: React.FC = () => {
           </select>
         </div>
 
-        {/* Filtro por Horário (Período) */}
         <div className="col-md-3 mb-2">
           <label htmlFor="filtroHorario" className="form-label">
             Período
@@ -202,7 +198,6 @@ const FiltrosAgendamento: React.FC = () => {
           </select>
         </div>
 
-        {/* Filtro por Serviço */}
         <div className="col-md-3 mb-2">
           <label htmlFor="filtroServico" className="form-label">
             Serviço

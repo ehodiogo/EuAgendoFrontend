@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
-import { FaSpinner, FaBan } from "react-icons/fa6"; // Atualizado para Fa6
+import { FaSpinner, FaBan } from "react-icons/fa6";
 import {FaCheckCircle, FaExclamationCircle, FaUserCircle as FaUserCircleSolid}  from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import axios from "axios";
@@ -19,7 +19,6 @@ const CancelarAgendamentoView = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
 
-  // Busca de dados
   const { data: agendamentoData, loading } = useFetch<Agendamento>(
     `/api/agendamento/detalhe/${identificador}`
   );
@@ -47,7 +46,7 @@ const CancelarAgendamentoView = () => {
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
-      setTimeout(() => setSubmitStatus(null), 3500); // Aumentei o tempo para melhor feedback
+      setTimeout(() => setSubmitStatus(null), 3500);
     }
   };
 

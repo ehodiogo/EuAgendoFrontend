@@ -6,6 +6,8 @@ export interface Agendamento {
   cliente_nome?: string;
   funcionario: number;
   funcionario_nome: number;
+  locacao_nome?: string;
+  duracao_locacao?: number;
   data: string; 
   hora: string; 
   duracao_servico: number;

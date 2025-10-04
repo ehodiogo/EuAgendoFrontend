@@ -27,7 +27,6 @@ const LocacaoForm: React.FC = () => {
   const empresas = useFetch<Empresa[]>(`/api/empresas-usuario/?usuario_token=${token}`);
   const [locacoesEmpresa, setLocacoesEmpresa] = useState<Locacao[]>([]);
 
-  // Carrega as locações quando a empresa é selecionada
   useEffect(() => {
     if (!empresaSelecionada) return;
 
@@ -39,13 +38,11 @@ const LocacaoForm: React.FC = () => {
       try {
         const url = import.meta.env.VITE_API_URL;
 
-        // ENDPOINT MOCK para Locações
         const { data } = await axios.get(`${url}/api/locacoes-criadas-usuario-empresa/`, {
           params: { empresa_id: empresaSelecionada, usuario_token: token },
         });
-        // Assumindo que o backend retorna um objeto { locacoes: Locacao[] }
         setLocacoesEmpresa(Array.isArray(data.locacoes) ? data.locacoes : []);
-        setFormError(null); // Limpa erro se o carregamento for bem-sucedido
+        setFormError(null);
       } catch (error) {
         // @ts-ignore
         const errorMessage = error.response?.data?.erro || "Falha ao carregar locações.";
@@ -56,7 +53,6 @@ const LocacaoForm: React.FC = () => {
     fetchLocacoes();
   }, [empresaSelecionada, token]);
 
-  // Preenche o formulário de edição quando uma locação é selecionada para edição
   useEffect(() => {
     if (acaoSelecionada === "editar" && locacaoSelecionada) {
       setEditLocacao(locacaoSelecionada);
@@ -65,7 +61,6 @@ const LocacaoForm: React.FC = () => {
     }
   }, [acaoSelecionada, locacaoSelecionada]);
 
-  // Handlers de Mudança
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setNovaLocacao((prev) => ({ ...prev, [name]: value }));
@@ -78,31 +73,24 @@ const LocacaoForm: React.FC = () => {
     }
   };
 
-  // Lógica de Validação
   const validateForm = () => {
-    setFormError(null); // Limpa erros anteriores
+    setFormError(null);
     if (!acaoSelecionada) return setFormError("Selecione uma ação."), false;
     if (!empresaSelecionada) return setFormError("Selecione uma empresa."), false;
 
-    // Validação para Cadastrar e Editar
     if (acaoSelecionada === "cadastrar" || (acaoSelecionada === "editar" && editLocacao)) {
         const item = acaoSelecionada === "cadastrar" ? novaLocacao : editLocacao!;
 
         if (!item.nome.trim()) return setFormError("O nome do item de locação é obrigatório."), false;
-        // Duração deve ser um valor. Ex: "1 dia", "3 horas", etc.
-        // A duração foi mudada para minutos, então a validação pode ser simplificada.
         if (!item.duracao.trim() || !/^\d+$/.test(String(item.duracao))) return setFormError("A duração deve ser um número inteiro de minutos."), false;
-        // Preço: valor numérico com até 2 casas decimais
         if (!item.preco || !/^\d+(\.\d{1,2})?$/.test(String(item.preco))) return setFormError("O preço deve ser um valor numérico válido (ex: 99.99)."), false;
     }
 
-    // Validação para Remover e Editar (Seleção de item)
     if ((acaoSelecionada === "remover" || acaoSelecionada === "editar") && !locacaoSelecionada) return setFormError("Selecione um item de locação."), false;
 
     return true;
   };
 
-  // --- SUBMISSÃO DO FORMULÁRIO (COM MELHOR TRATAMENTO DE ERRO) ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -160,10 +148,8 @@ const LocacaoForm: React.FC = () => {
 
         const { data } = await axios.post(`${url}${endpoint}`, payload);
 
-        // Sucesso
         setFormSuccess(data.mensagem || "Operação realizada com sucesso!");
 
-        // Atualização do estado local
         if (acaoSelecionada === "cadastrar") {
             setNovaLocacao({ nome: "", descricao: "", duracao: "", preco: "" });
             setLocacoesEmpresa((prev) => [
@@ -184,25 +170,18 @@ const LocacaoForm: React.FC = () => {
     } catch (error) {
         let errorMessage = "Ocorreu um erro desconhecido na comunicação com o servidor.";
 
-        // Verifica se é um erro de resposta do Axios
         if (axios.isAxiosError(error) && error.response) {
             const responseData = error.response.data;
 
-            // 1. Erros de Limite/Permissão (status 403, 404, 401)
-            // O backend retorna { "erro": "Mensagem clara..." }
             if (responseData.erro) {
                 errorMessage = responseData.erro;
             }
-            // 2. Erros de Validação (status 400 - ex: campo faltando)
-            // O backend retorna um objeto de erros do serializer { "campo": ["erro"] }
             else if (typeof responseData === 'object' && Object.keys(responseData).length > 0) {
-                // Tenta formatar os erros do Serializer
                 const fieldErrors = Object.entries(responseData)
                     .map(([key, value]) => `[${key}]: ${Array.isArray(value) ? value.join(', ') : value}`)
                     .join('; ');
                 errorMessage = `Erro de validação: ${fieldErrors}`;
             } else if (typeof responseData === 'string') {
-                // Caso raro onde o backend retorna apenas a string de erro (como no limite)
                  errorMessage = responseData;
             }
         }
@@ -396,7 +375,6 @@ const LocacaoForm: React.FC = () => {
                   </select>
                 </div>
 
-                {/* === CADASTRO DE LOCAÇÃO === */}
                 {acaoSelecionada === "cadastrar" && empresaSelecionada && (
                   <div className="mt-4">
                     <h3 className="servico-title mb-4">Cadastrar Novo Item</h3>
@@ -454,7 +432,6 @@ const LocacaoForm: React.FC = () => {
                   </div>
                 )}
 
-                {/* === EDIÇÃO DE LOCAÇÃO === */}
                 {acaoSelecionada === "editar" && empresaSelecionada && (
                   <div className="mt-4">
                     <h3 className="servico-title mb-4">Editar Item</h3>
@@ -531,7 +508,6 @@ const LocacaoForm: React.FC = () => {
                   </div>
                 )}
 
-                {/* === REMOÇÃO DE LOCAÇÃO === */}
                 {acaoSelecionada === "remover" && empresaSelecionada && (
                   <div className="mt-4">
                     <h3 className="servico-title mb-4">Remover Item</h3>
@@ -568,7 +544,6 @@ const LocacaoForm: React.FC = () => {
                   </div>
                 )}
 
-                {/* Mensagem de Instrução */}
                 {(!acaoSelecionada || !empresaSelecionada) && (
                     <div className="mt-4 p-3 border rounded text-center text-muted">
                         <FaClipboardList className="me-2" /> Selecione uma **Ação** e uma **Empresa** acima para começar a gerenciar os itens de locação.

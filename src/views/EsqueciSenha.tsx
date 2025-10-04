@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { FaEnvelope, FaLockOpen, FaSpinner, FaArrowLeft } from "react-icons/fa6"; // Atualizado para Fa6
+import { FaEnvelope, FaLockOpen, FaSpinner, FaArrowLeft } from "react-icons/fa6";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -25,8 +25,6 @@ function ForgotPassword() {
 
       if (response.status === 200) {
         setSuccess(true);
-        // Não limpa o email para que o usuário veja qual email foi usado
-        // setEmail("");
       }
     } catch (err: any) {
       setError(

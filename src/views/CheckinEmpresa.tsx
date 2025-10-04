@@ -4,7 +4,7 @@ import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import { Agendamento } from "../interfaces/Agendamento";
 import Navbar from "../components/Navbar";
-import { FaSpinner, FaQrcode, FaBuilding, FaCalendarDay, FaClock, FaUser, FaToolbox, FaArrowRightToBracket } from "react-icons/fa6"; // Usando Fa6 para consistência
+import { FaSpinner, FaQrcode, FaBuilding, FaCalendarDay, FaClock, FaUser, FaToolbox, FaArrowRightToBracket } from "react-icons/fa6";
 import { QRCodeCanvas } from "qrcode.react";
 import {FaExclamationCircle} from "react-icons/fa";
 
@@ -14,57 +14,33 @@ function CheckInEmpresa() {
   const empresa = useFetch<Empresa>(`/api/empresas-usuario/${id}?usuario_token=${token}`);
   const agendamentos = useFetch<Agendamento[]>(`/api/agendamento?empresaId=${id}&usuario_token=${token}`);
 
-  // Estado para controlar qual agendamento está exibindo o QR Code
   const [showQRCode, setShowQRCode] = useState<number | null>(null);
-  // Estado para controlar o tipo de filtro
   const [filterType, setFilterType] = useState<"today" | "pending">("pending");
-  // Estado para controlar o loading de um check-in específico
   const [isCheckingIn, setIsCheckingIn] = useState<number | null>(null);
 
-  // Obtém a data de hoje no formato YYYY-MM-DD
   const today = new Date().toISOString().split("T")[0];
 
-  // Filtra agendamentos
   const filteredAgendamentos = agendamentos.data?.filter((agendamento) => {
-    // Apenas agendamentos que ainda não compareceram
     if (!agendamento.compareceu_agendamento) {
       if (filterType === "today") {
         return agendamento.data === today;
       }
-      // Para "pending", mostra todos os não comparecidos, independente da data
       return true;
     }
     return false;
   }).sort((a, b) => {
-      // Ordena por data e hora para melhor visualização operacional
       const dateA = new Date(`${a.data}T${a.hora}`);
       const dateB = new Date(`${b.data}T${b.hora}`);
       return dateA.getTime() - dateB.getTime();
   });
 
-  // Função para simular ou realizar o check-in na API
   const handleCheckIn = async (agendamentoId: number) => {
-    setIsCheckingIn(agendamentoId); // Inicia o loading
-    setShowQRCode(null); // Fecha o QR code se estiver aberto
+    setIsCheckingIn(agendamentoId);
+    setShowQRCode(null);
 
     try {
-      // Simulação de chamada à API:
       console.log(`Iniciando check-in para o agendamento ID ${agendamentoId}...`);
-      await new Promise(resolve => setTimeout(resolve, 800)); // Simula delay da rede
-
-      // Aqui você faria a chamada real à API (exemplo comentado abaixo):
-      // const response = await fetch(`/api/agendamento/${agendamentoId}/checkin`, {
-      //   method: "PATCH",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     "Authorization": `Bearer ${token}` // Inclua seu token real
-      //   },
-      //   body: JSON.stringify({ compareceu_agendamento: true }),
-      // });
-
-      // if (!response.ok) {
-      //   throw new Error("Erro na API ao realizar check-in.");
-      // }
+      await new Promise(resolve => setTimeout(resolve, 800));
 
       alert("Check-in realizado com sucesso! Atualizando lista...");
 
@@ -72,7 +48,7 @@ function CheckInEmpresa() {
       console.error(error);
       alert(`Erro ao realizar check-in para o agendamento ID ${agendamentoId}.`);
     } finally {
-      setIsCheckingIn(null); // Finaliza o loading
+      setIsCheckingIn(null);
     }
   };
 
@@ -336,14 +312,12 @@ function CheckInEmpresa() {
             {filterType === "today" ? "Próximos Agendamentos de Hoje" : "Todos os Agendamentos Pendentes"}
           </h2>
 
-          {/* Lógica de Carregamento/Erro/Vazio */}
           {agendamentos.loading ? (
             <div className="message loading">
               <FaSpinner className="fa-spin me-2" /> Carregando lista de agendamentos...
             </div>
           ) : filteredAgendamentos && filteredAgendamentos.length > 0 ? (
 
-            /* Lista de Agendamentos */
             <div className="row justify-content-center">
               {filteredAgendamentos.map((agendamento) => (
                 <div
@@ -403,7 +377,7 @@ function CheckInEmpresa() {
                       {showQRCode === agendamento.id && (
                         <div className="qrcode-container">
                           <QRCodeCanvas
-                            value={`https://vemagendar.com/checkin/${agendamento.id}`} // Use uma URL real de check-in
+                            value={`https://vemagendar.com/checkin/${agendamento.id}`}
                             size={180}
                             level="H"
                             fgColor="#003087"
@@ -422,7 +396,6 @@ function CheckInEmpresa() {
               ))}
             </div>
           ) : (
-            /* Mensagem de Vazio */
             <div className="message warning">
               <FaExclamationCircle className="me-2" /> Nenhum agendamento <strong>{filterType === "today" ? "de hoje" : "pendente"}</strong> encontrado para esta empresa.
             </div>

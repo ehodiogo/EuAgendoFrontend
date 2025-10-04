@@ -1,6 +1,6 @@
 import { useFetch } from "../functions/GetData";
 import { Financeiro } from "../interfaces/DashboardEarnings";
-import { FaDollarSign, FaSpinner, FaChartPie, FaBriefcase, FaUsers, FaClock } from "react-icons/fa6"; // Ícones atualizados
+import { FaDollarSign, FaSpinner, FaChartPie, FaBriefcase, FaUsers, FaClock, FaArrowUp, FaArrowDown } from "react-icons/fa6";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { Bar } from "react-chartjs-2";
 
@@ -13,7 +13,9 @@ interface FinanceiroProps {
 const FinanceiroDados = ({ empresa_id }: FinanceiroProps) => {
   const dadosFinanceiros = useFetch<Financeiro>(`/api/financeiro/?empresa_id=${empresa_id}`);
 
-  // Função auxiliar para formatar valores
+  const empresaTipo = dadosFinanceiros.data?.tipo;
+  const isLocacao = empresaTipo === "Locação";
+
   const formatValue = (value: number | undefined) => (value ? `R$ ${value.toFixed(2)}` : "R$ 0.00");
 
   const chartData = {
@@ -37,7 +39,7 @@ const FinanceiroDados = ({ empresa_id }: FinanceiroProps) => {
           "rgba(40, 167, 69, 1)"
         ],
         borderWidth: 1,
-        borderRadius: 4, // Adiciona um pequeno arredondamento nas barras
+        borderRadius: 4,
       },
     ],
   };
@@ -110,11 +112,9 @@ const FinanceiroDados = ({ empresa_id }: FinanceiroProps) => {
           --border-light: #e0e0e0;
         }
 
-        /* Estilos do Container Principal (removido o card de dentro, pois o card externo já existe) */
-        .financeiro-dados-content {
-            padding: 0;
-        }
-
+        /* Estilos do Container Principal */
+        .financeiro-dados-content { padding: 0; }
+        
         /* Card interno de Dados Detalhados */
         .details-card {
           background-color: var(--light-gray-bg);
@@ -140,9 +140,7 @@ const FinanceiroDados = ({ empresa_id }: FinanceiroProps) => {
           padding: 1rem 0;
           border-bottom: 1px dashed var(--border-light);
         }
-        .financeiro-item:last-child {
-          border-bottom: none;
-        }
+        .financeiro-item:last-child { border-bottom: none; }
         .financeiro-item-content strong {
             font-size: 0.95rem;
             color: var(--dark-gray);
@@ -150,14 +148,14 @@ const FinanceiroDados = ({ empresa_id }: FinanceiroProps) => {
         }
         .financeiro-item-content span {
             font-size: 1rem;
-            color: var(--success-green); /* Destaque para valores */
+            color: var(--success-green); 
             display: block;
             margin-top: 2px;
         }
         .financeiro-item svg {
           color: var(--primary-blue);
           font-size: 1.5rem;
-          margin-top: 4px; /* Alinhamento visual */
+          margin-top: 4px; 
         }
         
         /* Controles de Loading e Erro */
@@ -177,7 +175,7 @@ const FinanceiroDados = ({ empresa_id }: FinanceiroProps) => {
           padding: 1.5rem;
           background-color: var(--white);
           border-radius: 8px;
-          height: 400px; /* Altura fixa para o gráfico */
+          height: 400px; 
           box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
@@ -185,14 +183,14 @@ const FinanceiroDados = ({ empresa_id }: FinanceiroProps) => {
         @media (min-width: 992px) {
             .financeiro-row {
                 display: flex;
-                gap: 1.5rem; /* Espaçamento entre as colunas */
+                gap: 1.5rem; 
             }
             .financeiro-col-details {
-                flex: 1; /* Ocupa 40% */
+                flex: 1; 
                 max-width: 40%;
             }
             .financeiro-col-chart {
-                flex: 1; /* Ocupa 60% */
+                flex: 1; 
                 max-width: 60%;
             }
         }
@@ -218,12 +216,10 @@ const FinanceiroDados = ({ empresa_id }: FinanceiroProps) => {
       ) : (
         <div className="row financeiro-row">
 
-          {/* COLUNA 1: DADOS DETALHADOS (40% - Lado Esquerdo) */}
           <div className="col-lg-5 financeiro-col-details">
             <div className="details-card">
               <h5><FaChartPie className="me-2"/> Principais Indicadores</h5>
 
-              {/* Resumo de Receita */}
               <FinanceiroItem
                 icon={FaDollarSign}
                 label="Receita Total"
@@ -242,29 +238,47 @@ const FinanceiroDados = ({ empresa_id }: FinanceiroProps) => {
 
               <hr className="my-3 text-medium-gray" />
 
-              {/* Destaques */}
-              <FinanceiroItem
-                icon={FaUsers}
-                label="Funcionário Top"
-                value={`${dadosFinanceiros.data.funcionario_top?.funcionario__nome || "Nenhum"} (${formatValue(dadosFinanceiros.data.funcionario_top?.total)})`}
-                isMonetary={false}
-              />
-              <FinanceiroItem
-                icon={FaBriefcase}
-                label="Serviço Mais Rentável"
-                value={`${dadosFinanceiros.data.servico_mais_rentavel?.servico__nome || "Nenhum"} (${formatValue(dadosFinanceiros.data.servico_mais_rentavel?.total)})`}
-                isMonetary={false}
-              />
-              <FinanceiroItem
-                icon={FaBriefcase}
-                label="Serviço Menos Rentável"
-                value={`${dadosFinanceiros.data.servico_menos_rentavel?.servico__nome || "Nenhum"} (${formatValue(dadosFinanceiros.data.servico_menos_rentavel?.total)})`}
-                isMonetary={false}
-              />
+              {isLocacao ? (
+                <>
+                  <FinanceiroItem
+                    icon={FaArrowUp}
+                    label="Locação Mais Rentável"
+                    value={`${dadosFinanceiros.data.locacao_mais_rentavel?.locacao__nome || "Nenhuma"} (${formatValue(dadosFinanceiros.data.locacao_mais_rentavel?.total)})`}
+                    isMonetary={false}
+                  />
+                  <FinanceiroItem
+                    icon={FaArrowDown}
+                    label="Locação Menos Rentável"
+                    value={`${dadosFinanceiros.data.locacao_menos_rentavel?.locacao__nome || "Nenhuma"} (${formatValue(dadosFinanceiros.data.locacao_menos_rentavel?.total)})`}
+                    isMonetary={false}
+                  />
+                </>
+              ) : (
+                <>
+                  <FinanceiroItem
+                    icon={FaUsers}
+                    label="Funcionário Top"
+                    value={`${dadosFinanceiros.data.funcionario_top?.funcionario__nome || "Nenhum"} (${formatValue(dadosFinanceiros.data.funcionario_top?.total)})`}
+                    isMonetary={false}
+                  />
+                  <FinanceiroItem
+                    icon={FaBriefcase}
+                    label="Serviço Mais Rentável"
+                    value={`${dadosFinanceiros.data.servico_mais_rentavel?.servico__nome || "Nenhum"} (${formatValue(dadosFinanceiros.data.servico_mais_rentavel?.total)})`}
+                    isMonetary={false}
+                  />
+                  <FinanceiroItem
+                    icon={FaBriefcase}
+                    label="Serviço Menos Rentável"
+                    value={`${dadosFinanceiros.data.servico_menos_rentavel?.servico__nome || "Nenhum"} (${formatValue(dadosFinanceiros.data.servico_menos_rentavel?.total)})`}
+                    isMonetary={false}
+                  />
+                </>
+              )}
+
             </div>
           </div>
 
-          {/* COLUNA 2: GRÁFICO (60% - Lado Direito) */}
           <div className="col-lg-7 financeiro-col-chart">
             <div className="chart-container">
               <Bar data={chartData} options={chartOptions as any} />

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { FaLock, FaSpinner, FaKey } from "react-icons/fa6"; // Atualizado para Fa6
+import { FaLock, FaSpinner, FaKey } from "react-icons/fa6";
 
 function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
@@ -43,7 +43,7 @@ function ResetPassword() {
         setSuccess(true);
         setTimeout(() => {
           navigate("/login");
-        }, 3000); // Aumentei o tempo de espera para melhor leitura da mensagem
+        }, 3000);
       }
     } catch (err: any) {
       setError(

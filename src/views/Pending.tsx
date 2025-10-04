@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { FaSpinner, FaCircleCheck, FaHourglassHalf, FaCircleExclamation } from "react-icons/fa6"; // Atualizado para Fa6
+import { FaSpinner, FaCircleCheck, FaHourglassHalf, FaCircleExclamation } from "react-icons/fa6";
 
 const PendingPage = () => {
   const [loading, setLoading] = useState(false);
@@ -51,7 +51,6 @@ const PendingPage = () => {
 
       if (response.data.status === "approved") {
         setVerified(true);
-        // Redireciona para a página de sucesso/dashboard
         window.location.href = "/dashboard";
       } else {
         setError("O pagamento ainda está em processamento. Tente novamente mais tarde.");

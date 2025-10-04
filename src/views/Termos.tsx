@@ -1,5 +1,5 @@
 import Navbar from "../components/Navbar";
-import { FaBookOpen, FaShieldHalved } from "react-icons/fa6"; // Ícones Fa6 para destaque
+import { FaBookOpen, FaShieldHalved } from "react-icons/fa6";
 
 function Termos() {
   return (
@@ -140,7 +140,6 @@ function Termos() {
             </p>
           </section>
 
-          {/* --- Termos de Uso --- */}
           <section className="mb-5">
             <h4 className="text-primary">
               <FaShieldHalved /> Condições Gerais
@@ -195,7 +194,6 @@ function Termos() {
             </ul>
           </section>
 
-          {/* --- Política de Privacidade --- */}
           <section className="mb-5">
             <h4 className="text-primary">
               <FaShieldHalved /> Política de Privacidade e Dados

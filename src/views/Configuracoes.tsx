@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaSpinner, FaEnvelope, FaLink, FaGear, FaCopy } from "react-icons/fa6"; // Alterado para Fa6
+import { FaSpinner, FaEnvelope, FaLink, FaGear, FaCopy } from "react-icons/fa6";
 import {FaCheckCircle, FaExclamationCircle} from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import axios from "axios";
@@ -25,7 +25,6 @@ const SettingsView = () => {
   const [copyStatus, setCopyStatus] = useState<"copied" | null>(null);
 
   const baseURL = import.meta.env.VITE_API_URL;
-  // Sugestão: Use uma função para obter o token para maior modularidade e segurança
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
@@ -41,7 +40,7 @@ const SettingsView = () => {
       try {
 
         const response = await axios.get(`${baseURL}/api/perfil-usuario/me/`, {
-          params: { usuario_token: token }, // Mantendo seu método atual de autenticação
+          params: { usuario_token: token },
         });
 
         setSettings({
@@ -422,7 +421,6 @@ const SettingsView = () => {
               </h2>
               <form onSubmit={handleSubmit} aria-label="Formulário de configurações">
 
-                {/* 1. SEÇÃO DE NOTIFICAÇÕES */}
                 <div className="settings-section">
                     <h3><FaEnvelope /> Notificações</h3>
                     <div className="toggle-group">
@@ -442,7 +440,6 @@ const SettingsView = () => {
                     </div>
                 </div>
 
-                {/* 2. SEÇÃO DE AFILIADO */}
                 <div className="settings-section affiliate-group">
                     <h3><FaLink /> Programa de Afiliados</h3>
                     <p>Compartilhe seu código de afiliado para que novos usuários usem e ganhem benefícios.</p>
@@ -476,7 +473,6 @@ const SettingsView = () => {
                     </button>
                 </div>
 
-                {/* BOTÃO DE SUBMIT PRINCIPAL */}
                 <button
                   type="submit"
                   className="settings-btn submit-btn"
@@ -491,7 +487,6 @@ const SettingsView = () => {
                 </button>
               </form>
 
-              {/* Mensagens de Status */}
               {submitStatus === "success" && (
                 <div className="message success">
                   <FaCheckCircle className="text-xl" aria-hidden="true" /> Configurações salvas com sucesso!

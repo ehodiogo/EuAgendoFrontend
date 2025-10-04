@@ -46,7 +46,6 @@ ChartJS.register(
 function Dashboard() {
 
   const token = localStorage.getItem("access_token");
-  // O token deve ser enviado de forma segura (ex: via cabeçalho Authorization), mas mantendo a lógica atual
   const empresas_usuario = useFetch<Empresa[]>(
     `/api/empresas-usuario/?usuario_token=${token}`
   );
@@ -73,20 +72,17 @@ function Dashboard() {
   const checkIfPlanExpiresTomorrow = () => {
     if (remainingTime) {
       const remainingTimeInSeconds = Number(remainingTime);
-      // Considerando que o modal deve aparecer se faltar menos de 2 dias (48 horas)
       return remainingTimeInSeconds > 0 && remainingTimeInSeconds < (48 * 3600);
     }
     return false;
   };
 
   useEffect(() => {
-    // Exibir modal se expirado ou se faltar menos de 48 horas
     if (isPlanExpired === "true" || checkIfPlanExpiresTomorrow()) {
       handleShowModal();
     }
   }, [isPlanExpired, remainingTime]);
 
-  // Estrutura para os botões de navegação
   const navButtons = [
     { to: "/perfil", icon: FaUserCircle, label: "Perfil & Pagamentos", description: "Gerencie suas informações, histórico de pagamentos e planos ativos.", variant: "primary" },
     { to: "/financeiro", icon: FaMoneyBillWave, label: "Relatório Financeiro", description: "Acompanhe seu rendimento, serviços mais e menos rentáveis.", variant: "success" },
@@ -337,7 +333,6 @@ function Dashboard() {
             administrar suas empresas, finanças e cadastros.
           </p>
 
-          {/* Seção 1: Atalhos de Navegação */}
           <section className="nav-section">
             <h3 className="text-center text-secondary mb-4" style={{fontWeight: 600}}>Ações Rápidas</h3>
             <div className="nav-buttons">
@@ -351,7 +346,6 @@ function Dashboard() {
             </div>
           </section>
 
-          {/* Seção 2: Dashboards por Empresa */}
           <section className="empresas-dash-list">
              <h3>Dashboards Detalhados por Empresa</h3>
              <p className="text-muted mb-4">
@@ -404,7 +398,6 @@ function Dashboard() {
           </section>
         </div>
 
-        {/* Modal de Status de Plano */}
         <Modal
           show={showModal}
           onHide={handleCloseModal}

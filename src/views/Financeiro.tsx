@@ -11,20 +11,16 @@ const Financeiro = () => {
   const empresas_usuario = useFetch<Empresa[]>(
     `/api/empresas-usuario/?usuario_token=${token}`
   );
-  // Estado para controlar o ID da empresa cujo dropdown está aberto
   const [dropdownAberto, setDropdownAberto] = useState<number | null>(null);
 
   const handleToggleDropdown = (empresaId: number) => {
-    // Se o mesmo card for clicado, feche-o (null)
     if (dropdownAberto === empresaId) {
       setDropdownAberto(null);
       return;
     }
-    // Caso contrário, abra o novo card
     setDropdownAberto(empresaId);
   };
 
-  // Se estiver carregando, mostra apenas o spinner com Navbar
   if (empresas_usuario.loading) {
     return (
         <div className="min-vh-100 custom-bg">
@@ -206,7 +202,6 @@ const Financeiro = () => {
             Clique em uma empresa abaixo para expandir e visualizar todos os seus dados e relatórios financeiros.
           </p>
 
-          {/* Se a lista de empresas estiver vazia */}
           {!empresas_usuario.data || empresas_usuario.data.length === 0 ? (
             <div className="error-container alert alert-info text-center">
               Nenhuma empresa encontrada para este usuário.
@@ -214,12 +209,10 @@ const Financeiro = () => {
           ) : (
             <div className="row">
                 <div className="col-12">
-                    {/* Aqui vamos iterar sobre as empresas, mantendo o controle de qual dropdown está aberto */}
                     {empresas_usuario.data.map((empresa: Empresa) => {
                         const isOpen = dropdownAberto === empresa.id;
                         return (
                             <div key={empresa.id} className="mb-4">
-                                {/* CARD DA EMPRESA */}
                                 <div
                                     className={`empresa-card ${isOpen ? 'active' : ''}`}
                                     onClick={() => handleToggleDropdown(empresa.id)}
@@ -234,10 +227,8 @@ const Financeiro = () => {
                                     <FaChevronDown className={`toggle-icon ${isOpen ? 'open' : ''}`} />
                                 </div>
 
-                                {/* DROP-DOWN DE DADOS FINANCEIROS */}
                                 <div className={`dropdown-wrapper ${isOpen ? 'open' : ''}`}>
                                     <div className="dropdown-card">
-                                        {/* Componente que deve carregar os dados específicos */}
                                         <FinanceiroDados empresa_id={empresa.id} />
                                     </div>
                                 </div>

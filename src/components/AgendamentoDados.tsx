@@ -3,22 +3,54 @@ import { useFetch } from "../functions/GetData";
 import { Funcionario } from "../interfaces/Funcionario";
 import { Cliente } from "../interfaces/Cliente";
 import { Servico } from "../interfaces/Servico";
-import { FaUserTie, FaUser, FaToolbox, FaRegClock, FaSpinner, FaIdBadge } from "react-icons/fa6";
+import { FaUserTie, FaUser, FaToolbox, FaRegClock, FaSpinner, FaIdBadge, FaCar } from "react-icons/fa6"; // Adicionei FaCar para Locação
 
 interface AgendamentoDadosProps {
   agendamento: Agendamento;
+  empresaTipo?: string;
 }
 
-const AgendamentoDados = ({ agendamento }: AgendamentoDadosProps) => {
-  const funcionario = useFetch<Funcionario>(`/api/funcionario/${agendamento.funcionario}`);
+const AgendamentoDados = ({ agendamento, empresaTipo }: AgendamentoDadosProps) => {
+  const isLocacao = empresaTipo === "Locação";
+
+  // @ts-ignore
+  const funcionario = useFetch<Funcionario>(isLocacao ? null : `/api/funcionario/${agendamento.funcionario}`);
   const cliente = useFetch<Cliente>(`/api/cliente/${agendamento.cliente}`);
-  const servico = useFetch<Servico>(`/api/servico/${agendamento.servico}`);
+  // @ts-ignore
+  const servico = useFetch<Servico>(isLocacao ? null : `/api/servico/${agendamento.servico}`);
 
-  const isLoading = funcionario.loading || cliente.loading || servico.loading;
+  const isLoading = cliente.loading || (!isLocacao && (funcionario.loading || servico.loading));
 
-  if (!servico.data || !funcionario.data || !cliente.data) {
+  if (!cliente.data || (!isLocacao && (!servico.data || !funcionario.data))) {
+    if(isLoading) {
+        return (
+            <div className="agendamento-dados-wrapper">
+                <div className="message-status loading">
+                    <FaSpinner className="fa-spin" aria-hidden="true" /> Carregando detalhes...
+                </div>
+            </div>
+        );
+    }
     return <></>;
   }
+
+  const detalhesServicoLocacao = isLocacao ? (
+    <li>
+        <strong><FaCar /> Locação:</strong>
+        <span>{agendamento.locacao_nome || "Locação não especificada"} (Duração: {agendamento.duracao_locacao || '?'} min)</span>
+    </li>
+  ) : (
+    <>
+      <li>
+        <strong><FaUserTie /> Funcionário:</strong>
+        <span>{funcionario.data?.nome || 'N/A'}</span>
+      </li>
+      <li>
+        <strong><FaToolbox /> Serviço:</strong>
+        <span>{servico.data?.nome || 'N/A'} (Duração: {servico.data?.duracao || '?'} min)</span>
+      </li>
+    </>
+  );
 
   return (
     <div className="agendamento-dados-wrapper">
@@ -53,9 +85,7 @@ const AgendamentoDados = ({ agendamento }: AgendamentoDadosProps) => {
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
           transition: all 0.3s ease;
         }
-        /* Como o componente é usado dentro de uma tabela/timeline, a borda e sombra
-           são aplicadas ao elemento pai, então vou usar um estilo de lista limpa aqui. */
-
+        
         /* Lista de Detalhes */
         .agendamento-details {
           list-style: none;
@@ -153,36 +183,25 @@ const AgendamentoDados = ({ agendamento }: AgendamentoDadosProps) => {
           }
         }
       `}</style>
-      {isLoading ? (
-        <div className="message-status loading">
-          <FaSpinner className="fa-spin" aria-hidden="true" /> Carregando detalhes...
-        </div>
-      ) : (
-        <div className="agendamento-card-details">
-          <ul className="agendamento-details">
-             <li>
+      <div className="agendamento-card-details">
+        <ul className="agendamento-details">
+            <li>
                 <strong><FaIdBadge /> ID:</strong>
                 <span>{agendamento.id}</span>
-              </li>
-            <li>
-              <strong><FaRegClock /> Horário:</strong>
-              <span className="hora-destaque">{agendamento.hora.slice(0, 5)}</span>
             </li>
             <li>
-              <strong><FaUserTie /> Funcionário:</strong>
-              <span>{funcionario.data.nome}</span>
+                <strong><FaRegClock /> Horário:</strong>
+                <span className="hora-destaque">{agendamento.hora.slice(0, 5)}</span>
             </li>
             <li>
-              <strong><FaUser /> Cliente:</strong>
-              <span>{cliente.data.nome}</span>
+                <strong><FaUser /> Cliente:</strong>
+                <span>{cliente.data.nome}</span>
             </li>
-            <li>
-              <strong><FaToolbox /> Serviço:</strong>
-              <span>{servico.data.nome} (Duração: {servico.data.duracao || '?'} min)</span>
-            </li>
-          </ul>
-        </div>
-      )}
+
+            {detalhesServicoLocacao}
+
+        </ul>
+      </div>
     </div>
   );
 };

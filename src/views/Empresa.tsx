@@ -6,10 +6,9 @@ import Navbar from "../components/Navbar";
 import {
   FaTools, FaCalendarAlt, FaSpinner,
   FaMapMarkerAlt, FaEnvelope, FaPhoneAlt, FaRegAddressCard,
-  FaClipboardList, FaUsers, FaEye, FaTags, FaClock, FaExclamationCircle // FaTags e FaClock adicionados
+  FaClipboardList, FaUsers, FaEye, FaTags, FaClock, FaExclamationCircle
 } from "react-icons/fa";
 
-// Interface para Locação (Você pode manter isso em interfaces/Empresa.tsx)
 interface Locacao {
     id: number;
     nome: string;
@@ -17,21 +16,15 @@ interface Locacao {
     duracao: string;
     preco: number;
 }
-// Interface para Serviço (Para manter a tipagem)
 interface Servico {
     nome: string;
     preco: number;
     duracao: string;
 }
 
-// --------------------------------------------------------------------------------
-// Componente principal modificado
-// --------------------------------------------------------------------------------
-
 function EmpresaDetails() {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
   const { data: empresasData, loading: empresasLoading } = useFetch<Empresa[]>(`/api/empresa/?q=${empresaNome}`);
-  // A requisição de funcionários permanece, mas será condicionalmente exibida
   const { data: funcionariosData, loading: funcionariosLoading } = useFetch<Funcionario[]>(`/api/funcionario/?empresa_nome=${empresaNome}`);
 
   const empresa = empresasData?.find(
@@ -46,7 +39,6 @@ function EmpresaDetails() {
       );
   }
 
-  // Define se é uma empresa de locação para simplificar a lógica
   const isLocacao = empresa.tipo.toLowerCase() === "locação";
 
   return (
@@ -279,9 +271,7 @@ function EmpresaDetails() {
           ) : (
             <div className="main-content-wrapper">
 
-              {/* === BARRA LATERAL: Identidade e CTA === */}
               <aside className="sidebar">
-                {/* Card de Identidade */}
                 <div className="identity-card">
                   <img
                     src={empresa.logo || "https://via.placeholder.com/150x150?text=LOGO"}
@@ -294,7 +284,6 @@ function EmpresaDetails() {
                   </p>
                 </div>
 
-                {/* Card CTA (Chamada para Ação) */}
                 <div className="cta-box">
                     <p className="mb-3 fw-bold">Pronto para {isLocacao ? "reservar" : "começar"}?</p>
                     <Link
@@ -306,7 +295,6 @@ function EmpresaDetails() {
                     </Link>
                 </div>
 
-                {/* Card Detalhes Corporativos */}
                 <div className="info-card">
                     <h4>
                         <FaRegAddressCard /> Detalhes Corporativos
@@ -322,10 +310,8 @@ function EmpresaDetails() {
                 </div>
               </aside>
 
-              {/* === CONTEÚDO PRINCIPAL === */}
               <div className="content">
 
-                {/* Visão Geral (Contato e Localização) */}
                 <div className="info-card">
                     <h4>
                         <FaEye /> Visão Geral e Contato
@@ -351,14 +337,12 @@ function EmpresaDetails() {
                     </div>
                 </div>
 
-                {/* LOCAÇÕES OU SERVIÇOS (RENDERIZAÇÃO CONDICIONAL) */}
                 <div className="info-card">
                     <h4>
                         {isLocacao ? <><FaTags /> Escopo de Locações</> : <><FaClipboardList /> Escopo de Serviços</>}
                     </h4>
 
                     {isLocacao ? (
-                        // Se for Locação, mostre os itens de locação
                         <ul className="list-items">
                             {empresa.locacoes && empresa.locacoes.length > 0 ? (
                                 (empresa.locacoes as Locacao[]).map((locacao, index) => (
@@ -372,7 +356,6 @@ function EmpresaDetails() {
                             )}
                         </ul>
                     ) : (
-                        // Se for Serviço (ou qualquer outro tipo), mostre os serviços
                         <ul className="list-items">
                             {empresa.servicos && empresa.servicos.length > 0 ? (
                                 (empresa.servicos as Servico[]).map((servico, index) => (
@@ -388,7 +371,6 @@ function EmpresaDetails() {
                     )}
                 </div>
 
-                {/* Equipe (Funcionários) - OCULTADO SE FOR LOCAÇÃO */}
                 {!isLocacao && (
                     <div className="info-card funcionarios-card">
                         <h4>

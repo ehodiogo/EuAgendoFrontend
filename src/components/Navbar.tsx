@@ -11,7 +11,6 @@ const Navbar = () => {
     localStorage.getItem("refresh_token") !== null;
 
   useEffect(() => {
-    // Scroll to top when the navbar is rendered
     window.scrollTo(0, 0);
 
     const updateCartCount = () => {
@@ -38,16 +37,13 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  // Handle link clicks to support Shift/Ctrl + click for new tab
   const handleLinkClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
     path: string
   ) => {
-    // Allow default behavior (open in new tab) if Shift or Ctrl is pressed
     if (e.shiftKey || e.ctrlKey) {
-      return; // Browser will handle opening in new tab/window
+      return;
     }
-    // Prevent default navigation and use react-router-dom for same-tab navigation
     e.preventDefault();
     navigate(path);
   };

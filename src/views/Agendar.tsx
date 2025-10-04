@@ -2,39 +2,31 @@ import { useFetch } from "../functions/GetData";
 import { ServicosFuncionariosEmpresa } from "../interfaces/ServicosFuncionarios";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
-// Importamos HorariosTabela e TabelaHorario (assumindo que são o mesmo componente)
 import HorariosTabela from "../components/TabelaHorario";
 import Navbar from "../components/Navbar";
 import {
   FaCalendarAlt, FaUserTie, FaSpinner, FaExclamationCircle, FaTimesCircle,
   FaChevronRight, FaClock, FaDollarSign, FaHome, FaTag
 } from "react-icons/fa";
-// Importação redundante removida para limpeza
-// import TabelaHorario from "../components/TabelaHorario";
 
-// 1. Definição da Interface Locacao
 export interface Locacao {
     id?: number;
     nome: string;
     descricao: string;
-    duracao: string; // Ex: '6h', '1 dia'
+    duracao: string;
     preco: string;
 }
 
-// 2. Interface Unificada
 interface EmpresaGeral extends ServicosFuncionariosEmpresa {
     tipo: "Serviço" | "Locação";
-    locacoes: Locacao[]; // Incluído para Locação
+    locacoes: Locacao[];
 }
 
 
 const Agendar = () => {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
 
-  // Estado para Serviço
   const [funcionarioSelecionado, setFuncionarioSelecionado] = useState<number | null>(null);
-
-  // NOVO Estado para Locação
   const [locacaoSelecionadaId, setLocacaoSelecionadaId] = useState<number | null>(null);
 
   const API_UNIFICADA = `/api/empresaservico/?empresa_nome=${empresaNome}`;
@@ -43,12 +35,10 @@ const Agendar = () => {
   const empresaDataFinal = dadosAgendamento.data ? dadosAgendamento.data[0] : null;
   const loading = dadosAgendamento.loading;
 
-  // Variáveis de Controle
   const isLocacao = empresaDataFinal?.tipo === "Locação";
   const shouldShowFuncionariosAndHorarios = !isLocacao;
 
   const handleClearSelection = () => {
-    // Limpa a seleção dependendo do modo
     if (isLocacao) {
         setLocacaoSelecionadaId(null);
     } else {
@@ -56,13 +46,10 @@ const Agendar = () => {
     }
   };
 
-  // Encontra a locação selecionada (se houver)
   const locacaoSelecionada = locacaoSelecionadaId
     ? empresaDataFinal?.locacoes.find(l => l.id === locacaoSelecionadaId)
     : null;
 
-  // No modo Locação, a lista de itens a ser passada para TabelaHorario é a lista
-  // contendo apenas o item selecionado (ou vazia se nada foi selecionado)
   const locacoesParaTabela = locacaoSelecionada ? [locacaoSelecionada] : [];
 
 
@@ -256,7 +243,6 @@ const Agendar = () => {
             </div>
           </header>
 
-          {/* === Mensagens de Carregamento/Erro === */}
           {loading ? (
             <div className="message loading">
               <FaSpinner className="fa-spin me-2" /> Carregando dados de {isLocacao ? "locação" : "agendamento"}...
@@ -267,10 +253,8 @@ const Agendar = () => {
             </div>
           ) : (
             <>
-              {/* --- CONTEÚDO ESPECÍFICO DE LOCAÇÃO (isLocacao == true) --- */}
               {isLocacao && empresaDataFinal.locacoes && (
                 <>
-                  {/* === ETAPA 1: Escolha do Item de Locação === */}
                   <section className="cards-section container">
                     <h2 className="section-heading">
                       <span className="me-2 text-primary-blue">1.</span> <FaHome /> Escolha o Item de Locação
@@ -312,7 +296,6 @@ const Agendar = () => {
                                 </li>
                               </ul>
                             </div>
-                            {/* Indicador de Seleção */}
                             {locacaoSelecionadaId === locacao.id && (
                                 <div className="p-2 bg-success text-white fw-bold" style={{borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px'}}>
                                     SELECIONADO <FaChevronRight />
@@ -324,7 +307,6 @@ const Agendar = () => {
                     </div>
                   </section>
 
-                  {/* === ETAPA 2: Horários de Locação === */}
                   <section className="horarios-section container">
                     <h2 className="section-heading">
                       <span className="me-2 text-primary-blue">2.</span> <FaCalendarAlt /> Selecione a Data de Retirada
@@ -334,9 +316,7 @@ const Agendar = () => {
                         {locacaoSelecionadaId ? (
                           <>
                             <HorariosTabela
-                                // Passamos locacoes como um array contendo APENAS a locação selecionada
                                 locacoes={locacoesParaTabela}
-                                // Garantimos que funcionario_id NÃO seja passado
                                 funcionario_id={null}
                                 locacao_id={locacaoSelecionadaId}
                                 key={locacaoSelecionadaId}
@@ -359,10 +339,8 @@ const Agendar = () => {
               )}
 
 
-              {/* --- CONTEÚDO ESPECÍFICO DE SERVIÇO (isLocacao == false) --- */}
               {shouldShowFuncionariosAndHorarios && empresaDataFinal.funcionarios && (
                 <>
-                  {/* === ETAPA 1: Escolha do Profissional === */}
                   <section className="cards-section container">
                     <h2 className="section-heading">
                       <span className="me-2 text-primary-blue">1.</span> <FaUserTie /> Escolha o Profissional
@@ -402,7 +380,6 @@ const Agendar = () => {
                                 )}
                               </ul>
                             </div>
-                            {/* Indicador de Seleção */}
                             {funcionarioSelecionado === funcionario.id && (
                                 <div className="p-2 bg-success text-white fw-bold" style={{borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px'}}>
                                     SELECIONADO <FaChevronRight />
@@ -414,7 +391,6 @@ const Agendar = () => {
                     </div>
                   </section>
 
-                  {/* === ETAPA 2: Horários === */}
                   <section className="horarios-section container">
                     <h2 className="section-heading">
                       <span className="me-2 text-primary-blue">2.</span> <FaCalendarAlt /> Selecione o Horário

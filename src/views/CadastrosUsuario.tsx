@@ -1,17 +1,14 @@
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
-// Importando o FaTags que é ideal para Locações/Itens
 import { FaBuilding, FaUserTie, FaList, FaLink, FaCalendar, FaDatabase, FaArrowRight, FaArrowDown, FaTags } from "react-icons/fa6";
 import { FaCog, FaTools } from "react-icons/fa";
 
 export default function CadastrosUsuario() {
 
-  // Dados para os Cards de Ação (Links)
   const actionCards = [
     { to: "/criar-empresa", icon: FaBuilding, title: "Gerenciar Empresas", description: "Crie a estrutura principal, horários e configurações do seu negócio.", color: "primary" },
     { to: "/criar-funcionario", icon: FaUserTie, title: "Gerenciar Funcionários", description: "Adicione sua equipe e defina suas disponibilidades para agendamentos.", color: "warning" },
     { to: "/criar-servico", icon: FaTools, title: "Gerenciar Serviços", description: "Defina os serviços oferecidos e associe-os aos funcionários corretos.", color: "success" },
-    // --- NOVO CARD DE LOCAÇÕES ADICIONADO ---
     { to: "/criar-locacao", icon: FaTags, title: "Gerenciar Locações (Itens)", description: "Cadastre itens de locação (recursos, equipamentos) e defina seus valores.", color: "purple" }
   ];
 
@@ -205,12 +202,9 @@ export default function CadastrosUsuario() {
             Crie, edite e organize a base de dados do seu sistema: Empresas, Funcionários, Serviços **e Locações**.
           </p>
 
-          {/* Cards de Ação (Links) */}
           <div className="action-cards-grid">
             {actionCards.map((card) => (
-              // Garantindo que a prop 'title' existe, o que ela faz na definição de 'actionCards'
               <Link to={card.to} key={card.title} className={`action-card ${card.color}`}>
-                {/* O componente ícone deve ser renderizado: card.icon */}
                 <card.icon className="card-icon" />
                 <h2 className="card-title">{card.title}</h2>
                 <p className="card-description">{card.description}</p>
@@ -219,10 +213,8 @@ export default function CadastrosUsuario() {
             ))}
           </div>
 
-          {/* Grid de Informações: Fluxo e Relação */}
           <div className="info-grid">
 
-            {/* CARD 1: FLUXO PARA CADASTRO CORRETO (Atualizado para incluir Locações) */}
             <div className="info-card fluxo-section">
               <h3>
                 <FaList /> Fluxo de Cadastro Recomendado
@@ -254,7 +246,6 @@ export default function CadastrosUsuario() {
               </ul>
             </div>
 
-            {/* CARD 2: RELAÇÃO HIERÁRQUICA (Atualizado para Locações) */}
             <div className="info-card relacao-section" style={{borderLeftColor: 'var(--purple-locacao)'}}>
               <h3>
                 <FaLink /> Relação Hierárquica dos Dados

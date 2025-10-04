@@ -31,7 +31,6 @@ function Planos() {
       if (Array.isArray(rawPlanos)) {
         const mapped = rawPlanos.map((plano: Plano) => {
 
-          // Lógica para determinar a feature de capacidade (Funcionários ou Locações)
           let capacityFeature = '';
           if (companyType === 'servico') {
               const count = plano.quantidade_funcionarios;
@@ -50,11 +49,10 @@ function Planos() {
             duracao_em_dias: plano.duracao_em_dias,
             quantidade_empresas: plano.quantidade_empresas,
             quantidade_funcionarios: plano.quantidade_funcionarios,
-            quantidade_locacoes: plano.quantidade_locacoes, // Garantir que está no objeto
+            quantidade_locacoes: plano.quantidade_locacoes,
             cor: getPlanColor(plano.nome),
             features: [
               `Até ${plano.quantidade_empresas} empresa${plano.quantidade_empresas !== 1 ? "s" : ""}`,
-              // Feature Condicional (Funcionários ou Locações)
               capacityFeature,
               ...(plano.nome.toLowerCase() !== "free trial" ? ["Agendamento Online 24/7", "Lembretes Automáticos"] : ["Acesso Limitado por 7 dias"]),
               ...(plano.nome.toLowerCase() === "plano profissional" || plano.nome.toLowerCase() === "plano corporativo" ? ["Relatórios Básicos"] : []),
@@ -66,7 +64,7 @@ function Planos() {
         setPlanos(mapped);
       }
     }
-  }, [loading, data, companyType]); // companyType é uma dependência
+  }, [loading, data, companyType]);
 
   const getPlanColor = (nome: string) => {
     switch (nome.toLowerCase()) {
@@ -355,9 +353,8 @@ function Planos() {
                 <div
                     key={index}
                     className={`plan-card ${plano.nome.toLowerCase().includes('profissional') ? 'highlight' : ''}`}
-                    style={{'--plan-color': plano.cor} as React.CSSProperties} // Propriedade CSS para a cor
+                    style={{'--plan-color': plano.cor} as React.CSSProperties}
                 >
-                    {/* Linha de Destaque por Cor */}
                     <div style={{
                         position: 'absolute',
                         top: 0,
@@ -420,7 +417,6 @@ function Planos() {
             </div>
           )}
 
-          {/* Seção de Pagamento */}
           <div className="payment-methods-section text-center">
             <h5 style={{ color: "var(--primary-blue)", fontWeight: "700" }}>
               Formas de Pagamento Aceitas
@@ -435,7 +431,6 @@ function Planos() {
             </div>
           </div>
 
-          {/* Seção de Expiração */}
           <div className="expiration-table-section text-center">
             <h5 style={{ color: "var(--primary-blue)", fontWeight: "700" }}>
               O que acontece se meu plano vencer?

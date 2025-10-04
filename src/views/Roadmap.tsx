@@ -1,7 +1,7 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "../components/Navbar";
-import { FaCheck, FaHourglassHalf, FaRegClock } from "react-icons/fa6"; // Atualizado para Fa6
+import { FaCheck, FaHourglassHalf, FaRegClock } from "react-icons/fa6";
 import {FaMapMarkerAlt} from "react-icons/fa";
 const roadmapData = [
   {

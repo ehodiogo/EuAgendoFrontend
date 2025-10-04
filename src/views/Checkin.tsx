@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import Navbar from "../components/Navbar";
-import { FaBuilding, FaSpinner, FaMagnifyingGlass, FaLocationDot } from "react-icons/fa6"; // Usando Fa6 para consistência
+import { FaBuilding, FaSpinner, FaMagnifyingGlass, FaLocationDot } from "react-icons/fa6";
 import {FaExclamationCircle} from "react-icons/fa";
 
 function CheckIn() {
@@ -13,7 +13,6 @@ function CheckIn() {
   );
   const [search, setSearch] = useState("");
 
-  // Filtra empresas com base na busca
   const filteredEmpresas = empresas_usuario.data?.filter((empresa: Empresa) =>
     empresa.nome.toLowerCase().includes(search.toLowerCase()) ||
     empresa.cidade.toLowerCase().includes(search.toLowerCase()) ||

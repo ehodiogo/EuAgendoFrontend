@@ -1,6 +1,7 @@
 import { useFetch } from "../functions/GetData";
 import { Dashboard } from "../interfaces/DashboardEarnings";
-import { FaUserTag, FaUserGroup, FaBriefcase, FaCalendarCheck, FaCalendarDays, FaChartLine, FaSpinner} from "react-icons/fa6"; // Atualizado para Fa6
+import { FaUserTag, FaUserGroup, FaBriefcase, FaCalendarCheck, FaCalendarDays, FaChartLine, FaSpinner } from "react-icons/fa6";
+import {FaBoxes} from "react-icons/fa";
 
 interface DashBoardDadosProps {
   empresa_id: number;
@@ -11,44 +12,98 @@ const DashBoardDados = ({ empresa_id }: DashBoardDadosProps) => {
     `/api/dashboard/?empresa_id=${empresa_id}`
   );
 
-  // Mapeamento dos dados para exibição em cards KPI
-  const kpiItems = dadosDashboard.data ? [
-    {
-      icon: FaBriefcase,
-      title: "Serviços Prestados",
-      value: dadosDashboard.data.total_servicos,
-      color: "#0056b3", // Accent Blue
-      bg: "#e0e7ff",
-    },
-    {
-      icon: FaUserTag,
-      title: "Total de Clientes",
-      value: dadosDashboard.data.total_clientes,
-      color: "#28a745", // Success Green
-      bg: "#d4edda",
-    },
-    {
-      icon: FaUserGroup,
-      title: "Total de Funcionários",
-      value: dadosDashboard.data.total_funcionarios,
-      color: "#fd7e14", // Warning Orange
-      bg: "#fff3cd",
-    },
-    {
-      icon: FaCalendarCheck,
-      title: "Agendamentos Hoje",
-      value: dadosDashboard.data.agendamentos_hoje,
-      color: "#003087", // Primary Blue
-      bg: "#f0f4f8",
-    },
-    {
-      icon: FaCalendarDays,
-      title: "Agendamentos Futuros",
-      value: dadosDashboard.data.agendamentos_pendentes,
-      color: "#dc3545", // Danger Red
-      bg: "#fcebeb",
-    },
-  ] : [];
+  const {
+    data,
+    loading,
+  } = dadosDashboard;
+
+  const empresaTipo = data?.tipo || 'Serviço';
+
+  if (!data) {
+      return (
+        <div className="dashboard-dados-wrapper">
+            <h4 className="dashboard-header">
+                <FaChartLine /> Painel de Métricas
+            </h4>
+            {loading ? (
+                <div className="loading-container message-status">
+                    <FaSpinner className="fa-spin me-2" /> Carregando dados do painel...
+                </div>
+            ) : null}
+        </div>
+      );
+  }
+
+  const kpiLocacao = [
+      {
+          icon: FaUserTag,
+          title: "Total de Clientes",
+          value: data.total_clientes,
+          color: "#28a745", // Success Green
+          bg: "#d4edda",
+      },
+      {
+          icon: FaBoxes,
+          title: "Total de Locações",
+          value: data.total_locacoes,
+          color: "#6f42c1", // Roxo
+          bg: "#f3e6ff",
+      },
+      {
+          icon: FaCalendarCheck,
+          title: "Agendamentos Hoje",
+          value: data.agendamentos_hoje,
+          color: "#003087", // Primary Blue
+          bg: "#f0f4f8",
+      },
+      {
+          icon: FaCalendarDays,
+          title: "Agendamentos Futuros",
+          value: data.agendamentos_pendentes,
+          color: "#dc3545", // Danger Red
+          bg: "#fcebeb",
+      },
+  ];
+
+  const kpiServicos = [
+      {
+          icon: FaUserTag,
+          title: "Total de Clientes",
+          value: data.total_clientes,
+          color: "#28a745", // Success Green
+          bg: "#d4edda",
+      },
+      {
+          icon: FaUserGroup,
+          title: "Total de Funcionários",
+          value: data.total_funcionarios,
+          color: "#fd7e14", // Warning Orange
+          bg: "#fff3cd",
+      },
+      {
+          icon: FaBriefcase,
+          title: "Total de Serviços",
+          value: data.total_servicos,
+          color: "#0056b3", // Accent Blue
+          bg: "#e0e7ff",
+      },
+      {
+          icon: FaCalendarCheck,
+          title: "Agendamentos Hoje",
+          value: data.agendamentos_hoje,
+          color: "#003087", // Primary Blue
+          bg: "#f0f4f8",
+      },
+      {
+          icon: FaCalendarDays,
+          title: "Agendamentos Futuros",
+          value: data.agendamentos_pendentes,
+          color: "#dc3545", // Danger Red
+          bg: "#fcebeb",
+      },
+  ];
+
+  const kpiItems = empresaTipo === 'Locação' ? kpiLocacao : kpiServicos;
 
   return (
     <div className="dashboard-dados-wrapper">
@@ -178,7 +233,7 @@ const DashBoardDados = ({ empresa_id }: DashBoardDadosProps) => {
         <FaChartLine /> Painel de Métricas
       </h4>
 
-      {dadosDashboard.loading ? (
+      {loading ? (
         <div className="loading-container message-status">
           <FaSpinner className="fa-spin me-2" /> Carregando dados do painel...
         </div>

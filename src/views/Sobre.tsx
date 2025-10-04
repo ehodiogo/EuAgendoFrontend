@@ -1,5 +1,5 @@
 import Navbar from "../components/Navbar";
-import { FaBuilding, FaBullseye, FaEye, FaUsers, FaArrowRight } from "react-icons/fa6"; // Ícones Fa6
+import { FaBuilding, FaBullseye, FaEye, FaUsers, FaArrowRight } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 
 function Sobre() {
@@ -187,7 +187,6 @@ function Sobre() {
       <div className="custom-bg min-vh-100">
         <Navbar />
 
-        {/* 1. HERO SECTION */}
         <section className="hero-section">
           <div className="container">
             <h1>
@@ -205,7 +204,6 @@ function Sobre() {
           </div>
         </section>
 
-        {/* 2. MISSÃO E VISÃO */}
         <section className="content-section container">
             <h2>Por que existimos?</h2>
             <div className="row justify-content-center">
@@ -230,7 +228,6 @@ function Sobre() {
             </div>
         </section>
 
-        {/* 3. EQUIPE */}
         <section className="content-section container" style={{ paddingTop: 0 }}>
             <h2><FaUsers /> Quem está por trás?</h2>
             <div className="row justify-content-center">

@@ -1,5 +1,5 @@
 import Navbar from "../components/Navbar";
-import { FaEnvelope, FaPhone, FaLocationDot, FaPaperPlane, FaUser, FaCircleCheck } from "react-icons/fa6"; // Atualizado para Fa6
+import { FaEnvelope, FaPhone, FaLocationDot, FaPaperPlane, FaCircleCheck, FaSpinner } from "react-icons/fa6";
 import { useState, ChangeEvent, FormEvent } from "react";
 
 function Contato() {
@@ -25,15 +25,11 @@ function Contato() {
     setIsLoading(true);
     setStatus("");
 
-    // Simulação de envio de formulário
     setTimeout(() => {
       setIsLoading(false);
-      // Aqui você integraria com sua API de envio (ex: Axios.post)
-      // Se fosse real: try { await axios.post('/api/contato', formData); setStatus(...) } catch(e) { setError(...) }
-
       setStatus("success");
       setFormData({ nome: "", email: "", mensagem: "" });
-      setTimeout(() => setStatus(""), 6000); // Remove a mensagem de sucesso após 6 segundos
+      setTimeout(() => setStatus(""), 6000);
     }, 1500);
   };
 
@@ -281,7 +277,6 @@ function Contato() {
           </section>
 
           <div className="contact-layout">
-            {/* COLUNA DE INFORMAÇÕES */}
             <div className="contact-info-card">
               <h3>Detalhes de Contato</h3>
 
@@ -289,7 +284,7 @@ function Contato() {
                 <FaEnvelope />
                 <div>
                   <strong>E-mail de Suporte</strong>
-                  <a href="mailto:vemagendar@gmail.com">suporte@vemagendar.com</a>
+                  <a href="mailto:vemagendar@gmail.com">vemagendar@gmail.com</a>
                 </div>
               </div>
 
@@ -297,7 +292,7 @@ function Contato() {
                 <FaPhone />
                 <div>
                   <strong>Telefone de Atendimento</strong>
-                  <a href="tel:+5511999999999">(11) 99999-9999</a>
+                  <a href="tel:+5555996995573">(55) 99699-5573</a>
                 </div>
               </div>
 
@@ -310,7 +305,6 @@ function Contato() {
               </div>
             </div>
 
-            {/* COLUNA DO FORMULÁRIO */}
             <div className="contact-form-card">
               <h3>Envie sua Mensagem</h3>
               <form onSubmit={handleSubmit}>

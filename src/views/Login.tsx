@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { FaKey, FaEnvelope, FaSpinner } from "react-icons/fa6"; // Atualizado para Fa6
+import { FaKey, FaEnvelope, FaSpinner } from "react-icons/fa6";
 import {FaSignInAlt} from "react-icons/fa";
 
 function Login() {
@@ -30,7 +30,6 @@ function Login() {
       localStorage.setItem("access_token", access);
       localStorage.setItem("refresh_token", refresh);
       localStorage.setItem("ultimo_acesso", new Date().getTime().toString());
-      // A API retorna strings para estes, é bom manter consistência
       localStorage.setItem("is_expired_plan", is_expired_plan.toString());
       localStorage.setItem("tempo_restante", tempo_restante.toString());
 

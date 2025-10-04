@@ -26,21 +26,15 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // === LÓGICA DE URL CONDICIONAL (Ajuste Solicitado) ===
-  // Se houver funcionario_id, usa agendamentos_funcionario.
-  // Caso contrário, usa agendamentos_locacao com locacao_id e data.
   const agendamentosUrl = funcionario_id
     ? `/api/agendamentos_funcionario/?id_funcionario=${funcionario_id}&data=${dataString}`
     : `/api/agendamentos_locacao/?id_locacao=${locacao_id}&data=${dataString}`;
 
   const agendamentosResponse = useFetch<Agendamento[]>(agendamentosUrl);
-  // ======================================================
 
   const agendamentos = agendamentosResponse.data;
 
-  // FUNÇÃO PARA FORMATAR A DATA NO PADRÃO BRASILEIRO
   const formatarDataBR = (dataIso: string): string => {
-    // dataIso é 'YYYY-MM-DD'
     const [ano, mes, dia] = dataIso.split('-');
     return `${dia}/${mes}/${ano}`;
   };
@@ -153,8 +147,6 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
     const servicoInfo = servicos.find(s => s.nome === servicoSelecionado);
 
     const agendamentoData = {
-      // Se funcionario_id for undefined, ele será passado como undefined para o backend, o que é esperado
-      // se a locação não exigir um funcionário específico.
       id_funcionario: funcionario_id,
       servico_nome: servicoSelecionado,
       data: dataString,
@@ -446,7 +438,6 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
           </div>
         )}
 
-        {/* === MODAL DE CONFIRMAÇÃO === */}
         <Modal
             show={modalAberto}
             onHide={() => !isSubmitting && setModalAberto(false)}
@@ -463,7 +454,6 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
               Agendamento: <strong>{dataFormatada}</strong> às <strong>{horaFormatada}</strong>
             </p>
 
-            {/* GRUPO DE SERVIÇOS */}
             <div className="radio-group">
               <h5><FaTag className="me-1" /> Escolha o Serviço</h5>
               {servicos.map((servico) => (
@@ -482,7 +472,6 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
                       <span className="service-info">
                         (R$ {servico.preco} | {servico.duracao}min)
                       </span>
-                      {/* CORREÇÃO DO TOOLTIP: O OverlayTrigger deve envolver APENAS o ícone. */}
                       <OverlayTrigger
                           placement="right"
                           overlay={
@@ -498,7 +487,6 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
               ))}
             </div>
 
-            {/* INFORMAÇÕES DO CLIENTE */}
             <div className="row g-2">
               <h5 className="mb-3 mt-0"><FaUser className="me-1" /> Informações do Cliente</h5>
               <div className="col-12">

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { FaSpinner, FaCheckCircle, FaCircleExclamation, FaHourglassHalf, FaCircleCheck } from "react-icons/fa6"; // Atualizado para Fa6
+import { FaSpinner, FaCircleExclamation, FaHourglassHalf, FaCircleCheck } from "react-icons/fa6";
 
 const ValidarPlano = () => {
   const [loading, setLoading] = useState(false);
@@ -10,15 +10,13 @@ const ValidarPlano = () => {
   const [statusPagamento, setStatusPagamento] = useState<string | null>(null);
 
   useEffect(() => {
-    // Função de limpeza para evitar a chamada duplicada no modo Strict Mode
     let isMounted = true;
 
-    // Pequena função para introduzir backoff simples ou delay para UX
     const timer = setTimeout(() => {
       if (isMounted) {
         verificarPagamento();
       }
-    }, 500); // Dá um pequeno tempo para o usuário perceber a tela de loading
+    }, 500);
 
     return () => {
       isMounted = false;
@@ -37,7 +35,6 @@ const ValidarPlano = () => {
 
     setLoading(true);
     try {
-      // NOTE: Usando a variável de ambiente VITE_API_URL, conforme o código original
       const url = import.meta.env.VITE_API_URL;
 
       const response = await axios.post(url + "/api/payment-success/", {
@@ -241,7 +238,6 @@ const ValidarPlano = () => {
                 instantes ou verifique o status novamente.
               </p>
               <div className="mb-4">
-                {/* Mensagem de Status Dinâmica */}
                 {loading ? (
                   <p className="status-message loading">
                     <FaSpinner className="animate-spin" /> Verificando status...
@@ -251,13 +247,11 @@ const ValidarPlano = () => {
                     className={`status-message ${getStatusClass()}`}
                   >
                     {getStatusIcon()}
-                    {/* Renderiza o texto do status, substituindo <strong> por tags <strong> */}
                     <span dangerouslySetInnerHTML={{ __html: statusPagamento.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
                   </p>
                 ) : null}
               </div>
 
-              {/* Botão de Ação Principal */}
               <button
                 onClick={verificarPagamento}
                 className="btn-custom btn-success-custom w-100 mb-3"
@@ -270,7 +264,6 @@ const ValidarPlano = () => {
                   : "Verificar Status do Pagamento"}
               </button>
 
-              {/* Link de Retorno */}
               <Link
                 to="/"
                 className="btn-custom btn-outline-custom w-100"

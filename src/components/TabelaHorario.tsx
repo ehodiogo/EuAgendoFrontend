@@ -7,13 +7,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import HorariosDoDia from "./Horarios";
 import { Servicos } from "../interfaces/ServicosFuncionarios";
 import { FaExclamationCircle, FaSpinner, FaCalendarDay, FaLock, FaTimes, FaUserTie, FaHome } from "react-icons/fa";
-import { Locacao } from "../interfaces/Locacao"; // Importação assumida
+import { Locacao } from "../interfaces/Locacao";
 
-// 1. Interface de Props Ajustada
 interface HorariosTabelaProps {
   funcionario_id?: number | null;
   servicos?: Servicos[];
-  locacoes?: Locacao[]; // Propriedade de Locações
+  locacoes?: Locacao[];
   locacao_id?: number | null;
 }
 
@@ -34,17 +33,12 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
   useEffect(() => {
     if (empresa) {
       const horasRestantes = empresa.assinatura_vencimento;
-      // Define a assinatura como vencida se passar de 49 horas de atraso (mais de 2 dias)
       setAssinaturaVencida(horasRestantes < -49);
     }
   }, [empresa]);
 
-  // Lógica para determinar o MODO e a LISTA de Itens
   const isLocacaoMode = !funcionario_id && locacoes && locacoes.length > 0;
 
-  // A lista de itens a serem agendados (Serviços ou Locações)
-  // Usamos 'as Servicos[]' pois HorariosDoDia espera esse tipo, mas ele deve
-  // tratar internamente a Locação (que compartilha campos como nome, preco, duracao).
   const itensParaAgendamento = (isLocacaoMode ? locacoes : servicos) || [];
 
   const diaSelecionado = [
@@ -63,12 +57,10 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
     (diaSelecionado === "Sábado" && !empresa?.abre_sabado) ||
     (diaSelecionado === "Domingo" && !empresa?.abre_domingo);
 
-  // Determina o Título com base no MODO
   const tituloComponente = isLocacaoMode
     ? "Horários de Locação"
     : (funcionario_id ? "Horários do Profissional" : "Disponibilidade Geral");
 
-  // Lógica de limitação de datas (mantida)
   const limitarDatasDisponiveis = (date: Date) => {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
@@ -80,17 +72,15 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
     dataNormalizada.setHours(0, 0, 0, 0);
 
     if (empresa?.assinatura_ativa === false) {
-      // Se a assinatura expirou, limitamos estritamente.
       if (diferencaHoras > -24) {
         return (dataNormalizada.getTime() === hoje.getTime() || dataNormalizada.getTime() === amanha.getTime());
       }
       if (diferencaHoras >= -49 && diferencaHoras <= -24) {
         return dataNormalizada.getTime() === hoje.getTime();
       }
-      return false; // Bloqueia todas as datas
+      return false;
     }
 
-    // Se a assinatura está ativa, permite hoje e datas futuras
     return dataNormalizada >= hoje;
   };
 
@@ -239,7 +229,6 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
         }
       `}</style>
       <div className="horarios-tabela">
-        {/* === MENSAGENS DE STATUS INICIAIS === */}
         {empresaInterfaceList.loading ? (
           <div className="message loading">
             <FaSpinner className="fa-spin icon-large" />
@@ -254,14 +243,12 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
           </div>
         ) : (
           <div className="horarios-card">
-             {/* Título dinâmico */}
             <h2>
                 {isLocacaoMode ? <FaHome className="me-2" /> : (funcionario_id ? <FaUserTie className="me-2" /> : <FaCalendarDay className="me-2" />)}
                 {tituloComponente}
             </h2>
 
             {assinaturaVencida ? (
-              // === AVISO DE ASSINATURA VENCIDA (BLOQUEIO TOTAL) ===
               <div className="message warning">
                 <FaLock className="icon-large" />
                 <h4>Agendamentos Bloqueados</h4>
@@ -272,7 +259,6 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
               </div>
             ) : (
               <>
-                {/* === CONTROLE DE DATA === */}
                 <div className="datepicker-group">
                   <label htmlFor="data" className="form-label">
                     <FaCalendarDay className="me-2" /> Selecione a Data {isLocacaoMode ? "da Locação" : "do Serviço"}:
@@ -288,7 +274,6 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
                   />
                 </div>
 
-                {/* === MENSAGENS DE VALIDAÇÃO APÓS A DATA === */}
                 {empresaFechada ? (
                   <div className="message error">
                     <FaTimes className="icon-large" />
@@ -311,7 +296,6 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
                     </p>
                   </div>
                 ) : (
-                  // === RENDERIZAÇÃO DA TABELA DE HORÁRIOS ===
                   <HorariosDoDia
                     key={dataSelecionadaString}
                     empresa={empresa}

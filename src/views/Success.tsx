@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { FaSpinner, FaRocket } from "react-icons/fa6"; // Atualizado para Fa6
+import { FaSpinner, FaRocket } from "react-icons/fa6";
 import {FaCheckCircle} from "react-icons/fa";
 
 const SuccessPage = () => {
@@ -43,10 +43,8 @@ const SuccessPage = () => {
       setSuccess(true);
       setError(null);
 
-      // Limpa o carrinho e redireciona após a ativação (melhor UX)
       window.localStorage.removeItem("carrinho");
 
-      // Delay de 1 segundo para a transição de sucesso ser percebida
       setTimeout(() => {
           window.location.href = "/dashboard";
       }, 1000);

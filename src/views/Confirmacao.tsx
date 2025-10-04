@@ -1,4 +1,4 @@
-import { FaEnvelopeOpenText } from "react-icons/fa6"; // Ícones Fa6 para destaque
+import { FaEnvelopeOpenText } from "react-icons/fa6";
 import {FaCheckCircle} from "react-icons/fa";
 
 function Confirmacao() {
