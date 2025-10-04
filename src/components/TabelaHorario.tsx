@@ -6,14 +6,18 @@ import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import HorariosDoDia from "./Horarios";
 import { Servicos } from "../interfaces/ServicosFuncionarios";
-import { FaExclamationCircle, FaSpinner, FaCalendarDay, FaLock, FaTimes } from "react-icons/fa";
+import { FaExclamationCircle, FaSpinner, FaCalendarDay, FaLock, FaTimes, FaUserTie, FaHome } from "react-icons/fa";
+import { Locacao } from "../interfaces/Locacao"; // Importação assumida
 
+// 1. Interface de Props Ajustada
 interface HorariosTabelaProps {
-  funcionario_id: number;
-  servicos: Servicos[];
+  funcionario_id?: number | null;
+  servicos?: Servicos[];
+  locacoes?: Locacao[]; // Propriedade de Locações
+  locacao_id?: number | null;
 }
 
-const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
+const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: HorariosTabelaProps) => {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
   const [dataSelecionada, setDataSelecionada] = useState(() => {
     const hoje = new Date();
@@ -35,6 +39,14 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
     }
   }, [empresa]);
 
+  // Lógica para determinar o MODO e a LISTA de Itens
+  const isLocacaoMode = !funcionario_id && locacoes && locacoes.length > 0;
+
+  // A lista de itens a serem agendados (Serviços ou Locações)
+  // Usamos 'as Servicos[]' pois HorariosDoDia espera esse tipo, mas ele deve
+  // tratar internamente a Locação (que compartilha campos como nome, preco, duracao).
+  const itensParaAgendamento = (isLocacaoMode ? locacoes : servicos) || [];
+
   const diaSelecionado = [
     "Domingo",
     "Segunda-feira",
@@ -51,7 +63,12 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
     (diaSelecionado === "Sábado" && !empresa?.abre_sabado) ||
     (diaSelecionado === "Domingo" && !empresa?.abre_domingo);
 
-  // Lógica de limitação de datas
+  // Determina o Título com base no MODO
+  const tituloComponente = isLocacaoMode
+    ? "Horários de Locação"
+    : (funcionario_id ? "Horários do Profissional" : "Disponibilidade Geral");
+
+  // Lógica de limitação de datas (mantida)
   const limitarDatasDisponiveis = (date: Date) => {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
@@ -76,6 +93,8 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
     // Se a assinatura está ativa, permite hoje e datas futuras
     return dataNormalizada >= hoje;
   };
+
+  const listaVazia = itensParaAgendamento.length === 0;
 
   return (
     <div className="horarios-tabela">
@@ -105,7 +124,7 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
           border-radius: 12px;
           border: 1px solid var(--border-light);
           box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-          padding: 2rem; /* Mais padding para um visual premium */
+          padding: 2rem; 
           max-width: 900px;
           margin: 0 auto;
         }
@@ -136,12 +155,12 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
           display: block;
         }
         .datepicker-group .react-datepicker-wrapper {
-          display: inline-block; /* Alinha ao centro */
+          display: inline-block; 
           width: auto;
           min-width: 250px;
         }
         .datepicker-group .form-control {
-          border: 2px solid var(--primary-blue); /* Borda mais grossa e cor corporativa */
+          border: 2px solid var(--primary-blue); 
           border-radius: 8px;
           padding: 0.75rem 1rem;
           font-size: 1.1rem;
@@ -235,6 +254,11 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
           </div>
         ) : (
           <div className="horarios-card">
+             {/* Título dinâmico */}
+            <h2>
+                {isLocacaoMode ? <FaHome className="me-2" /> : (funcionario_id ? <FaUserTie className="me-2" /> : <FaCalendarDay className="me-2" />)}
+                {tituloComponente}
+            </h2>
 
             {assinaturaVencida ? (
               // === AVISO DE ASSINATURA VENCIDA (BLOQUEIO TOTAL) ===
@@ -251,7 +275,7 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
                 {/* === CONTROLE DE DATA === */}
                 <div className="datepicker-group">
                   <label htmlFor="data" className="form-label">
-                    <FaCalendarDay className="me-2" /> Selecione a Data do Serviço:
+                    <FaCalendarDay className="me-2" /> Selecione a Data {isLocacaoMode ? "da Locação" : "do Serviço"}:
                   </label>
                   <ReactDatePicker
                     selected={dataSelecionada}
@@ -273,12 +297,17 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
                       A empresa <strong>não funciona</strong> aos <strong>{diaSelecionado}</strong>. Por favor, escolha outra data.
                     </p>
                   </div>
-                ) : servicos.length === 0 ? (
+                ) : listaVazia ? (
                   <div className="message info">
                     <FaExclamationCircle className="icon-large" />
-                    <h4>Serviços Não Encontrados</h4>
+                    <h4>{isLocacaoMode ? "Locações" : "Serviços"} Não Encontradas</h4>
                     <p>
-                      Este profissional <strong>não tem serviços ativos</strong> para agendamento.
+                      {isLocacaoMode
+                        ? 'Não há itens de locação ativos para agendamento.'
+                        : (funcionario_id
+                          ? 'Este profissional não tem serviços ativos para agendamento.'
+                          : 'Não há serviços ativos para agendamento geral da empresa.')
+                      }
                     </p>
                   </div>
                 ) : (
@@ -287,8 +316,9 @@ const HorariosTabela = ({ funcionario_id, servicos }: HorariosTabelaProps) => {
                     key={dataSelecionadaString}
                     empresa={empresa}
                     data_selecionada={dataSelecionada}
-                    funcionario_id={funcionario_id}
-                    servicos={servicos}
+                    funcionario_id={funcionario_id!}
+                    locacao_id={locacao_id!}
+                    servicos={itensParaAgendamento as Servicos[]}
                   />
                 )}
               </>

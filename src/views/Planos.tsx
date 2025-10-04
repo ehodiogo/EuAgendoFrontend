@@ -13,10 +13,14 @@ import { useEffect, useState } from "react";
 import {useFetch} from "../functions/GetData.tsx";
 import {Plano} from "../interfaces/Plano.tsx";
 
+type CompanyType = 'servico' | 'locacao';
+
 function Planos() {
   const navigate = useNavigate();
   const { data, loading } = useFetch<Plano[]>(`/api/planos`);
   const [planos, setPlanos] = useState<Plano[]>([]);
+
+  const [companyType, setCompanyType] = useState<CompanyType>('servico');
 
   useEffect(() => {
     console.log("data", data);
@@ -25,29 +29,44 @@ function Planos() {
       const rawPlanos = Array.isArray(data) ? data : data.results;
 
       if (Array.isArray(rawPlanos)) {
-        const mapped = rawPlanos.map((plano: Plano) => ({
-          nome: plano.nome,
-          valor: plano.valor,
-          valor_cheio: plano.valor_cheio,
-          is_promo: plano.is_promo,
-          porcentagem_promo: plano.porcentagem_promo,
-          duracao_em_dias: plano.duracao_em_dias,
-          quantidade_empresas: plano.quantidade_empresas,
-          quantidade_funcionarios: plano.quantidade_funcionarios,
-          cor: getPlanColor(plano.nome),
-          features: [
-            `Até ${plano.quantidade_empresas} empresa${plano.quantidade_empresas > 1 ? "s" : ""}`,
-            `Até ${plano.quantidade_funcionarios} funcionário${plano.quantidade_funcionarios > 1 ? "s" : ""} por empresa`,
-            ...(plano.nome.toLowerCase() !== "free trial" ? ["Agendamento Online 24/7", "Lembretes Automáticos"] : ["Acesso Limitado por 7 dias"]),
-            ...(plano.nome.toLowerCase() === "plano profissional" || plano.nome.toLowerCase() === "plano corporativo" ? ["Relatórios Básicos"] : []),
-            ...(plano.nome.toLowerCase() === "plano corporativo" ? ["API de Integração", "Suporte VIP 24h"] : []),
-          ],
-        }));
+        const mapped = rawPlanos.map((plano: Plano) => {
+
+          // Lógica para determinar a feature de capacidade (Funcionários ou Locações)
+          let capacityFeature = '';
+          if (companyType === 'servico') {
+              const count = plano.quantidade_funcionarios;
+              capacityFeature = `Até ${count} funcionário${count !== 1 ? "s" : ""} por empresa`;
+          } else if (companyType === 'locacao') {
+              const count = plano.quantidade_locacoes;
+              capacityFeature = `Até ${count} locaç${count !== 1 ? "ões" : "ão"} ativa${count !== 1 ? "s" : ""}`;
+          }
+
+          return {
+            nome: plano.nome,
+            valor: plano.valor,
+            valor_cheio: plano.valor_cheio,
+            is_promo: plano.is_promo,
+            porcentagem_promo: plano.porcentagem_promo,
+            duracao_em_dias: plano.duracao_em_dias,
+            quantidade_empresas: plano.quantidade_empresas,
+            quantidade_funcionarios: plano.quantidade_funcionarios,
+            quantidade_locacoes: plano.quantidade_locacoes, // Garantir que está no objeto
+            cor: getPlanColor(plano.nome),
+            features: [
+              `Até ${plano.quantidade_empresas} empresa${plano.quantidade_empresas !== 1 ? "s" : ""}`,
+              // Feature Condicional (Funcionários ou Locações)
+              capacityFeature,
+              ...(plano.nome.toLowerCase() !== "free trial" ? ["Agendamento Online 24/7", "Lembretes Automáticos"] : ["Acesso Limitado por 7 dias"]),
+              ...(plano.nome.toLowerCase() === "plano profissional" || plano.nome.toLowerCase() === "plano corporativo" ? ["Relatórios Básicos"] : []),
+              ...(plano.nome.toLowerCase() === "plano corporativo" ? ["API de Integração", "Suporte VIP 24h"] : []),
+            ],
+          };
+        });
         // @ts-ignore
         setPlanos(mapped);
       }
     }
-  }, [loading, data]);
+  }, [loading, data, companyType]); // companyType é uma dependência
 
   const getPlanColor = (nome: string) => {
     switch (nome.toLowerCase()) {
@@ -312,6 +331,21 @@ function Planos() {
             Escolha o plano ideal para o seu negócio. Todos os planos incluem
             agendamento online 24/7 e lembretes automáticos.
           </p>
+            <div className="mb-4">
+                <button
+                    className={`btn btn-sm me-2 ${companyType === 'servico' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    onClick={() => setCompanyType('servico')}
+                >
+                    Ver Planos para Agendamento de Serviços
+                </button>
+                <button
+                    className={`btn btn-sm ${companyType === 'locacao' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    onClick={() => setCompanyType('locacao')}
+                >
+                    Ver Planos para Locações de Quadras, Vagas, Salas, etc.
+                </button>
+            </div>
+
 
           {loading ? (
             <p className="fw-bold text-primary-blue">Carregando planos...</p>

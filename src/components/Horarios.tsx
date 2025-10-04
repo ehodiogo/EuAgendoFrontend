@@ -5,21 +5,17 @@ import { useState } from "react";
 import { Modal, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Servicos } from "../interfaces/ServicosFuncionarios";
 import "bootstrap/dist/css/bootstrap.min.css";
-// Removida a FaEnvelope e FaPhone para corresponder ao último código fornecido, mantendo o FaUser e FaTools
 import { FaCheckCircle, FaTimesCircle, FaCoffee, FaSpinner, FaCalendarCheck, FaExclamationCircle, FaUser, FaTools, FaTag } from "react-icons/fa";
 
 interface HorariosDoDiaProps {
   empresa: Empresa;
   data_selecionada: Date;
-  funcionario_id: number;
+  funcionario_id?: number;
+  locacao_id?: number;
   servicos: Servicos[];
 }
 
-// Constante para definir o número inicial de cards visíveis (Se você usou a versão anterior, é bom mantê-la ou reintroduzi-la)
-// const HORARIOS_INICIAIS = 16;
-// const HORARIOS_POR_PAGINA = 12;
-
-const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: HorariosDoDiaProps) => {
+const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, locacao_id }: HorariosDoDiaProps) => {
   const dataString = data_selecionada.toISOString().split("T")[0];
   const [modalAberto, setModalAberto] = useState(false);
   const [horarioSelecionado, setHorarioSelecionado] = useState<string | null>(null);
@@ -29,11 +25,17 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
   const [clienteNumero, setClienteNumero] = useState<string>("");
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // const [horariosVisiveis, setHorariosVisiveis] = useState(HORARIOS_INICIAIS); // Removido para simplificar com base no código fornecido
 
-  const agendamentosResponse = useFetch<Agendamento[]>(
-    `/api/agendamentos_funcionario/?id_funcionario=${funcionario_id}&data=${dataString}`
-  );
+  // === LÓGICA DE URL CONDICIONAL (Ajuste Solicitado) ===
+  // Se houver funcionario_id, usa agendamentos_funcionario.
+  // Caso contrário, usa agendamentos_locacao com locacao_id e data.
+  const agendamentosUrl = funcionario_id
+    ? `/api/agendamentos_funcionario/?id_funcionario=${funcionario_id}&data=${dataString}`
+    : `/api/agendamentos_locacao/?id_locacao=${locacao_id}&data=${dataString}`;
+
+  const agendamentosResponse = useFetch<Agendamento[]>(agendamentosUrl);
+  // ======================================================
+
   const agendamentos = agendamentosResponse.data;
 
   // FUNÇÃO PARA FORMATAR A DATA NO PADRÃO BRASILEIRO
@@ -151,6 +153,8 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
     const servicoInfo = servicos.find(s => s.nome === servicoSelecionado);
 
     const agendamentoData = {
+      // Se funcionario_id for undefined, ele será passado como undefined para o backend, o que é esperado
+      // se a locação não exigir um funcionário específico.
       id_funcionario: funcionario_id,
       servico_nome: servicoSelecionado,
       data: dataString,
@@ -478,8 +482,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos }: 
                       <span className="service-info">
                         (R$ {servico.preco} | {servico.duracao}min)
                       </span>
-                      {/* CORREÇÃO DO TOOLTIP: O OverlayTrigger deve envolver APENAS o ícone, não o label inteiro.
-                         O label já era clicável. O Tooltip deve ser acionado pelo ícone para mostrar a descrição. */}
+                      {/* CORREÇÃO DO TOOLTIP: O OverlayTrigger deve envolver APENAS o ícone. */}
                       <OverlayTrigger
                           placement="right"
                           overlay={

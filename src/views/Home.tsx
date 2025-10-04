@@ -7,10 +7,17 @@ import { useEffect, useState } from "react";
 import { useFetch } from "../functions/GetData.tsx";
 import { Plano } from "../interfaces/Plano.tsx";
 
+// Define os tipos de empresa possíveis
+type CompanyType = 'servico' | 'locacao';
+
 function Home() {
   const navigate = useNavigate();
   const { data, loading } = useFetch<Plano[]>("/api/planos");
   const [planos, setPlanos] = useState<Plano[]>([]);
+
+  // 1. Estado para o Tipo de Empresa (Mockado)
+  // **Atenção:** Em produção, você DEVE buscar e definir o tipo real da empresa logada.
+  const [companyType, setCompanyType] = useState<CompanyType>('servico');
 
   useEffect(() => {
     if (!loading && data) {
@@ -19,29 +26,43 @@ function Home() {
       if (Array.isArray(rawPlanos)) {
         const mapped = rawPlanos
           .filter((plano: Plano) => plano.nome.toLowerCase() !== "free trial")
-          .map((plano: Plano) => ({
-            nome: plano.nome,
-            valor: plano.valor,
-            valor_cheio: plano.valor_cheio,
-            is_promo: plano.is_promo,
-            porcentagem_promo: plano.porcentagem_promo,
-            duracao_em_dias: plano.duracao_em_dias,
-            quantidade_empresas: plano.quantidade_empresas,
-            quantidade_funcionarios: plano.quantidade_funcionarios,
-            cor: getPlanColor(plano.nome),
-            features: [
-              `Até ${plano.quantidade_empresas} empresa${plano.quantidade_empresas > 1 ? "s" : ""}`,
-              `Até ${plano.quantidade_funcionarios} funcionário${plano.quantidade_funcionarios > 1 ? "s" : ""} por empresa`,
-              "Agendamento Online 24/7",
-              "Lembretes Automáticos",
-              "Gestão de Clientes",
-            ].filter(Boolean),
-            descricao: plano.descricao || "Plano ideal para o crescimento do seu negócio",
-          }));
+          .map((plano: Plano) => {
+
+            // 2. Lógica Condicional para a Feature de Capacidade
+            let capacityFeature = '';
+            if (companyType === 'servico') {
+                const count = plano.quantidade_funcionarios;
+                capacityFeature = `Até ${count} funcionário${count !== 1 ? "s" : ""} por empresa`;
+            } else if (companyType === 'locacao') {
+                const count = plano.quantidade_locacoes;
+                capacityFeature = `Até ${count} locaç${count !== 1 ? "ões" : "ão"} ativa${count !== 1 ? "s" : ""}`;
+            }
+
+            return {
+                nome: plano.nome,
+                valor: plano.valor,
+                valor_cheio: plano.valor_cheio,
+                is_promo: plano.is_promo,
+                porcentagem_promo: plano.porcentagem_promo,
+                duracao_em_dias: plano.duracao_em_dias,
+                quantidade_empresas: plano.quantidade_empresas,
+                quantidade_funcionarios: plano.quantidade_funcionarios,
+                quantidade_locacoes: plano.quantidade_locacoes, // Garantir que está no objeto
+                cor: getPlanColor(plano.nome),
+                features: [
+                    `Até ${plano.quantidade_empresas} empresa${plano.quantidade_empresas !== 1 ? "s" : ""}`,
+                    capacityFeature, // Feature dinâmica
+                    "Agendamento Online 24/7",
+                    "Lembretes Automáticos",
+                    "Gestão de Clientes",
+                ].filter(Boolean),
+                descricao: plano.descricao || "Plano ideal para o crescimento do seu negócio",
+            };
+          });
         setPlanos(mapped);
       }
     }
-  }, [loading, data]);
+  }, [loading, data, companyType]); // 3. Adicionar companyType como dependência
 
   const getPlanColor = (nome: string) => {
     switch (nome.toLowerCase()) {
@@ -479,12 +500,26 @@ function Home() {
           </div>
         </section>
 
-        {/* 4. PLANOS DE PREÇO - REVISADO */}
         <section className="custom-section container text-center">
           <h2 className="fw-bold">Escolha seu Plano Ideal</h2>
           <p className="text-muted-lg">
             Planos flexíveis que se ajustam ao tamanho do seu negócio. Comece com o que é essencial e cresça conosco.
           </p>
+            <div className="mb-4">
+                <button
+                    className={`btn btn-sm me-2 ${companyType === 'servico' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    onClick={() => setCompanyType('servico')}
+                >
+                    Plano para Agendamento de Serviço
+                </button>
+                <button
+                    className={`btn btn-sm ${companyType === 'locacao' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    onClick={() => setCompanyType('locacao')}
+                >
+                    Plano para Locação de Quadras, Vagas, etc.
+                </button>
+            </div>
+
           {loading ? (
             <p className="fw-bold text-primary-blue">Carregando planos...</p>
           ) : (

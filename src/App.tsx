@@ -32,6 +32,7 @@ const AvaliacaoAgendamento = lazy(() => import("./views/AvaliarAgendamento"))
 const EmpresaCreate = lazy(() => import("./views/EmpresaCriar"));
 const FuncionarioCreate = lazy(() => import("./views/FuncionarioCriar"));
 const ServicoCreate = lazy(() => import("./views/ServicosCriar"));
+const LocacaoCreate = lazy(() => import("./views/LocacoesCriar"));
 const Configuracao = lazy(() => import("./views/Configuracoes"));
 const Checkin = lazy(() => import("./views/Checkin"));
 const CheckinEmpresa = lazy(() => import("./views/CheckinEmpresa"));
@@ -99,6 +100,15 @@ function App() {
         element={
           <ProtectedRoute>
             <FuncionarioCreate />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/criar-locacao/:empresa?"
+        element={
+          <ProtectedRoute>
+            <LocacaoCreate />
           </ProtectedRoute>
         }
       />

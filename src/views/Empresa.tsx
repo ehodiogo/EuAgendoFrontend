@@ -4,14 +4,34 @@ import { Empresa } from "../interfaces/Empresa";
 import { Funcionario } from "../interfaces/Funcionario";
 import Navbar from "../components/Navbar";
 import {
-FaTools, FaCalendarAlt, FaSpinner,
+  FaTools, FaCalendarAlt, FaSpinner,
   FaMapMarkerAlt, FaEnvelope, FaPhoneAlt, FaRegAddressCard,
-  FaClipboardList, FaUsers, FaEye
+  FaClipboardList, FaUsers, FaEye, FaTags, FaClock, FaExclamationCircle // FaTags e FaClock adicionados
 } from "react-icons/fa";
+
+// Interface para Locação (Você pode manter isso em interfaces/Empresa.tsx)
+interface Locacao {
+    id: number;
+    nome: string;
+    descricao: string;
+    duracao: string;
+    preco: number;
+}
+// Interface para Serviço (Para manter a tipagem)
+interface Servico {
+    nome: string;
+    preco: number;
+    duracao: string;
+}
+
+// --------------------------------------------------------------------------------
+// Componente principal modificado
+// --------------------------------------------------------------------------------
 
 function EmpresaDetails() {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
   const { data: empresasData, loading: empresasLoading } = useFetch<Empresa[]>(`/api/empresa/?q=${empresaNome}`);
+  // A requisição de funcionários permanece, mas será condicionalmente exibida
   const { data: funcionariosData, loading: funcionariosLoading } = useFetch<Funcionario[]>(`/api/funcionario/?empresa_nome=${empresaNome}`);
 
   const empresa = empresasData?.find(
@@ -19,8 +39,15 @@ function EmpresaDetails() {
   );
 
   if (!empresa) {
-      return <>SEM</>
+      return (
+        <div className="message error">
+            <FaExclamationCircle className="me-2" /> Empresa não encontrada.
+        </div>
+      );
   }
+
+  // Define se é uma empresa de locação para simplificar a lógica
+  const isLocacao = empresa.tipo.toLowerCase() === "locação";
 
   return (
     <div className="min-vh-100">
@@ -71,8 +98,8 @@ function EmpresaDetails() {
 
         /* Cards em Geral - APLICANDO BORDA E REFORÇANDO A SOMBRA */
         .identity-card, .cta-box, .info-card {
-            border: 1px solid var(--border-light); /* Borda sutil */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Sombra mais discreta no geral */
+            border: 1px solid var(--border-light); 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); 
         }
         
         /* Header e Logo na Sidebar (Card de Identidade) */
@@ -130,13 +157,12 @@ function EmpresaDetails() {
           transform: scale(1.02);
         }
 
-        /* Cards de Conteúdo (Visão Geral, Detalhes, Serviços) */
+        /* Cards de Conteúdo (Visão Geral, Detalhes, Serviços/Locações) */
         .info-card {
           background-color: var(--card-bg);
           border-radius: 12px;
           padding: 2rem;
           margin-bottom: 1.5rem; 
-          /* REMOVIDO: height: 100%; para que os cards cresçam dinamicamente */
         }
         .info-card h4 {
           color: var(--primary-blue);
@@ -152,10 +178,10 @@ function EmpresaDetails() {
         
         /* Ajustes na Visão Geral/Contato para ser mais compacta */
         .contact-item {
-          padding: 0.5rem 0; /* Menos padding */
+          padding: 0.5rem 0; 
           display: flex;
           align-items: center;
-          font-size: 0.95rem; /* Fonte um pouco menor */
+          font-size: 0.95rem; 
           color: var(--text-dark);
         }
         .contact-item strong {
@@ -168,23 +194,24 @@ function EmpresaDetails() {
             text-decoration: none;
         }
 
-        /* Serviços */
-        .servicos-list {
+        /* Serviços e Locações */
+        .list-items {
             list-style: none;
             padding: 0;
         }
-        .servicos-list li {
-            padding: 0.5rem 0;
+        .list-items li {
+            padding: 0.75rem 0; /* Aumentado o padding para melhor visualização */
             display: flex;
             align-items: center;
             gap: 0.75rem;
             color: var(--text-dark);
             border-bottom: 1px dashed var(--border-light);
+            font-size: 1rem;
         }
-        .servicos-list li:last-child {
+        .list-items li:last-child {
             border-bottom: none;
         }
-        .servicos-list .service-icon {
+        .list-items .item-icon {
             color: var(--accent-green);
             font-size: 1.1rem;
         }
@@ -262,17 +289,20 @@ function EmpresaDetails() {
                     className="empresa-logo"
                   />
                   <h1>{empresa.nome}</h1>
-                  <p className="text-muted">Detalhes e Agendamento</p>
+                  <p className="text-muted">
+                      {isLocacao ? "Detalhes e Reserva" : "Detalhes e Agendamento"}
+                  </p>
                 </div>
 
                 {/* Card CTA (Chamada para Ação) */}
                 <div className="cta-box">
-                    <p className="mb-3 fw-bold">Pronto para começar?</p>
+                    <p className="mb-3 fw-bold">Pronto para {isLocacao ? "reservar" : "começar"}?</p>
                     <Link
                         to={`/agendar/${empresa.nome}`}
                         className="btn btn-cta"
                     >
-                        <FaCalendarAlt className="me-2" /> Agendar Serviço
+                        <FaCalendarAlt className="me-2" />
+                        Ver Disponibilidade e Agendar
                     </Link>
                 </div>
 
@@ -285,6 +315,9 @@ function EmpresaDetails() {
                         <li className="list-group-item">
                             <strong>CNPJ:</strong> <span className="text-end">{empresa.cnpj || "Não Informado"}</span>
                         </li>
+                        <li className="list-group-item">
+                            <strong>Tipo:</strong> <span className="text-end">{empresa.tipo || "Não Informado"}</span>
+                        </li>
                     </ul>
                 </div>
               </aside>
@@ -292,14 +325,12 @@ function EmpresaDetails() {
               {/* === CONTEÚDO PRINCIPAL === */}
               <div className="content">
 
-                {/* Visão Geral (Contato e Localização) - Layout Compactado */}
+                {/* Visão Geral (Contato e Localização) */}
                 <div className="info-card">
                     <h4>
                         <FaEye /> Visão Geral e Contato
                     </h4>
-                    <div className="row g-2"> {/* g-2 para reduzir o espaçamento entre colunas */}
-
-                        {/* Email e Telefone */}
+                    <div className="row g-2">
                         <div className="col-lg-6">
                             <div className="contact-item">
                                 <strong><FaEnvelope className="me-1" /> Email:</strong>
@@ -310,72 +341,86 @@ function EmpresaDetails() {
                                 <a href={`tel:${empresa.telefone}`}>{empresa.telefone || "N/I"}</a>
                             </div>
                         </div>
-
-                        {/* Endereço */}
                         <div className="col-lg-6">
                             <div className="contact-item">
                                 <strong><FaMapMarkerAlt className="me-1" /> Endereço:</strong>
                                 <span className="text-end">{empresa.endereco || "Não Informado"}</span>
                             </div>
-                            {/* Um espaço vazio para preencher a coluna, se necessário */}
                             <div className="contact-item invisible">.</div>
                         </div>
                     </div>
                 </div>
 
-                {/* Serviços Oferecidos */}
+                {/* LOCAÇÕES OU SERVIÇOS (RENDERIZAÇÃO CONDICIONAL) */}
                 <div className="info-card">
                     <h4>
-                        <FaClipboardList /> Escopo de Serviços
+                        {isLocacao ? <><FaTags /> Escopo de Locações</> : <><FaClipboardList /> Escopo de Serviços</>}
                     </h4>
-                    <ul className="servicos-list">
-                        {empresa.servicos && empresa.servicos.length > 0 ? (
-                          empresa.servicos.map((servico, index) => (
-                            <li key={index}>
-                              <FaTools className="service-icon" />
-                              {servico.nome}
-                            </li>
-                          ))
-                        ) : (
-                          <li className="text-muted">Nenhum serviço fundamental cadastrado no momento.</li>
-                        )}
-                    </ul>
-                </div>
 
-                {/* Equipe (Funcionários) */}
-                <div className="info-card funcionarios-card">
-                    <h4>
-                        <FaUsers /> Nossos Profissionais
-                    </h4>
-                    {funcionariosData && funcionariosData.length > 0 ? (
-                      <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
-                        {funcionariosData.slice(0, 8).map((funcionario) => (
-                          <div
-                            key={funcionario.id}
-                            className="col"
-                          >
-                            <div className="card member-card">
-                              <img
-                                src={funcionario.foto || "https://via.placeholder.com/90x90?text=USR"}
-                                alt={funcionario.nome}
-                                className="card-img-top rounded-circle member-img"
-                              />
-                              <div className="card-body">
-                                <h5 className="card-title">{funcionario.nome}</h5>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                        {funcionariosData.length > 8 && (
-                            <div className="col-12 text-center mt-4">
-                                <p className="text-muted">E mais {funcionariosData.length - 8} profissionais...</p>
-                            </div>
-                        )}
-                      </div>
+                    {isLocacao ? (
+                        // Se for Locação, mostre os itens de locação
+                        <ul className="list-items">
+                            {empresa.locacoes && empresa.locacoes.length > 0 ? (
+                                (empresa.locacoes as Locacao[]).map((locacao, index) => (
+                                    <li key={index}>
+                                        <FaClock className="item-icon" />
+                                        {locacao.nome} - Duração: {locacao.duracao} (R$ {locacao.preco})
+                                    </li>
+                                ))
+                            ) : (
+                                <li className="text-muted">Nenhum item de locação cadastrado no momento.</li>
+                            )}
+                        </ul>
                     ) : (
-                      <p className="text-muted">Nenhum profissional listado para esta unidade.</p>
+                        // Se for Serviço (ou qualquer outro tipo), mostre os serviços
+                        <ul className="list-items">
+                            {empresa.servicos && empresa.servicos.length > 0 ? (
+                                (empresa.servicos as Servico[]).map((servico, index) => (
+                                    <li key={index}>
+                                        <FaTools className="item-icon" />
+                                        {servico.nome} (R$ {servico.preco})
+                                    </li>
+                                ))
+                            ) : (
+                                <li className="text-muted">Nenhum serviço fundamental cadastrado no momento.</li>
+                            )}
+                        </ul>
                     )}
                 </div>
+
+                {/* Equipe (Funcionários) - OCULTADO SE FOR LOCAÇÃO */}
+                {!isLocacao && (
+                    <div className="info-card funcionarios-card">
+                        <h4>
+                            <FaUsers /> Nossos Profissionais
+                        </h4>
+                        {funcionariosData && funcionariosData.length > 0 ? (
+                            <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+                                {funcionariosData.slice(0, 8).map((funcionario) => (
+                                    <div key={funcionario.id} className="col">
+                                        <div className="card member-card">
+                                            <img
+                                                src={funcionario.foto || "https://via.placeholder.com/90x90?text=USR"}
+                                                alt={funcionario.nome}
+                                                className="card-img-top rounded-circle member-img"
+                                            />
+                                            <div className="card-body">
+                                                <h5 className="card-title">{funcionario.nome}</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                                {funcionariosData.length > 8 && (
+                                    <div className="col-12 text-center mt-4">
+                                        <p className="text-muted">E mais {funcionariosData.length - 8} profissionais...</p>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <p className="text-muted">Nenhum profissional listado para esta unidade.</p>
+                        )}
+                    </div>
+                )}
               </div>
             </div>
           )}

@@ -39,12 +39,11 @@ const SettingsView = () => {
 
       setIsLoading(true);
       try {
-        // Sugestão: Use headers para o token se a API suportar
-        const response = await axios.get(`${baseURL}api/perfil-usuario/me/`, {
+
+        const response = await axios.get(`${baseURL}/api/perfil-usuario/me/`, {
           params: { usuario_token: token }, // Mantendo seu método atual de autenticação
         });
 
-        // Adaptação dos dados para garantir que a estrutura corresponda ao PerfilUsuario
         setSettings({
           id: response.data.id ?? 0,
           usuario: response.data.usuario ?? { id: 0, first_name: "", email: "", username: "", password: "" },
@@ -80,7 +79,7 @@ const SettingsView = () => {
     setSubmitStatus(null);
     try {
       const response = await axios.post(
-        `${baseURL}api/perfil-usuario/affiliate-code/`,
+        `${baseURL}/api/perfil-usuario/affiliate-code/`,
         { usuario_token: token },
       );
       setSettings((prev: PerfilUsuario) => ({
@@ -117,7 +116,7 @@ const SettingsView = () => {
     setSubmitStatus(null);
     try {
       await axios.patch(
-        `${baseURL}api/perfil-usuario/settings/`,
+        `${baseURL}/api/perfil-usuario/settings/`,
         {
           usuario_token: token,
           receive_email_notifications: settings.receive_email_notifications,

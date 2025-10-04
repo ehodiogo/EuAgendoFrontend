@@ -8,6 +8,7 @@ export interface Plano {
   duracao_em_dias: number;
   quantidade_empresas: number;
   quantidade_funcionarios: number;
+  quantidade_locacoes:  number;
   cor: string;
   features: string[];
 }

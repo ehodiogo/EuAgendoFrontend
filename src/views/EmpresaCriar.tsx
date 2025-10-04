@@ -18,6 +18,7 @@ const EmpresaForm: React.FC = () => {
   const [empresa, setEmpresa] = useState<EmpresaCreate>({
     nome: "",
     cnpj: "",
+    tipo: "",
     endereco: "",
     bairro: "",
     cidade: "",
@@ -51,6 +52,7 @@ const EmpresaForm: React.FC = () => {
         setEmpresa({
           nome: selectedEmpresa.nome || "",
           cnpj: selectedEmpresa.cnpj || "",
+          tipo:  selectedEmpresa.tipo || "",
           endereco: selectedEmpresa.endereco || "",
           bairro: selectedEmpresa.bairro || "",
           cidade: selectedEmpresa.cidade || "",
@@ -108,6 +110,7 @@ const EmpresaForm: React.FC = () => {
     if (acaoSelecionada === "cadastrar" || acaoSelecionada === "editar") {
       if (!empresa.nome.trim()) return setFormError("O nome da empresa é obrigatório."), false;
       if (!empresa.cnpj || !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(empresa.cnpj)) return setFormError("CNPJ inválido."), false;
+      if (!empresa.tipo.trim()) return setFormError("O tipo de empresa é obrigatório."), false;
       if (!empresa.endereco.trim()) return setFormError("O endereço é obrigatório."), false;
       if (!empresa.bairro.trim()) return setFormError("O bairro é obrigatório."), false;
       if (!empresa.cidade.trim()) return setFormError("A cidade é obrigatória."), false;
@@ -170,6 +173,7 @@ const EmpresaForm: React.FC = () => {
         const requiredFields = [
           "nome",
           "cnpj",
+          "tipo",
           "endereco",
           "bairro",
           "cidade",
@@ -200,6 +204,7 @@ const EmpresaForm: React.FC = () => {
         setEmpresa({
           nome: "",
           cnpj: "",
+          tipo: "",
           endereco: "",
           bairro: "",
           cidade: "",
@@ -241,6 +246,7 @@ const EmpresaForm: React.FC = () => {
         const requiredFields = [
           "nome",
           "cnpj",
+          "tipo",
           "endereco",
           "bairro",
           "cidade",
@@ -578,6 +584,33 @@ const EmpresaForm: React.FC = () => {
                       />
                     </div>
                     <div className="mb-3">
+                      <label className="form-label">Tipo de Empresa</label>
+                      <div className="form-check">
+                        <input
+                          type="radio"
+                          name="tipo"
+                          className="form-check-input"
+                          value="Serviço"
+                          checked={empresa.tipo === "Serviço"}
+                          onChange={handleChange}
+                          required
+                        />
+                        <label className="form-check-label ms-2">Agendamento de Serviço</label>
+                      </div>
+                      <div className="form-check">
+                        <input
+                          type="radio"
+                          name="tipo"
+                          className="form-check-input"
+                          value="Locação"
+                          checked={empresa.tipo === "Locação"}
+                          onChange={handleChange}
+                          required
+                        />
+                        <label className="form-check-label ms-2">Locação de Espaço</label>
+                      </div>
+                    </div>
+                    <div className="mb-3">
                       <label className="form-label">Endereço</label>
                       <input
                         type="text"
@@ -833,6 +866,33 @@ const EmpresaForm: React.FC = () => {
                             className="form-control"
                             required
                           />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label">Tipo de Empresa</label>
+                          <div className="form-check">
+                            <input
+                              type="radio"
+                              name="tipo"
+                              className="form-check-input"
+                              value="Serviço"
+                              checked={empresa.tipo === "Serviço"}
+                              onChange={handleChange}
+                              required
+                            />
+                            <label className="form-check-label ms-2">Agendamento de Serviço</label>
+                          </div>
+                          <div className="form-check">
+                            <input
+                              type="radio"
+                              name="tipo"
+                              className="form-check-input"
+                              value="Locação"
+                              checked={empresa.tipo === "Locação"}
+                              onChange={handleChange}
+                              required
+                            />
+                            <label className="form-check-label ms-2">Locação de Espaço</label>
+                          </div>
                         </div>
                         <div className="mb-3">
                           <label className="form-label">Endereço</label>

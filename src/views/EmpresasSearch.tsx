@@ -2,9 +2,63 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
+import {Locacao} from "../interfaces/Locacao.tsx";
 import Navbar from "../components/Navbar";
 import FilterModal from "../components/FilterModal";
-import { FaSearch, FaSpinner, FaExclamationCircle, FaFilter, FaMapMarkerAlt, FaPhoneAlt, FaDollarSign } from "react-icons/fa"; // Adicionando ícones para detalhes do card
+import { FaSearch, FaSpinner, FaExclamationCircle, FaFilter, FaMapMarkerAlt, FaPhoneAlt, FaDollarSign, FaBuilding, FaTags } from "react-icons/fa";
+
+// Componente Auxiliar para Lista de Serviços (Refatorado)
+interface Servico {
+  nome: string;
+  preco: number;
+  duracao: string;
+}
+
+const ListaServicos: React.FC<{ servicos?: Servico[] }> = ({ servicos }) => (
+    <div className="list-servicos">
+        <h6><FaDollarSign /> Serviços Oferecidos:</h6>
+        <ul className="list-unstyled">
+            {servicos && servicos.length > 0 ? (
+                servicos.slice(0, 3).map((servico, i) => (
+                    <li key={i}>
+                        {servico.nome} (R$ {servico.preco})
+                    </li>
+                ))
+            ) : (
+                <li>Nenhum serviço cadastrado</li>
+            )}
+            {servicos && servicos.length > 3 && (
+                <li className="text-muted text-small">
+                    e mais {servicos.length - 3} serviço(s)...
+                </li>
+            )}
+        </ul>
+    </div>
+);
+
+// Componente Auxiliar para Lista de Locações (NOVO)
+const ListaLocacoes: React.FC<{ locacoes?: Locacao[] }> = ({ locacoes }) => (
+    <div className="list-servicos">
+        <h6><FaTags /> Locações oferecidas:</h6>
+        <ul className="list-unstyled">
+            {locacoes && locacoes.length > 0 ? (
+                locacoes.slice(0, 3).map((locacao, i) => (
+                    <li key={i}>
+                        {locacao.nome} (Duração: {locacao.duracao})
+                    </li>
+                ))
+            ) : (
+                <li>Nenhum item de locação cadastrado</li>
+            )}
+            {locacoes && locacoes.length > 3 && (
+                <li className="text-muted text-small">
+                    e mais {locacoes.length - 3} item(s)...
+                </li>
+            )}
+        </ul>
+    </div>
+);
+
 
 function EmpresasSearch() {
   const [search, setSearch] = useState("");
@@ -12,15 +66,19 @@ function EmpresasSearch() {
   const [estado, setEstado] = useState("");
   const [bairro, setBairro] = useState("");
   const [pais, setPais] = useState("");
+  const [tipoEmpresa, setTipoEmpresa] = useState("");
   const [showModal, setShowModal] = useState(false);
   const empresas = useFetch<Empresa[]>("/api/empresa");
+
+  const tiposDisponiveis = ["Serviço", "Locação"];
 
   const filteredEmpresas = empresas.data?.filter((empresa: Empresa) =>
     empresa.nome.toLowerCase().includes(search.toLowerCase()) &&
     (cidade ? empresa.cidade.toLowerCase().includes(cidade.toLowerCase()) : true) &&
     (estado ? empresa.estado.toLowerCase().includes(estado.toLowerCase()) : true) &&
     (bairro ? empresa.bairro.toLowerCase().includes(bairro.toLowerCase()) : true) &&
-    (pais ? empresa.pais.toLowerCase().includes(pais.toLowerCase()) : true)
+    (pais ? empresa.pais.toLowerCase().includes(pais.toLowerCase()) : true) &&
+    (tipoEmpresa ? empresa.tipo.toLowerCase() === tipoEmpresa.toLowerCase() : true)
   );
 
   const estados = [
@@ -37,6 +95,7 @@ function EmpresasSearch() {
     setEstado("");
     setBairro("");
     setPais("");
+    setTipoEmpresa("");
     setShowModal(false);
   };
 
@@ -471,7 +530,7 @@ function EmpresasSearch() {
             </p>
           </div>
         </header>
-        <section className="search-section container-fluid"> {/* container-fluid para input maior em telas grandes */}
+        <section className="search-section container-fluid">
           <div className="input-group">
             <input
               type="text"
@@ -504,6 +563,9 @@ function EmpresasSearch() {
           setBairro={setBairro}
           pais={pais}
           setPais={setPais}
+          tipoEmpresa={tipoEmpresa}
+          setTipoEmpresa={setTipoEmpresa}
+          tiposDisponiveis={tiposDisponiveis}
           estados={estados}
         />
 
@@ -530,8 +592,8 @@ function EmpresasSearch() {
 
                       <div className="card-details">
                           <p>
-                            <FaMapMarkerAlt className="icon" />
-                            <strong>Endereço:</strong> {empresa.endereco}, {empresa.bairro}
+                            <FaBuilding className="icon" />
+                            <strong>Tipo:</strong> {empresa.tipo}
                           </p>
                           <p>
                             <FaMapMarkerAlt className="icon" />
@@ -545,29 +607,15 @@ function EmpresasSearch() {
                           )}
                       </div>
 
-                      <div className="list-servicos">
-                          <h6><FaDollarSign /> Serviços Oferecidos:</h6>
-                          <ul className="list-unstyled">
-                            {/* Exibe no máximo 3 serviços para manter o card limpo */}
-                            {empresa.servicos && empresa.servicos.length > 0 ? (
-                              empresa.servicos.slice(0, 3).map((servico, i) => (
-                                <li key={i}>
-                                  {servico.nome} (R$ {servico.preco})
-                                </li>
-                              ))
-                            ) : (
-                              <li>Nenhum serviço cadastrado</li>
-                            )}
-                            {empresa.servicos && empresa.servicos.length > 3 && (
-                                <li className="text-muted text-small">
-                                  e mais {empresa.servicos.length - 3} serviço(s)...
-                                </li>
-                            )}
-                          </ul>
-                      </div>
+                      {/* LÓGICA CONDICIONAL: Mostra Locações se for 'Locação', senão mostra Serviços */}
+                      {empresa.tipo === "Locação" ? (
+                          <ListaLocacoes locacoes={empresa.locacoes} />
+                      ) : (
+                          <ListaServicos servicos={empresa.servicos} />
+                      )}
 
                       <Link
-                        to={`/empresas/${empresa.nome}`} // Assumindo que você tem uma rota para detalhes da empresa
+                        to={`/empresas/${empresa.nome}`}
                         className="btn btn-success"
                       >
                         Ver Detalhes e Agendar

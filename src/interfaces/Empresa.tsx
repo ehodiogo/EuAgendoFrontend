@@ -1,4 +1,5 @@
 import { Funcionario } from "./Funcionario";
+import { Locacao} from "./Locacao.tsx";
 
 interface Servico {
   nome: string;
@@ -11,6 +12,8 @@ export interface Empresa {
   nome: string;
   cnpj: string;
 
+  tipo:  string;
+
   endereco: string;
   bairro:  string;
   cidade: string;
@@ -19,7 +22,8 @@ export interface Empresa {
 
   telefone: string;
   email: string;
-  servicos: Servico[];
+  servicos?: Servico[];
+  locacoes?: Locacao[];
   logo: string;
 
   horario_abertura_dia_semana: string;
@@ -45,6 +49,8 @@ export interface EmpresaCreate {
   nome: string;
   cnpj: string;
 
+  tipo:  string;
+
   endereco: string;
   bairro:  string;
   cidade: string;
@@ -53,7 +59,8 @@ export interface EmpresaCreate {
 
   telefone: string;
   email: string;
-  servicos: Servico[];
+  servicos?: Servico[];
+  locacoes?: Locacao[];
   logo: string;
 
   horario_abertura_dia_semana: string;

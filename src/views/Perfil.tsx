@@ -1,15 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { useFetch } from "../functions/GetData";
 import { UserProfile } from "../interfaces/User";
+import { Usage  } from "../interfaces/Usage";
+import { Pagamentos } from "../interfaces/Pagamentos";
+
 import Navbar from "../components/Navbar";
 import { FaUser, FaEnvelope, FaKey, FaEye, FaEyeSlash, FaCreditCard, FaPix,
   FaRegCreditCard, FaChartSimple, FaGaugeHigh, FaCalendarCheck, FaMoneyBillTransfer,
   FaBusinessTime, FaBriefcase, FaUsers } from "react-icons/fa6";
-import { Usage } from "../interfaces/Usage";
-import { Pagamentos } from "../interfaces/Pagamentos";
 import { FaSpinner, FaCircleCheck, FaCircleXmark } from "react-icons/fa6";
 import {FaEdit} from "react-icons/fa";
 import { Link } from "react-router-dom";
+
+// Tipo auxiliar para a lista consolidada
+interface ConsolidatedUsageItem {
+    empresa: string;
+    tipo: 'Serviço' | 'Locação';
+    current: number;
+    max: number;
+}
+
 
 const Profile = () => {
   const token = localStorage.getItem("access_token");
@@ -19,6 +29,7 @@ const Profile = () => {
   const payments = useFetch<Pagamentos>(`/api/pagamentos-usuario/?usuario_token=${token}`);
 
   const [userData, setUserData] = useState<UserProfile | null>(null);
+  const [consolidatedUsage, setConsolidatedUsage] = useState<ConsolidatedUsageItem[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
@@ -35,6 +46,32 @@ const Profile = () => {
       setUserData(user.data);
     }
   }, [user.data]);
+
+  // Efeito para consolidar os dados de uso
+  useEffect(() => {
+    if (usage.data) {
+        const { limite_funcionarios, limite_locacoes, funcionarios_por_empresa, locacoes_por_empresa } = usage.data;
+
+        // 1. Consolidar Locações
+        const locacaoItems: ConsolidatedUsageItem[] = locacoes_por_empresa.map(item => ({
+            empresa: item.empresa,
+            tipo: 'Locação',
+            current: item.total_locativos,
+            max: limite_locacoes,
+        }));
+
+        // 2. Consolidar Serviços/Funcionários
+        const servicoItems: ConsolidatedUsageItem[] = funcionarios_por_empresa.map(item => ({
+            empresa: item.empresa,
+            tipo: 'Serviço',
+            current: item.total_funcionarios,
+            max: limite_funcionarios,
+        }));
+
+        // 3. Juntar e atualizar o estado
+        setConsolidatedUsage([...locacaoItems, ...servicoItems]);
+    }
+  }, [usage.data]); // Depende apenas dos dados de uso
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserData({ ...userData!, [e.target.name]: e.target.value });
@@ -169,6 +206,49 @@ const Profile = () => {
     );
   }
 
+  // Verifica se usage.data existe antes de prosseguir
+  if (!usage.data) {
+    return (
+        <div className="min-vh-100 custom-bg">
+            <Navbar />
+            <div className="profile-container container">
+                <div className="alert alert-danger text-center py-5">
+                    <FaCircleXmark size={30} className="mb-2" />
+                    <p className="mb-0">Não foi possível carregar os dados de uso e limite do plano.</p>
+                </div>
+            </div>
+        </div>
+    );
+  }
+
+  // --- Funções de Renderização de Uso Condicional ---
+  const renderUsageProgress = (item: ConsolidatedUsageItem) => {
+    const { current, max, tipo } = item;
+    const percentage = calculateProgress(current, max);
+
+    return (
+        <>
+            <div className="progress">
+                <div
+                    className={`progress-bar ${getProgressBarColor(percentage)}`}
+                    role="progressbar"
+                    style={{ width: `${percentage}%` }}
+                    aria-valuenow={current}
+                    aria-valuemin={0}
+                    aria-valuemax={max}
+                >
+                    {current}/{max}
+                </div>
+            </div>
+            <p className="text-muted text-center mt-2" style={{fontSize: '0.8rem'}}>
+                {tipo === 'Locação' ? 'Locações/Espaços em uso' : 'Funcionários em uso'}
+            </p>
+        </>
+    );
+  };
+  // ---------------------------------------------------
+
+
   return (
     <div className="min-vh-100">
       <style>{`
@@ -261,6 +341,20 @@ const Profile = () => {
           font-size: 1.1rem;
           z-index: 1;
         }
+        /* Botão de Toggle de Senha */
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--medium-gray);
+            font-size: 1.1rem;
+            padding: 0;
+            z-index: 2; /* Acima do input */
+        }
         .form-control {
           border: 1px solid var(--border-light);
           border-radius: 8px;
@@ -310,7 +404,7 @@ const Profile = () => {
             margin-bottom: 0.75rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem; /* Aumentei o gap para ícone */
         }
         .progress {
           height: 1.25rem;
@@ -393,6 +487,7 @@ const Profile = () => {
                     {error && <div className="alert alert-danger">{error}</div>}
                     {success && <div className="alert alert-success">{success}</div>}
                     {userData && (
+                        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                     <form onSubmit={(e) => {e.preventDefault(); isEditing ? handleSave() : setIsEditing(true);}}>
                         <div className="mb-3 input-icon">
                         <label htmlFor="first_name" className="form-label">Nome Completo</label>
@@ -451,15 +546,13 @@ const Profile = () => {
                             disabled={!isEditing}
                             placeholder="Necessária para qualquer alteração de senha"
                         />
-                        {isEditing && (
-                            <button
+                        <button
                             type="button"
                             className="password-toggle"
                             onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                            >
+                        >
                             {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
-                            </button>
-                        )}
+                        </button>
                         </div>
                         <div className="mb-3 input-icon">
                         <label htmlFor="newPassword" className="form-label">Nova Senha</label>
@@ -473,15 +566,13 @@ const Profile = () => {
                             disabled={!isEditing}
                             placeholder="Mínimo 6 caracteres"
                         />
-                        {isEditing && (
-                            <button
+                        <button
                             type="button"
                             className="password-toggle"
                             onClick={() => setShowNewPassword(!showNewPassword)}
-                            >
+                        >
                             {showNewPassword ? <FaEyeSlash /> : <FaEye />}
-                            </button>
-                        )}
+                        </button>
                         </div>
                         <div className="mb-4 input-icon">
                         <label htmlFor="newPasswordConfirm" className="form-label">Confirmar Nova Senha</label>
@@ -495,15 +586,13 @@ const Profile = () => {
                             disabled={!isEditing}
                             placeholder="Repita a nova senha"
                         />
-                        {isEditing && (
-                            <button
+                        <button
                             type="button"
                             className="password-toggle"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            >
+                        >
                             {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                            </button>
-                        )}
+                        </button>
                         </div>
 
                         {/* Botões de Ação */}
@@ -551,12 +640,9 @@ const Profile = () => {
                 </div>
             </div>
 
-            {/* COLUNA 2: PLANO, USO E PAGAMENTOS */}
             <div className="info-column">
 
-                {/* Sub-Grid 1: Plano Ativo e Histórico de Pagamentos (LADO A LADO) */}
                 <div className="plan-payment-grid">
-                    {/* Card de Plano Ativo */}
                     <div className="base-card plan-card">
                         <h4><FaCalendarCheck /> Plano Ativo</h4>
                         {usage.data?.plano_ativo ? (
@@ -573,7 +659,6 @@ const Profile = () => {
                         )}
                     </div>
 
-                    {/* Card de Histórico de Pagamentos */}
                     <div className="base-card payment-card">
                         <h4><FaMoneyBillTransfer /> Histórico (5 Recentes)</h4>
                         <div className="table-responsive" style={{ maxHeight: '300px', overflowY: 'auto' }}>
@@ -617,11 +702,9 @@ const Profile = () => {
                     </div>
                 </div>
 
-                {/* Card de Limites de Uso (Abaixo da sub-grid) */}
                 <div className="base-card usage-card">
                     <h4><FaGaugeHigh /> Limites de Uso (Plano)</h4>
 
-                    {/* Limite de Empresas */}
                     <div className="progress-section">
                         <h6><FaBusinessTime /> Limite de Empresas Criadas</h6>
                         <div className="progress">
@@ -639,32 +722,24 @@ const Profile = () => {
                         <p className="text-muted text-center mt-2" style={{fontSize: '0.9rem'}}>Empresas em uso</p>
                     </div>
 
-                    {/* Limite de Funcionários por Empresa */}
-                    {usage.data?.funcionarios_por_empresa && usage.data.funcionarios_por_empresa.length > 0 ? (
+                    {consolidatedUsage.length > 0 ? (
                         <>
-                        <h6 className="mt-3"><FaBriefcase /> Limite de Funcionários (Total por Empresa)</h6>
-                        {usage.data.funcionarios_por_empresa.map((item, index) => (
+                        <h6 className="mt-3"><FaBriefcase /> Limites de Uso por Empresa</h6>
+                        {consolidatedUsage.map((item, index) => (
                             <div key={index} className="progress-section usage-card-compact">
-                                <h6><FaUsers /> {item.empresa}</h6>
-                                <div className="progress">
-                                    <div
-                                        className={`progress-bar ${getProgressBarColor(calculateProgress(item.total_funcionarios, usage.data.limite_funcionarios))}`}
-                                        role="progressbar"
-                                        style={{ width: `${calculateProgress(item.total_funcionarios, usage.data.limite_funcionarios)}%` }}
-                                        aria-valuenow={item.total_funcionarios}
-                                        aria-valuemin={0}
-                                        aria-valuemax={usage.data.limite_funcionarios}
-                                    >
-                                        {item.total_funcionarios}/{usage.data.limite_funcionarios}
-                                    </div>
-                                </div>
-                                <p className="text-muted text-center mt-2" style={{fontSize: '0.8rem'}}>Funcionários em uso</p>
+                                <h6>
+                                    {item.tipo === "Locação" ? <FaCalendarCheck /> : <FaUsers />}
+                                    {item.empresa}
+                                </h6>
+
+                                {renderUsageProgress(item)}
+
                             </div>
                         ))}
                         </>
                     ) : (
                         <div className="progress-section">
-                           <p className="text-center text-muted mb-0">Nenhuma empresa criada para acompanhar o limite de funcionários.</p>
+                           <p className="text-center text-muted mb-0">Nenhuma empresa criada para acompanhar seus limites de uso.</p>
                         </div>
                     )}
                 </div>
