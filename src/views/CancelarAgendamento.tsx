@@ -8,8 +8,9 @@ import axios from "axios";
 
 interface Agendamento {
   cliente_nome: string;
-  servico_nome: string;
-  funcionario: { nome: string; foto?: string };
+  servico_nome?: string;
+  funcionario?: { nome: string; foto?: string }; // Tornando funcionario opcional
+  locacao_nome?: string;
   data: string;
   hora: string;
 }
@@ -49,6 +50,21 @@ const CancelarAgendamentoView = () => {
       setTimeout(() => setSubmitStatus(null), 3500);
     }
   };
+
+  const formatarData = (dataIso: string) => {
+      return new Date(dataIso).toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+      });
+  };
+
+  // Garante que os dados existem antes de tentar acessá-los
+  if (agendamentoData) {
+      // Variável de controle para a lógica condicional
+      // Se servico_nome existir, é um agendamento de serviço (com funcionário).
+      // Caso contrário, assumimos que é uma locação.
+  }
 
   return (
     <>
@@ -310,34 +326,44 @@ const CancelarAgendamentoView = () => {
               <h2 id="cancelamento-title">
                 <FaBan aria-hidden="true" /> Cancelar Agendamento
               </h2>
+
               <div className="info-agendamento">
-                {agendamentoData.funcionario.foto ? (
-                  <img
-                    src={agendamentoData.funcionario.foto}
-                    alt={`Foto de ${agendamentoData.funcionario.nome}`}
-                    className="funcionario-foto"
-                  />
+                {/* Lógica Condicional: Se for agendamento de Serviço, mostra funcionário/foto. */}
+                {agendamentoData.servico_nome && agendamentoData.funcionario ? (
+                  <>
+                    {agendamentoData.funcionario.foto ? (
+                      <img
+                        src={agendamentoData.funcionario.foto}
+                        alt={`Foto de ${agendamentoData.funcionario.nome}`}
+                        className="funcionario-foto"
+                      />
+                    ) : (
+                      <div className="funcionario-foto-placeholder">
+                        <FaUserCircleSolid />
+                      </div>
+                    )}
+                    <p>
+                      <strong>Serviço:</strong> {agendamentoData.servico_nome}
+                    </p>
+                    <p>
+                      <strong>Funcionário:</strong> {agendamentoData.funcionario.nome}
+                    </p>
+                  </>
                 ) : (
-                  <div className="funcionario-foto-placeholder">
-                    <FaUserCircleSolid />
-                  </div>
+                    /* Lógica para Locação (sem servico_nome) */
+                    agendamentoData.locacao_nome && (
+                        <p>
+                            <strong>Locação:</strong> {agendamentoData.locacao_nome}
+                        </p>
+                    )
                 )}
+
                 <p>
                   <strong>Cliente:</strong> {agendamentoData.cliente_nome}
                 </p>
                 <p>
-                  <strong>Serviço:</strong> {agendamentoData.servico_nome}
-                </p>
-                <p>
-                  <strong>Funcionário:</strong> {agendamentoData.funcionario.nome}
-                </p>
-                <p>
                   <strong>Data:</strong>{" "}
-                  {new Date(agendamentoData.data).toLocaleDateString("pt-BR", {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                  })}
+                  {formatarData(agendamentoData.data)}
                 </p>
                 <p>
                   <strong>Hora:</strong> {agendamentoData.hora.slice(0, 5)}

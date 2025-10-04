@@ -212,9 +212,10 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
           --border-light: #e0e6ed;
         }
 
-        /* Grid de Horários */
+        /* Grid de Horários - Padrão para Desktop e Telas Grandes */
         .horarios-grid {
           display: grid;
+          /* Tenta criar colunas de no mínimo 160px. Isso pode resultar em 4, 5 ou mais colunas em telas grandes */
           grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
           gap: 1rem;
           max-width: 900px;
@@ -233,7 +234,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         
-        /* Cores e Status */
+        /* Cores e Status (sem mudanças) */
         .horario-card h5 {
           font-size: 1.25rem;
           margin-bottom: 0.5rem;
@@ -289,7 +290,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
         }
 
 
-        /* Modal */
+        /* Modal (sem mudanças) */
         .horarios-modal .modal-content {
           border-radius: 12px;
         }
@@ -322,7 +323,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
           box-shadow: 0 0 5px rgba(0, 76, 153, 0.3);
         }
 
-        /* Serviço Radio Group */
+        /* Serviço Radio Group (sem mudanças) */
         .radio-group {
           padding: 1rem;
           border: 1px solid var(--border-light);
@@ -385,17 +386,17 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
             opacity: 0.6;
         }
 
-        /* === RESPONSIVIDADE PARA CELULAR (Telas Pequenas) === */
+        /* === RESPONSIVIDADE PARA CELULAR (Telas de até 576px) === */
         @media (max-width: 576px) {
           .horarios-grid {
-            /* Força os cards a ocuparem a largura total, ficando em uma coluna */
-            grid-template-columns: 1fr;
+            /* 2 horários por linha (50% cada) */
+            grid-template-columns: 1fr 1fr; 
             gap: 0.75rem;
-            padding: 0 1rem; /* Adiciona um padding nas laterais do grid */
+            padding: 0 1rem; 
           }
           .horario-card {
             padding: 0.75rem;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05); /* Sombra mais sutil */
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
           }
           .horario-card h5 {
             font-size: 1.1rem;
@@ -404,8 +405,22 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
             font-size: 0.85rem;
           }
           .horarios-modal .modal-body {
-            padding: 1.5rem; /* Ajusta o padding do modal */
+            padding: 1.5rem;
           }
+          /* Garante que os campos de cliente no modal fiquem em 100% da largura em celulares */
+          .horarios-modal .row.g-2 > .col-md-6 {
+             width: 100%;
+          }
+        }
+        
+        /* === RESPONSIVIDADE PARA TABLET PEQUENO (Entre 577px e 768px) === */
+        @media (min-width: 577px) and (max-width: 768px) {
+            .horarios-grid {
+                /* 4 horários por linha (cerca de 25% cada) */
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: 1rem;
+                padding: 0 1rem;
+            }
         }
       `}</style>
       <div className="horarios-do-dia">

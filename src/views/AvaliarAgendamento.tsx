@@ -7,6 +7,9 @@ import { AvaliacaoAgendamento } from "../interfaces/AvaliacaoAgendamento";
 import Navbar from "../components/Navbar";
 import axios from "axios";
 
+// Importando o ícone da locação para um placeholder genérico
+import { FaBuilding } from "react-icons/fa";
+
 const AvaliacaoAgendamentoView = () => {
   const { identificador } = useParams<{ identificador: string }>();
   const [nota, setNota] = useState<number>(0);
@@ -32,6 +35,7 @@ const AvaliacaoAgendamentoView = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Permite submissão se a nota for diferente de zero E se ainda não foi avaliado
     if (nota === 0 || agendamentoData?.avaliacao_existente) return;
 
     setIsSubmitting(true);
@@ -54,6 +58,10 @@ const AvaliacaoAgendamentoView = () => {
 
       if (response.status === 200) {
         setSubmitStatus("success");
+        // Atualiza o estado da avaliação existente após o sucesso
+        if (agendamentoData) {
+            agendamentoData.avaliacao_existente = true;
+        }
       }
     } catch (error) {
       console.error("Error submitting evaluation:", error);
@@ -214,7 +222,7 @@ const AvaliacaoAgendamentoView = () => {
             margin-bottom: 3rem;
           }
           .star {
-            transition: color 0.3s ease, transform 0.3s ease;
+            transition: color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
             font-size: 3.25rem;
             color: var(--gray-300);
           }
@@ -229,7 +237,7 @@ const AvaliacaoAgendamentoView = () => {
             transform: scale(1.15);
           }
           .star-rating .cursor-pointer:focus {
-            outline: 3px solid var(--light-blue);
+            outline: 3px solid var(--accent-blue);
             outline-offset: 4px;
             border-radius: 6px;
           }
@@ -279,6 +287,7 @@ const AvaliacaoAgendamentoView = () => {
             max-width: 400px;
             margin: 0 auto;
             box-shadow: 0 6px 16px rgba(0, 48, 135, 0.3);
+            border: none;
           }
           .btn-submit:hover {
             background: linear-gradient(135deg, var(--accent-blue), var(--primary-blue));
@@ -409,23 +418,58 @@ const AvaliacaoAgendamentoView = () => {
               <h2 id="avaliacao-title">
                 <FaStar aria-hidden="true" /> {avaliacaoExistente ? "Avaliação Recebida" : "Avaliar Agendamento"}
               </h2>
+
               <div className="info-agendamento">
-                {agendamentoData.funcionario.foto ? (
-                  <img
-                    src={agendamentoData.funcionario.foto}
-                    alt={`Foto de ${agendamentoData.funcionario.nome}`}
-                    className="funcionario-foto"
-                  />
+
+                {/* Lógica Condicional: Se for agendamento de Serviço */}
+                {agendamentoData.servico_nome && agendamentoData.funcionario ? (
+                  <>
+                    {/* Foto do Funcionário */}
+                    {agendamentoData.funcionario.foto ? (
+                      <img
+                        src={agendamentoData.funcionario.foto}
+                        alt={`Foto de ${agendamentoData.funcionario.nome}`}
+                        className="funcionario-foto"
+                      />
+                    ) : (
+                      <div className="funcionario-foto-placeholder">
+                        <FaUserCircleSolid />
+                      </div>
+                    )}
+                    {/* Detalhes do Serviço */}
+                    <p>
+                      <strong>Serviço:</strong> {agendamentoData.servico_nome}
+                    </p>
+                    <p>
+                      <strong>Funcionário:</strong> {agendamentoData.funcionario.nome}
+                    </p>
+                  </>
                 ) : (
-                  <div className="funcionario-foto-placeholder">
-                    <FaUserCircleSolid />
-                  </div>
+                    /* Lógica Condicional: Se for agendamento de Locação (sem servico_nome) */
+                    agendamentoData.locacao_nome && (
+                        <>
+                            {/* Foto da Locação */}
+                            {agendamentoData.locacao_foto ? (
+                                <img
+                                    src={agendamentoData.locacao_foto}
+                                    alt={`Foto de ${agendamentoData.locacao_nome}`}
+                                    className="funcionario-foto" // Reutiliza a classe de foto
+                                />
+                            ) : (
+                                <div className="funcionario-foto-placeholder">
+                                    <FaBuilding /> {/* Ícone para locação */}
+                                </div>
+                            )}
+                            {/* Detalhes da Locação */}
+                            <p>
+                                <strong>Locação:</strong> {agendamentoData.locacao_nome}
+                            </p>
+                        </>
+                    )
                 )}
+
                 <p>
-                  <strong>Serviço:</strong> {agendamentoData.servico_nome}
-                </p>
-                <p>
-                  <strong>Funcionário:</strong> {agendamentoData.funcionario.nome}
+                  <strong>Cliente:</strong> {agendamentoData.cliente_nome}
                 </p>
                 <p>
                   <strong>Data e Hora:</strong>{" "}
