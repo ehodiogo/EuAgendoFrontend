@@ -43,6 +43,9 @@ export interface Empresa {
   assinatura_vencimento: number;
 
   funcionarios?: Funcionario[];
+
+  avaliacoes_empresa:  number;
+  nota_empresa:  number;
 }
 
 export interface EmpresaCreate {

@@ -433,7 +433,7 @@ function Home() {
               >
                 Começar a Organizar Agora
               </button>
-              <p className="mt-3 small text-white-50">Sem cartão de crédito. Teste grátis em todos os planos.</p>
+              <p className="mt-3 small text-white-50">Sem cartão de crédito. Teste grátis no plano Free Trial.</p>
             </div>
             <div className="ms-lg-5 col-lg-4 mt-4 mt-lg-0 text-center">
               <img
@@ -609,7 +609,7 @@ function Home() {
                 <a href="https://www.github.com/ehodiogo" target="_blank" rel="noopener noreferrer" className="text-decoration-none d-flex align-items-center me-3">
                     <FaGithub className="me-2" /> GitHub
                 </a>
-                <a href="https://www.instagram.com/ehodiogo" target="_blank" rel="noopener noreferrer" className="text-decoration-none d-flex align-items-center me-3">
+                <a href="https://www.instagram.com/vemagendarapp" target="_blank" rel="noopener noreferrer" className="text-decoration-none d-flex align-items-center me-3">
                     <FaInstagram className="me-2" /> Instagram
                 </a>
                 <a href="https://www.linkedin.com/in/dabpereira" target="_blank" rel="noopener noreferrer" className="text-decoration-none d-flex align-items-center">

@@ -8,13 +8,14 @@ import {
   FaMapMarkerAlt, FaEnvelope, FaPhoneAlt, FaRegAddressCard,
   FaClipboardList, FaUsers, FaEye, FaTags, FaClock, FaExclamationCircle
 } from "react-icons/fa";
+import RatingStars from "../components/RatingStars.tsx";
 
 interface Locacao {
     id: number;
     nome: string;
     descricao: string;
     duracao: string;
-    preco: number;
+    preco: string;
 }
 interface Servico {
     nome: string;
@@ -113,6 +114,13 @@ function EmpresaDetails() {
           color: var(--text-muted);
           font-style: italic;
           font-size: 1rem;
+        }
+        .identity-card .rating-container {
+          margin-top: 1rem;
+          margin-bottom: 0.5rem !important; /* Ajuste o margin-bottom para não conflitar */
+        }
+        .identity-card .stars-list {
+          font-size: 1.1rem;
         }
         .empresa-logo {
           width: 150px;
@@ -279,6 +287,10 @@ function EmpresaDetails() {
                     className="empresa-logo"
                   />
                   <h1>{empresa.nome}</h1>
+                    <RatingStars
+                        score={empresa.nota_empresa}
+                        ratingCount={empresa.avaliacoes_empresa}
+                      />
                   <p className="text-muted">
                       {isLocacao ? "Detalhes e Reserva" : "Detalhes e Agendamento"}
                   </p>

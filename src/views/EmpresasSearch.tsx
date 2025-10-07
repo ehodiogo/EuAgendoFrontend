@@ -6,6 +6,7 @@ import {Locacao} from "../interfaces/Locacao.tsx";
 import Navbar from "../components/Navbar";
 import FilterModal from "../components/FilterModal";
 import { FaSearch, FaSpinner, FaExclamationCircle, FaFilter, FaMapMarkerAlt, FaPhoneAlt, FaDollarSign, FaBuilding, FaTags } from "react-icons/fa";
+import RatingStars from "../components/RatingStars";
 
 interface Servico {
   nome: string;
@@ -355,7 +356,7 @@ function EmpresasSearch() {
         .empresas-list .card-subtitle {
             font-size: 0.95rem;
             color: var(--medium-gray);
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -431,6 +432,9 @@ function EmpresasSearch() {
           border-color: #1e7e34;
           transform: translateY(-3px);
           box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+        }
+        .empresas-list .rating-container {
+          margin-bottom: 1rem; /* Espaço para separar dos outros detalhes */
         }
 
         /* Mensagens (Loading, Erro, Vazio) */
@@ -588,6 +592,10 @@ function EmpresasSearch() {
                       <h5 className="card-title">{empresa.nome}</h5>
 
                       <div className="card-details">
+                          <RatingStars
+                            score={empresa.nota_empresa}
+                            ratingCount={empresa.avaliacoes_empresa}
+                          />
                           <p>
                             <FaBuilding className="icon" />
                             <strong>Tipo:</strong> {empresa.tipo}
