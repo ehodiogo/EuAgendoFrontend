@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { FaUser, FaEnvelope, FaKey, FaEye, FaEyeSlash, FaLink, FaSpinner } from "react-icons/fa6"; // Atualizado para Fa6
+import { FaUser, FaEnvelope, FaKey, FaEye, FaEyeSlash, FaLink, FaSpinner } from "react-icons/fa6";
 import {FaPlusCircle} from "react-icons/fa";
 
 function Register() {
@@ -30,7 +30,13 @@ function Register() {
         codigo_usado: referralCode || null,
       });
 
-      navigate("/login");
+      // Redireciona para o login e passa a mensagem de sucesso
+      navigate("/login", {
+        state: {
+          successMessage: "Conta criada com sucesso! Por favor, <strong>confirme seu e-mail</strong> antes de fazer login. Enviamos as instruções para o seu endereço.",
+        },
+      });
+
     } catch (err: any) {
       setError(
         err.response?.data?.detail ||

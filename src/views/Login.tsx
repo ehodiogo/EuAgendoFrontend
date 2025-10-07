@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import { FaKey, FaEnvelope, FaSpinner } from "react-icons/fa6";
@@ -9,13 +9,26 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Efeito para checar se há uma mensagem de sucesso vinda do /register
+  useEffect(() => {
+    if (location.state && (location.state as { successMessage?: string }).successMessage) {
+      setSuccessMessage((location.state as { successMessage: string }).successMessage);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, location.pathname, navigate]);
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setSuccessMessage(null);
+
     try {
       const url = import.meta.env.VITE_API_URL;
 
@@ -34,9 +47,31 @@ function Login() {
       localStorage.setItem("tempo_restante", tempo_restante.toString());
 
       navigate("/dashboard");
-    } catch (err) {
-      setError("Credenciais inválidas. Verifique seu e-mail e senha.");
-      console.error("Erro no login", err);
+    } catch (err: any) { // Usamos 'any' para facilitar o acesso à estrutura de erro do Axios
+
+      // 1. Tenta capturar a mensagem de erro específica do backend (se for JSON)
+      const apiError =
+        err.response?.data?.erro ||         // Se o backend usar a chave "erro"
+        err.response?.data?.detail ||       // Se o backend usar a chave "detail" (padrão Django Rest Framework)
+        err.response?.data?.non_field_errors; // Se for um erro de campos não específicos
+
+      let errorMessage = "Erro de login. Verifique suas credenciais e tente novamente.";
+
+      if (apiError) {
+          // Se for um array (como non_field_errors), pegue o primeiro elemento
+          errorMessage = Array.isArray(apiError) ? apiError[0] : apiError;
+      }
+
+      // Se o erro for 403 (Forbidden), sabemos que é provavelmente o e-mail não confirmado
+      if (err.response?.status === 403) {
+          // Mantemos a mensagem da API, que é específica.
+          // Ex: "Conta ainda não confirmada. Verifique seu e-mail."
+          errorMessage = apiError || "Conta não ativada. Por favor, confirme seu e-mail.";
+      }
+
+
+      setError(errorMessage);
+      console.error("Erro no login:", err.response || err);
     } finally {
       setIsLoading(false);
     }
@@ -176,6 +211,7 @@ function Login() {
           box-shadow: none;
         }
 
+        /* Alerta de Erro */
         .alert-danger {
           background-color: #fcebeb;
           color: var(--danger-red);
@@ -186,6 +222,19 @@ function Login() {
           text-align: center;
           font-weight: 600;
         }
+        
+        /* Alerta de Sucesso (Novo Estilo) */
+        .alert-success {
+          background-color: #eaf8ee; /* Light Green */
+          color: var(--success-green);
+          border: 1px solid #c3e6cb;
+          padding: 1rem;
+          border-radius: 8px;
+          margin-bottom: 1.5rem;
+          text-align: center;
+          font-weight: 600;
+        }
+
 
         .link-container {
           display: flex;
@@ -234,6 +283,12 @@ function Login() {
             <h2>
               <FaSignInAlt /> Acesso ao Sistema
             </h2>
+
+            {/* Exibe a mensagem de sucesso se houver (vinda do Register) */}
+            {successMessage && (
+                <div className="alert-success mb-3" dangerouslySetInnerHTML={{ __html: successMessage }} />
+            )}
+
             <form onSubmit={handleLogin}>
               <div className="mb-3">
                 <label htmlFor="email" className="form-label">
