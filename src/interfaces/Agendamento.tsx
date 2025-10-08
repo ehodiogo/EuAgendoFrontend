@@ -12,4 +12,5 @@ export interface Agendamento {
   hora: string; 
   duracao_servico: number;
   compareceu_agendamento: boolean;
+  observacao?: string;
 }

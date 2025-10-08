@@ -2,10 +2,10 @@ import { Empresa } from "../interfaces/Empresa";
 import { Agendamento } from "../interfaces/Agendamento";
 import { useFetch } from "../functions/GetData";
 import { useState } from "react";
-import { Modal, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Modal, Button, OverlayTrigger, Tooltip, Form } from "react-bootstrap"; // Importado Form para o textarea
 import { Servicos } from "../interfaces/ServicosFuncionarios";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { FaCheckCircle, FaTimesCircle, FaCoffee, FaSpinner, FaCalendarCheck, FaExclamationCircle, FaUser, FaTools, FaTag } from "react-icons/fa";
+import { FaCheckCircle, FaTimesCircle, FaCoffee, FaSpinner, FaCalendarCheck, FaExclamationCircle, FaUser, FaTools, FaTag, FaCommentDots } from "react-icons/fa"; // Adicionado FaCommentDots
 
 interface HorariosDoDiaProps {
   empresa: Empresa;
@@ -23,6 +23,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
   const [clienteNome, setClienteNome] = useState<string>("");
   const [clienteEmail, setClienteEmail] = useState<string>("");
   const [clienteNumero, setClienteNumero] = useState<string>("");
+  const [descricao, setDescricao] = useState<string>(""); // O estado se chama 'descricao' para bater com a interface/API
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -115,6 +116,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
     setClienteNome("");
     setClienteEmail("");
     setClienteNumero("");
+    setDescricao(""); // Limpa o estado (que armazena a observação)
     setFormError(null);
     setModalAberto(true);
   };
@@ -155,6 +157,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
       cliente_email: clienteEmail,
       cliente_numero: clienteNumero,
       duracao_minima: servicoInfo?.duracao || Math.min(...servicos.map((servico) => servico.duracao)),
+      descricao: descricao, // Mantido 'descricao' para a API/interface
     };
 
     try {
@@ -537,6 +540,25 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
                   disabled={isSubmitting}
                 />
               </div>
+
+              {/* CAMPO REVISADO: Agora usa "Observação" nos rótulos */}
+              <div className="col-12 mt-3">
+                <h5 className="mb-3"><FaCommentDots className="me-1" /> Observações (Opcional)</h5>
+                <label htmlFor="descricao" className="form-label">Detalhes Adicionais/Observação:</label>
+                <Form.Control
+                  as="textarea"
+                  // Mantém o ID como 'descricao' por convenção e para associar o label
+                  id="descricao"
+                  rows={3}
+                  value={descricao}
+                  onChange={(e) => setDescricao(e.target.value)}
+                  disabled={isSubmitting}
+                  // Alterado o placeholder para ser mais focado em Observação
+                  placeholder="Ex: Não se esqueça do meu desconto. Ou: Prefiro que a ponta fique mais longa."
+                />
+              </div>
+              {/* FIM CAMPO REVISADO */}
+
             </div>
             {formError && <div className="error-message">{formError}</div>}
           </Modal.Body>

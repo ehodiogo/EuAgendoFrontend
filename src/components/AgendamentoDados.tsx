@@ -3,7 +3,7 @@ import { useFetch } from "../functions/GetData";
 import { Funcionario } from "../interfaces/Funcionario";
 import { Cliente } from "../interfaces/Cliente";
 import { Servico } from "../interfaces/Servico";
-import { FaUserTie, FaUser, FaToolbox, FaRegClock, FaSpinner, FaIdBadge, FaCar } from "react-icons/fa6"; // Adicionei FaCar para Locação
+import { FaUserTie, FaUser, FaToolbox, FaRegClock, FaSpinner, FaIdBadge, FaCar, FaCommentDots } from "react-icons/fa6";
 
 interface AgendamentoDadosProps {
   agendamento: Agendamento;
@@ -52,6 +52,13 @@ const AgendamentoDados = ({ agendamento, empresaTipo }: AgendamentoDadosProps) =
     </>
   );
 
+  const detalheObservacao = agendamento.observacao ? (
+    <li className="observacao-item">
+        <strong><FaCommentDots /> Observação:</strong>
+        <span className="observacao-texto">{agendamento.observacao}</span>
+    </li>
+  ) : null;
+
   return (
     <div className="agendamento-dados-wrapper">
       <style>{`
@@ -92,9 +99,30 @@ const AgendamentoDados = ({ agendamento, empresaTipo }: AgendamentoDadosProps) =
           padding: 0;
           margin: 0;
           display: grid;
+          /* Modificado para que o campo de observação use a largura total */
           grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
           gap: 0.5rem 1.5rem;
         }
+        /* Classe para itens que devem ocupar a largura total, como a observação */
+        .agendamento-details .observacao-item {
+            grid-column: 1 / -1; /* Ocupa todas as colunas */
+            display: block !important; /* Força o display block para texto longo */
+            flex-direction: column;
+            align-items: flex-start !important;
+            padding-top: 1rem !important;
+        }
+        .agendamento-details .observacao-item strong {
+            margin-bottom: 0.25rem;
+        }
+        .agendamento-details .observacao-item .observacao-texto {
+            background-color: var(--light-gray-bg);
+            padding: 0.75rem;
+            border-radius: 6px;
+            width: 100%;
+            font-style: italic;
+            white-space: pre-wrap; /* Preserva quebras de linha e espaços no texto */
+        }
+
         .agendamento-details.list-style-display {
             display: block;
         }
@@ -199,6 +227,8 @@ const AgendamentoDados = ({ agendamento, empresaTipo }: AgendamentoDadosProps) =
             </li>
 
             {detalhesServicoLocacao}
+
+            {detalheObservacao}
 
         </ul>
       </div>
