@@ -1,6 +1,8 @@
 import Navbar from "../components/Navbar";
-import { FaEnvelope, FaPhone, FaLocationDot, FaPaperPlane, FaCircleCheck, FaSpinner } from "react-icons/fa6";
+import { FaEnvelope, FaPhone, FaLocationDot, FaPaperPlane, FaCircleCheck, FaSpinner, FaCircleXmark } from "react-icons/fa6";
 import { useState, ChangeEvent, FormEvent } from "react";
+
+type ChangeType = ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
 
 function Contato() {
   const [formData, setFormData] = useState({
@@ -8,7 +10,8 @@ function Contato() {
     email: "",
     mensagem: "",
   });
-  const [status, setStatus] = useState("");
+
+  const [status, setStatus] = useState<"success" | "error" | "">("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: ChangeType) => {
@@ -18,30 +21,56 @@ function Contato() {
     });
   };
 
-  type ChangeType = ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setStatus("");
 
-    setTimeout(() => {
+    const baseUrl = import.meta.env.VITE_API_URL;
+    const endpoint = `${baseUrl}/api/contato/enviar/`;
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStatus("success");
+        setFormData({ nome: "", email: "", mensagem: "" });
+      } else {
+        console.error("Erro no envio:", data.erro || data.detail || "Erro desconhecido");
+        setStatus("error");
+      }
+    } catch (error) {
+      console.error("Falha ao se conectar com a API:", error);
+      setStatus("error");
+    } finally {
       setIsLoading(false);
-      setStatus("success");
-      setFormData({ nome: "", email: "", mensagem: "" });
       setTimeout(() => setStatus(""), 6000);
-    }, 1500);
+    }
   };
 
   const getStatusMessage = () => {
     if (status === "success") {
       return {
-        message: "Mensagem enviada com sucesso! Agradecemos o contato.",
+        message: "Mensagem enviada com sucesso! Agradecemos o contato. ✅",
         className: "status-success",
         icon: <FaCircleCheck size={20} className="me-2" />
       };
     }
-    // Adicionar um status de erro se necessário
+    if (status === "error") {
+      return {
+        message: "Ocorreu um erro ao enviar a mensagem. Tente novamente mais tarde. ❌",
+        className: "status-error",
+        icon: <FaCircleXmark size={20} className="me-2" />
+      };
+    }
     return null;
   };
 
@@ -58,6 +87,7 @@ function Contato() {
           --light-gray-bg: #f5f7fa;
           --white: #ffffff;
           --success-green: #28a745;
+          --danger-red: #dc3545; /* Adicionado para status de erro */
           --shadow-color: rgba(0, 0, 0, 0.15);
         }
 
@@ -88,7 +118,7 @@ function Contato() {
         /* Layout principal */
         .contact-layout {
           display: grid;
-          grid-template-columns: 1fr 1.5fr; /* Dando mais espaço ao formulário */
+          grid-template-columns: 1fr 1.5fr; 
           gap: 3rem;
           max-width: 1100px;
           margin: 2rem auto 0;
@@ -223,11 +253,19 @@ function Contato() {
           display: flex;
           align-items: center;
           justify-content: center;
+          border: 1px solid transparent;
         }
+        /* Status de Sucesso */
         .status-success {
           background-color: #d4edda;
           color: var(--success-green);
-          border: 1px solid #c3e6cb;
+          border-color: #c3e6cb;
+        }
+        /* Status de Erro (NOVO) */
+        .status-error {
+          background-color: #f8d7da;
+          color: var(--danger-red);
+          border-color: #f5c6cb;
         }
 
         /* Responsividade */
