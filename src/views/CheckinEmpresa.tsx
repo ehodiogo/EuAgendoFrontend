@@ -399,7 +399,7 @@ function CheckInEmpresa() {
                       {showQRCode === agendamento.id && (
                         <div className="qrcode-container">
                           <QRCodeCanvas
-                            value={`https://vemagendar.com/agendamento/${agendamento.identificador}/avaliar`}
+                            value={`https://vemagendar.com.br/agendamento/${agendamento.identificador}/avaliar`}
                             size={180}
                             level="H"
                             fgColor="#003087"
