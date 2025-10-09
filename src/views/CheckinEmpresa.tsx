@@ -9,10 +9,9 @@ import { QRCodeCanvas } from "qrcode.react";
 import {FaExclamationCircle} from "react-icons/fa";
 
 function CheckInEmpresa() {
-  const { id } = useParams<{ id: string }>();
-  const token = localStorage.getItem("access_token");
-  const empresa = useFetch<Empresa>(`/api/empresas-usuario/${id}?usuario_token=${token}`);
-  const agendamentos = useFetch<Agendamento[]>(`/api/agendamento?empresaId=${id}&usuario_token=${token}`);
+  const { empresaId } = useParams<{ empresaId: string }>();
+  const empresa = useFetch<Empresa>(`/api/empresa/${empresaId}`);
+  const agendamentos = useFetch<Agendamento[]>(`/api/agendamento-avaliar/sem-comparecimento/?empresa_id=${empresaId}`);
 
   const [showQRCode, setShowQRCode] = useState<number | null>(null);
   const [filterType, setFilterType] = useState<"today" | "pending">("pending");
@@ -34,19 +33,42 @@ function CheckInEmpresa() {
       return dateA.getTime() - dateB.getTime();
   });
 
-  const handleCheckIn = async (agendamentoId: number) => {
+  const handleCheckIn = async (agendamentoIdentificador: string, agendamentoId: number) => {
     setIsCheckingIn(agendamentoId);
     setShowQRCode(null);
 
-    try {
-      console.log(`Iniciando check-in para o agendamento ID ${agendamentoId}...`);
-      await new Promise(resolve => setTimeout(resolve, 800));
+    const baseUrl = import.meta.env.VITE_API_URL;
+    const endpointPath = `/api/agendamento-avaliar/${agendamentoIdentificador}/marcar-compareceu/`;
+    const checkinUrl = `${baseUrl}${endpointPath}`;
 
-      alert("Check-in realizado com sucesso! Atualizando lista...");
+    try {
+      console.log(`Iniciando check-in para o identificador ${agendamentoIdentificador} na URL: ${checkinUrl}`);
+
+      const response = await fetch(checkinUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Check-in Response:", data.message);
+
+        alert("Check-in realizado com sucesso! Atualizando lista...");
+
+        window.location.reload();
+
+      } else {
+        const errorData = await response.json();
+        console.error("Erro no check-in:", errorData);
+        alert(`Erro ao realizar check-in: ${errorData.message || response.statusText}`);
+      }
 
     } catch (error) {
-      console.error(error);
-      alert(`Erro ao realizar check-in para o agendamento ID ${agendamentoId}.`);
+      console.error("Erro de Rede/Fetch:", error);
+      alert(`Erro inesperado ao realizar check-in para o identificador ${agendamentoIdentificador}.`);
     } finally {
       setIsCheckingIn(null);
     }
@@ -352,7 +374,7 @@ function CheckInEmpresa() {
                     <div className="agendamento-actions">
                       <button
                         className="btn btn-checkin"
-                        onClick={() => handleCheckIn(agendamento.id)}
+                        onClick={() => handleCheckIn(agendamento.identificador, agendamento.id)}
                         disabled={isCheckingIn === agendamento.id}
                       >
                         {isCheckingIn === agendamento.id ? (
@@ -377,7 +399,7 @@ function CheckInEmpresa() {
                       {showQRCode === agendamento.id && (
                         <div className="qrcode-container">
                           <QRCodeCanvas
-                            value={`https://vemagendar.com/checkin/${agendamento.id}`}
+                            value={`https://vemagendar.com/agendamento/${agendamento.identificador}/avaliar`}
                             size={180}
                             level="H"
                             fgColor="#003087"

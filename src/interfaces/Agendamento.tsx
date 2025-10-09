@@ -1,5 +1,6 @@
 export interface Agendamento {
   id: number;
+  identificador:  string;
   servico: string;
   servico_nome?: string;
   cliente: string;
