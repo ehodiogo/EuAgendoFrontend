@@ -8,6 +8,51 @@ import FilterModal from "../components/FilterModal";
 import { FaSearch, FaSpinner, FaExclamationCircle, FaFilter, FaMapMarkerAlt, FaPhoneAlt, FaDollarSign, FaBuilding, FaTags } from "react-icons/fa";
 import RatingStars from "../components/RatingStars";
 
+// =================================================================
+// 1. COMPONENTE AUXILIAR: Skeleton Loader
+// =================================================================
+const EmpresaCardSkeleton: React.FC = () => (
+    <div className="col-lg-4 col-md-6 mb-4">
+        <div className="card">
+            {/* Imagem/Logo */}
+            <div className="card-img-container skeleton skeleton-logo"></div>
+            <div className="card-body">
+                {/* Título da Empresa */}
+                <div className="skeleton skeleton-line-long" style={{ height: '1.8rem', marginBottom: '1rem' }}></div>
+
+                <div className="card-details">
+                    {/* Linha de Avaliação */}
+                    <div className="d-flex align-items-center mb-3">
+                        <div className="skeleton-circle"></div>
+                        <div className="skeleton-circle"></div>
+                        <div className="skeleton-circle"></div>
+                        <div className="skeleton-circle"></div>
+                        <div className="skeleton-circle"></div>
+                        <div className="skeleton skeleton-line-short" style={{ width: '30%', marginLeft: '1rem' }}></div>
+                    </div>
+
+                    {/* Linhas de Detalhes */}
+                    <div className="skeleton skeleton-line-medium"></div>
+                    <div className="skeleton skeleton-line-long"></div>
+                    <div className="skeleton skeleton-line-medium"></div>
+                </div>
+
+                {/* Lista de Serviços/Locações */}
+                <div className="skeleton skeleton-line-short" style={{ width: '40%', marginTop: '1rem' }}></div>
+                <div className="skeleton skeleton-line-long" style={{ width: '85%' }}></div>
+                <div className="skeleton skeleton-line-medium"></div>
+
+                {/* Botão */}
+                <div className="skeleton" style={{ height: '3.3rem', marginTop: 'auto' }}></div>
+            </div>
+        </div>
+    </div>
+);
+
+
+// =================================================================
+// COMPONENTES AUXILIARES EXISTENTES
+// =================================================================
 interface Servico {
   nome: string;
   preco: number;
@@ -59,6 +104,9 @@ const ListaLocacoes: React.FC<{ locacoes?: Locacao[] }> = ({ locacoes }) => (
 );
 
 
+// =================================================================
+// COMPONENTE PRINCIPAL: EmpresasSearch
+// =================================================================
 function EmpresasSearch() {
   const [search, setSearch] = useState("");
   const [cidade, setCidade] = useState("");
@@ -117,7 +165,7 @@ function EmpresasSearch() {
           --success-green: #28a745;
           --danger-red: #dc3545;
           --warning-orange: #fd7e14;
-          --border-light: #e0e0e0; /* Borda sutil */
+          --border-light: #e0e0e0; /* Borda sutil (usado no skeleton) */
         }
 
         /* Estilos gerais */
@@ -437,7 +485,7 @@ function EmpresasSearch() {
           margin-bottom: 1rem; /* Espaço para separar dos outros detalhes */
         }
 
-        /* Mensagens (Loading, Erro, Vazio) */
+        /* Mensagens (Erro, Vazio) */
         .message {
           font-size: 1.2rem;
           padding: 2rem;
@@ -452,11 +500,6 @@ function EmpresasSearch() {
           gap: 1rem;
           font-weight: 500;
         }
-        .message.loading {
-          color: var(--primary-blue);
-          background-color: var(--white);
-          border: 1px solid var(--light-blue);
-        }
         .message.error {
           color: var(--danger-red);
           background-color: #ffebeb;
@@ -467,6 +510,47 @@ function EmpresasSearch() {
           background-color: #fff8e1;
           border: 1px solid var(--warning-orange);
         }
+
+
+        /* ======================================= */
+        /* --- ESTILOS DO SKELETON LOADER NOVO --- */
+        /* ======================================= */
+        @keyframes shimmer {
+            0% { background-position: -468px 0; }
+            100% { background-position: 468px 0; }
+        }
+
+        .skeleton {
+            background-color: var(--border-light);
+            border-radius: 8px;
+            height: 1.2rem;
+            margin-bottom: 0.75rem;
+            /* Efeito de brilho (Shimmer) */
+            background-image: linear-gradient(to right, var(--border-light) 0%, #ececec 20%, var(--border-light) 40%, var(--border-light) 100%);
+            background-repeat: no-repeat;
+            background-size: 800px 104px;
+            animation: shimmer 1.2s linear infinite;
+        }
+        .skeleton-logo {
+            height: 220px;
+            margin-bottom: 0;
+            border-radius: 15px 15px 0 0;
+            background-size: 100% 100%;
+        }
+        .skeleton-line-long { width: 90%; }
+        .skeleton-line-medium { width: 70%; }
+        .skeleton-line-short { width: 50%; }
+        .skeleton-circle { 
+            height: 20px; 
+            width: 20px; 
+            border-radius: 50%; 
+            display: inline-block; 
+            margin-right: 4px;
+            background-color: var(--border-light);
+            background-image: linear-gradient(to right, var(--border-light) 0%, #ececec 50%, var(--border-light) 100%);
+            animation: shimmer 1.2s linear infinite;
+        }
+
 
         /* Responsividade */
         @media (max-width: 991px) { /* Tablets e menores */
@@ -572,8 +656,14 @@ function EmpresasSearch() {
 
         <section className="empresas-list container">
           {empresas.loading ? (
-            <div className="message loading">
-              <FaSpinner className="fa-spin" /> Carregando empresas...
+            // =================================================================
+            // 2. APLICAÇÃO DO SKELETON LOADER
+            // Renderiza 6 esqueletos enquanto carrega
+            // =================================================================
+            <div className="row">
+                {[...Array(6)].map((_, index) => (
+                    <EmpresaCardSkeleton key={index} />
+                ))}
             </div>
           ) : filteredEmpresas && filteredEmpresas.length > 0 ? (
             <div className="row">
@@ -635,9 +725,6 @@ function EmpresasSearch() {
             </div>
           )}
         </section>
-        <footer className="empresas-footer">
-          <p>&copy; 2025 VemAgendar. Todos os direitos reservados.</p>
-        </footer>
       </div>
     </div>
   );
