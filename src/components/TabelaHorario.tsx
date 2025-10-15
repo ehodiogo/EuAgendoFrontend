@@ -6,7 +6,7 @@ import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import HorariosDoDia from "./Horarios";
 import { Servicos } from "../interfaces/ServicosFuncionarios";
-import { FaExclamationCircle, FaSpinner, FaCalendarDay, FaLock, FaTimes, FaUserTie, FaHome } from "react-icons/fa";
+import { FaExclamationCircle, FaSpinner, FaCalendarDay, FaLock, FaTimes, FaUserTie, FaHome, FaClock } from "react-icons/fa";
 import { Locacao } from "../interfaces/Locacao";
 
 interface HorariosTabelaProps {
@@ -25,7 +25,8 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
   });
   const [assinaturaVencida, setAssinaturaVencida] = useState(false);
 
-  const empresaInterfaceList = useFetch<Empresa[]>(`/api/empresa/?q=${empresaNome}`);
+  const API_EMPRESA = `/api/empresa/?q=${empresaNome}`;
+  const empresaInterfaceList = useFetch<Empresa[]>(API_EMPRESA);
   const empresa = empresaInterfaceList.data?.find(
     (e) => e.nome === empresaNome
   );
@@ -37,7 +38,7 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
     }
   }, [empresa]);
 
-  const isLocacaoMode = !funcionario_id && locacoes && locacoes.length > 0;
+  const isLocacaoMode = !funcionario_id && locacoes && locacoes.length > 0 && locacao_id;
 
   const itensParaAgendamento = (isLocacaoMode ? locacoes : servicos) || [];
 
@@ -86,6 +87,10 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
 
   const listaVazia = itensParaAgendamento.length === 0;
 
+  const tituloIcone = isLocacaoMode
+    ? <FaHome className="me-2" />
+    : (funcionario_id ? <FaUserTie className="me-2" /> : <FaCalendarDay className="me-2" />);
+
   return (
     <div className="horarios-tabela">
       <style>{`
@@ -117,6 +122,7 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
           padding: 2rem; 
           max-width: 900px;
           margin: 0 auto;
+          min-height: 450px; /* Adicionado para dar espaço para o placeholder */
         }
 
         /* Título */
@@ -213,6 +219,21 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
           color: var(--text-dark);
           border-color: var(--border-light);
         }
+        
+        /* Placeholders (Skeleton) - Reutilizando e adaptando o estilo do Agendar.tsx */
+        @keyframes pulse {
+          0% { background-position: -200px 0; }
+          100% { background-position: calc(200px + 100%) 0; }
+        }
+        .placeholder-glow {
+          background-color: #e9ecef;
+          background-image: linear-gradient(90deg, #e9ecef 0%, #f9f9f9 50%, #e9ecef 100%);
+          background-size: 200px 100%;
+          background-repeat: no-repeat;
+          animation: pulse 1.5s infinite linear;
+          border-radius: 6px;
+        }
+
 
         /* Responsividade */
         @media (max-width: 576px) {
@@ -230,10 +251,41 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
       `}</style>
       <div className="horarios-tabela">
         {empresaInterfaceList.loading ? (
-          <div className="message loading">
-            <FaSpinner className="fa-spin icon-large" />
-            <h4>Carregando Dados</h4>
-            <p>Buscando informações de horário da empresa...</p>
+          <div className="horarios-card">
+            <h2>
+              <FaSpinner className="fa-spin me-2" /> Carregando Dados
+            </h2>
+            <div className="placeholder-glow w-50 mb-4" style={{ height: '1.5rem' }}></div>
+
+            <div className="datepicker-group">
+                <div className="placeholder-glow w-30 mx-auto mb-2" style={{ height: '1rem' }}></div>
+                <div className="placeholder-glow w-50 mx-auto" style={{ height: '2.5rem' }}></div>
+            </div>
+
+            <h4 className="text-center text-muted mb-3"><FaCalendarDay className="me-2" /> Calendário de Horários</h4>
+            <div className="row g-3">
+                <div className="col-4">
+                    <div className="placeholder-glow w-100 mb-2" style={{ height: '30px', backgroundColor: '#e0e0e0' }}></div>
+                    <div className="placeholder-glow w-100 mb-2" style={{ height: '30px', backgroundColor: '#e0e0e0' }}></div>
+                    <div className="placeholder-glow w-100 mb-2" style={{ height: '30px', backgroundColor: '#e0e0e0' }}></div>
+                </div>
+                <div className="col-8">
+                    <div className="d-flex justify-content-between mb-2">
+                        <div className="placeholder-glow" style={{ height: '30px', width: '30%', backgroundColor: '#f0f0f0' }}></div>
+                        <div className="placeholder-glow" style={{ height: '30px', width: '30%', backgroundColor: '#f0f0f0' }}></div>
+                        <div className="placeholder-glow" style={{ height: '30px', width: '30%', backgroundColor: '#f0f0f0' }}></div>
+                    </div>
+                    <div className="d-flex justify-content-between mb-2">
+                        <div className="placeholder-glow" style={{ height: '30px', width: '20%', backgroundColor: '#f0f0f0' }}></div>
+                        <div className="placeholder-glow" style={{ height: '30px', width: '35%', backgroundColor: '#f0f0f0' }}></div>
+                        <div className="placeholder-glow" style={{ height: '30px', width: '35%', backgroundColor: '#f0f0f0' }}></div>
+                    </div>
+                    <div className="d-flex justify-content-between mb-2">
+                        <div className="placeholder-glow" style={{ height: '30px', width: '25%', backgroundColor: '#f0f0f0' }}></div>
+                        <div className="placeholder-glow" style={{ height: '30px', width: '60%', backgroundColor: '#f0f0f0' }}></div>
+                    </div>
+                </div>
+            </div>
           </div>
         ) : !empresa ? (
           <div className="message error">
@@ -244,7 +296,7 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
         ) : (
           <div className="horarios-card">
             <h2>
-                {isLocacaoMode ? <FaHome className="me-2" /> : (funcionario_id ? <FaUserTie className="me-2" /> : <FaCalendarDay className="me-2" />)}
+                {tituloIcone}
                 {tituloComponente}
             </h2>
 
@@ -261,7 +313,7 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
               <>
                 <div className="datepicker-group">
                   <label htmlFor="data" className="form-label">
-                    <FaCalendarDay className="me-2" /> Selecione a Data {isLocacaoMode ? "da Locação" : "do Serviço"}:
+                    <FaClock className="me-2" /> Selecione a Data {isLocacaoMode ? "da Locação" : "do Serviço"}:
                   </label>
                   <ReactDatePicker
                     selected={dataSelecionada}
@@ -288,7 +340,7 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
                     <h4>{isLocacaoMode ? "Locações" : "Serviços"} Não Encontradas</h4>
                     <p>
                       {isLocacaoMode
-                        ? 'Não há itens de locação ativos para agendamento.'
+                        ? 'Não há itens de locação ativos para agendamento com este item selecionado.'
                         : (funcionario_id
                           ? 'Este profissional não tem serviços ativos para agendamento.'
                           : 'Não há serviços ativos para agendamento geral da empresa.')

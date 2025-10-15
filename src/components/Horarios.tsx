@@ -2,10 +2,10 @@ import { Empresa } from "../interfaces/Empresa";
 import { Agendamento } from "../interfaces/Agendamento";
 import { useFetch } from "../functions/GetData";
 import { useState } from "react";
-import { Modal, Button, OverlayTrigger, Tooltip, Form } from "react-bootstrap"; // Importado Form para o textarea
+import { Modal, Button, OverlayTrigger, Tooltip, Form } from "react-bootstrap";
 import { Servicos } from "../interfaces/ServicosFuncionarios";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { FaCheckCircle, FaTimesCircle, FaCoffee, FaSpinner, FaCalendarCheck, FaExclamationCircle, FaUser, FaTools, FaTag, FaCommentDots } from "react-icons/fa"; // Adicionado FaCommentDots
+import { FaCheckCircle, FaTimesCircle, FaCoffee, FaSpinner, FaCalendarCheck, FaExclamationCircle, FaUser, FaTools, FaTag, FaCommentDots } from "react-icons/fa";
 
 interface HorariosDoDiaProps {
   empresa: Empresa;
@@ -15,6 +15,27 @@ interface HorariosDoDiaProps {
   servicos: Servicos[];
 }
 
+const GridPlaceholder = () => {
+    const slots = Array.from({ length: 16 });
+    return (
+        <div className="horarios-grid">
+            {slots.map((_, index) => (
+                <div key={index} className="horario-card placeholder-card">
+                    <div
+                        className="placeholder-glow mx-auto"
+                        style={{ height: '1.25rem', width: '60%', marginBottom: '0.5rem' }}
+                    ></div>
+                    <div
+                        className="placeholder-glow mx-auto"
+                        style={{ height: '0.9rem', width: '80%' }}
+                    ></div>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+
 const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, locacao_id }: HorariosDoDiaProps) => {
   const dataString = data_selecionada.toISOString().split("T")[0];
   const [modalAberto, setModalAberto] = useState(false);
@@ -23,7 +44,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
   const [clienteNome, setClienteNome] = useState<string>("");
   const [clienteEmail, setClienteEmail] = useState<string>("");
   const [clienteNumero, setClienteNumero] = useState<string>("");
-  const [descricao, setDescricao] = useState<string>(""); // O estado se chama 'descricao' para bater com a interface/API
+  const [descricao, setDescricao] = useState<string>("");
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -44,7 +65,8 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
     const horarios: string[] = [];
     let [hora, minuto] = inicio.split(":").map(Number);
     const [horaFim, minutoFim] = fim.split(":").map(Number);
-    const menorDuracaoServico = Math.min(...servicos.map((servico) => servico.duracao as number));
+    // Assegura que servicos não está vazio antes de calcular o Math.min
+    const menorDuracaoServico = servicos.length > 0 ? Math.min(...servicos.map((servico) => servico.duracao as number)) : 30;
     const intervaloMinutos = menorDuracaoServico > 0 ? menorDuracaoServico : 30;
 
     while (hora < horaFim || (hora === horaFim && minuto < minutoFim)) {
@@ -75,7 +97,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
   const isDataMenorQueAtual = dataSelecionadaSemHora < dataAtualSemHora;
   const isDataIgualAoAtual = dataSelecionadaSemHora.getTime() === dataAtualSemHora.getTime();
 
-  if (horarioAbertura && horarioFechamento) {
+  if (horarioAbertura && horarioFechamento && !agendamentosResponse.loading) {
     const horarios = gerarHorarios(horarioAbertura, horarioFechamento);
     horarios.forEach((hora) => {
       if (!agendamentos) return;
@@ -116,7 +138,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
     setClienteNome("");
     setClienteEmail("");
     setClienteNumero("");
-    setDescricao(""); // Limpa o estado (que armazena a observação)
+    setDescricao("");
     setFormError(null);
     setModalAberto(true);
   };
@@ -156,8 +178,8 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
       cliente_nome: clienteNome,
       cliente_email: clienteEmail,
       cliente_numero: clienteNumero,
-      duracao_minima: servicoInfo?.duracao || Math.min(...servicos.map((servico) => servico.duracao)),
-      descricao: descricao, // Mantido 'descricao' para a API/interface
+      duracao_minima: servicoInfo?.duracao || (servicos.length > 0 ? Math.min(...servicos.map((servico) => servico.duracao)) : 30),
+      descricao: descricao,
     };
 
     try {
@@ -193,7 +215,6 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
       .toLowerCase();
   };
 
-  // VARIÁVEIS DE FORMATO BR
   const dataFormatada = formatarDataBR(dataString);
   const horaFormatada = horarioSelecionado?.substring(0, 5);
 
@@ -232,7 +253,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
           transition: all 0.2s ease;
           border: 1px solid var(--border-light);
         }
-        .horario-card:hover {
+        .horario-card:not(.placeholder-card):hover {
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
@@ -388,6 +409,29 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
         .horarios-modal .btn-primary:disabled {
             opacity: 0.6;
         }
+        
+        /* Placeholder Styles - Reutilizado do componente pai */
+        @keyframes pulse {
+          0% { background-position: -200px 0; }
+          100% { background-position: calc(200px + 100%) 0; }
+        }
+        .placeholder-glow {
+          background-color: #e9ecef;
+          background-image: linear-gradient(90deg, #e9ecef 0%, #f9f9f9 50%, #e9ecef 100%);
+          background-size: 200px 100%;
+          background-repeat: no-repeat;
+          animation: pulse 1.5s infinite linear;
+          border-radius: 6px;
+        }
+        .horario-card.placeholder-card {
+            background-color: #f7f7f7;
+            cursor: default;
+        }
+        .horario-card.placeholder-card:hover {
+            transform: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
 
         /* === RESPONSIVIDADE PARA CELULAR (Telas de até 576px) === */
         @media (max-width: 576px) {
@@ -428,9 +472,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
       `}</style>
       <div className="horarios-do-dia">
         {agendamentosResponse.loading ? (
-          <div className="message info">
-            <FaSpinner className="fa-spin me-2" /> Carregando horários disponíveis...
-          </div>
+          <GridPlaceholder />
         ) : Object.keys(horariosDisponiveis).length === 0 ? (
           <div className="message info">
             <FaExclamationCircle /> Nenhum horário gerado para este dia.
@@ -541,23 +583,19 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
                 />
               </div>
 
-              {/* CAMPO REVISADO: Agora usa "Observação" nos rótulos */}
               <div className="col-12 mt-3">
                 <h5 className="mb-3"><FaCommentDots className="me-1" /> Observações (Opcional)</h5>
                 <label htmlFor="descricao" className="form-label">Detalhes Adicionais/Observação:</label>
                 <Form.Control
                   as="textarea"
-                  // Mantém o ID como 'descricao' por convenção e para associar o label
                   id="descricao"
                   rows={3}
                   value={descricao}
                   onChange={(e) => setDescricao(e.target.value)}
                   disabled={isSubmitting}
-                  // Alterado o placeholder para ser mais focado em Observação
                   placeholder="Ex: Não se esqueça do meu desconto. Ou: Prefiro que a ponta fique mais longa."
                 />
               </div>
-              {/* FIM CAMPO REVISADO */}
 
             </div>
             {formError && <div className="error-message">{formError}</div>}

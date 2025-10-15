@@ -5,7 +5,7 @@ import { useState } from "react";
 import HorariosTabela from "../components/TabelaHorario";
 import Navbar from "../components/Navbar";
 import {
-  FaCalendarAlt, FaUserTie, FaSpinner, FaExclamationCircle, FaTimesCircle,
+  FaCalendarAlt, FaUserTie, FaExclamationCircle, FaTimesCircle,
   FaChevronRight, FaClock, FaDollarSign, FaHome, FaTag
 } from "react-icons/fa";
 
@@ -22,6 +22,45 @@ interface EmpresaGeral extends ServicosFuncionariosEmpresa {
     locacoes: Locacao[];
 }
 
+
+const CardPlaceholder = ({ count }: { count: number }) => {
+  const placeholders = Array.from({ length: count });
+
+  return (
+    <div className="row justify-content-center g-4">
+      {placeholders.map((_, index) => (
+        <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3">
+          <div className="card placeholder-card" style={{ height: '350px', overflow: 'hidden', cursor: 'default' }}>
+            <div
+              className="placeholder-glow mx-auto mt-4"
+              style={{
+                width: '100px',
+                height: '100px',
+                borderRadius: '50%',
+                backgroundColor: '#e0e0e0',
+              }}
+            ></div>
+            <div className="card-body d-flex flex-column align-items-center">
+              <div
+                className="placeholder-glow w-75 mb-3 rounded"
+                style={{ height: '1.5rem', backgroundColor: '#e0e0e0' }}
+              ></div>
+              <div className="placeholder-glow w-100 mt-2 p-3 rounded" style={{ backgroundColor: '#f0f0f0' }}>
+                <div className="placeholder-glow mb-2 rounded" style={{ height: '0.8rem', width: '90%', backgroundColor: '#e0e0e0' }}></div>
+                <div className="placeholder-glow mb-2 rounded" style={{ height: '0.8rem', width: '70%', backgroundColor: '#e0e0e0' }}></div>
+                <div className="placeholder-glow rounded" style={{ height: '0.8rem', width: '85%', backgroundColor: '#e0e0e0' }}></div>
+              </div>
+            </div>
+            <div
+              className="placeholder-glow w-100 mt-auto"
+              style={{ height: '40px', backgroundColor: '#e0e0e0' }}
+            ></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const Agendar = () => {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
@@ -224,6 +263,34 @@ const Agendar = () => {
           text-align: center;
           font-size: 0.9rem;
         }
+
+        /* Efeito de Brilho Placeholder */
+        @keyframes pulse {
+          0% {
+            background-position: -200px 0;
+          }
+          100% {
+            background-position: calc(200px + 100%) 0;
+          }
+        }
+        .placeholder-glow {
+          background-color: #e9ecef;
+          background-image: linear-gradient(90deg, #e9ecef 0%, #f9f9f9 50%, #e9ecef 100%);
+          background-size: 200px 100%;
+          background-repeat: no-repeat;
+          animation: pulse 1.5s infinite linear;
+        }
+        /* Ajuste do placeholder para o card */
+        .placeholder-card {
+            border: 1px solid #e0e6ed;
+            cursor: default; /* Remove o cursor de clique */
+        }
+        .placeholder-card:hover {
+            transform: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Desativa o hover */
+            border-color: #e0e6ed;
+        }
+        
       `}</style>
       <div className="custom-bg min-vh-100">
         <Navbar />
@@ -244,9 +311,27 @@ const Agendar = () => {
           </header>
 
           {loading ? (
-            <div className="message loading">
-              <FaSpinner className="fa-spin me-2" /> Carregando dados de {isLocacao ? "locação" : "agendamento"}...
-            </div>
+            <>
+                <section className="cards-section container">
+                    <h2 className="section-heading">
+                      <span className="me-2 text-primary-blue">1.</span> <FaHome /> Carregando Items...
+                    </h2>
+                    <CardPlaceholder count={3} />
+                </section>
+                <section className="horarios-section container">
+                    <h2 className="section-heading">
+                      <span className="me-2 text-primary-blue">2.</span> <FaCalendarAlt /> Carregando Calendário...
+                    </h2>
+                    <div className="horarios-content p-5">
+                       <div className="placeholder-glow w-100 mb-3 rounded" style={{height: '40px', backgroundColor: '#e0e0e0'}}></div>
+                       <div className="placeholder-glow w-100 mb-3 rounded" style={{height: '30px', backgroundColor: '#f0f0f0'}}></div>
+                       <div className="row g-2">
+                           <div className="col-4"><div className="placeholder-glow rounded" style={{height: '300px', backgroundColor: '#e0e0e0'}}></div></div>
+                           <div className="col-8"><div className="placeholder-glow rounded" style={{height: '300px', backgroundColor: '#f0f0f0'}}></div></div>
+                       </div>
+                    </div>
+                </section>
+            </>
           ) : !empresaDataFinal || (shouldShowFuncionariosAndHorarios && (!empresaDataFinal.funcionarios || empresaDataFinal.funcionarios.length === 0)) ? (
             <div className="message error">
               <FaExclamationCircle /> Não foi possível carregar os dados de {isLocacao ? "locação" : "agendamento"} ou nenhum {isLocacao ? "item de locação" : "profissional"} encontrado.
