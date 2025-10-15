@@ -9,6 +9,38 @@ import { Plano } from "../interfaces/Plano.tsx";
 
 type CompanyType = 'servico' | 'locacao';
 
+
+const PlanCardPlaceholder = ({ count }: { count: number }) => {
+    const placeholders = Array.from({ length: count });
+
+    return (
+        <div className="plan-row">
+            {placeholders.map((_, index) => (
+                <div key={index} className="plan-card placeholder-card" style={{ cursor: 'default', borderTop: '5px solid #e9ecef' }}>
+                    <div className="placeholder-glow mx-auto mb-4 mt-2" style={{ height: '1.8rem', width: '70%' }}></div>
+                    <div className="placeholder-glow mx-auto mb-3" style={{ height: '1rem', width: '85%' }}></div>
+
+                    <div className="plan-price-group">
+                        <div className="placeholder-glow mx-auto" style={{ height: '3.5rem', width: '60%' }}></div>
+                        <div className="placeholder-glow mx-auto mt-2" style={{ height: '1rem', width: '35%' }}></div>
+                    </div>
+
+                    <ul style={{textAlign: 'left'}}>
+                        {[...Array(4)].map((_, i) => (
+                            <li key={i} className="mb-3 d-flex align-items-center">
+                                <div className="placeholder-glow me-3" style={{ height: '1.1rem', width: '1.1rem', borderRadius: '50%' }}></div>
+                                <div className="placeholder-glow" style={{ height: '0.9rem', width: `${60 + (i * 8)}%` }}></div>
+                            </li>
+                        ))}
+                    </ul>
+
+                    <div className="placeholder-glow custom-btn-hero btn mt-auto" style={{ height: '3rem', width: '100%' }}></div>
+                </div>
+            ))}
+        </div>
+    );
+};
+
 function Home() {
   const navigate = useNavigate();
   const { data, loading } = useFetch<Plano[]>("/api/planos");
@@ -43,11 +75,11 @@ function Home() {
                 duracao_em_dias: plano.duracao_em_dias,
                 quantidade_empresas: plano.quantidade_empresas,
                 quantidade_funcionarios: plano.quantidade_funcionarios,
-                quantidade_locacoes: plano.quantidade_locacoes, // Garantir que está no objeto
+                quantidade_locacoes: plano.quantidade_locacoes,
                 cor: getPlanColor(plano.nome),
                 features: [
                     `Até ${plano.quantidade_empresas} empresa${plano.quantidade_empresas !== 1 ? "s" : ""}`,
-                    capacityFeature, // Feature dinâmica
+                    capacityFeature,
                     "Agendamento Online 24/7",
                     "Lembretes Automáticos",
                     "Gestão de Clientes",
@@ -63,13 +95,13 @@ function Home() {
   const getPlanColor = (nome: string) => {
     switch (nome.toLowerCase()) {
       case "plano básico":
-        return "#28a745"; // Success Green
+        return "#28a745";
       case "plano profissional":
-        return "#fd7e14"; // Warning Orange (Destaque)
+        return "#fd7e14";
       case "plano corporativo":
-        return "#003087"; // Primary Blue
+        return "#003087";
       default:
-        return "#6c757d"; // Secondary Gray
+        return "#6c757d";
     }
   };
 
@@ -100,7 +132,7 @@ function Home() {
           --accent-yellow: #f6c107;
           --success-green: #28aa45;
           --warning-orange: #fd7e14;
-          --danger-red: #dc3545; /* Adicionado para preço cheio */
+          --danger-red: #dc3545;
           --gradient-blue: linear-gradient(135deg, #003087, #0056b3);
           --border-light: #e0e0e0;
         }
@@ -225,7 +257,7 @@ function Home() {
           border-top: 5px solid var(--primary-blue);
           text-align: center;
         }
-        .plan-card:hover {
+        .plan-card:not(.placeholder-card):hover {
           transform: translateY(-5px);
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
@@ -262,7 +294,7 @@ function Home() {
             border-bottom: 1px solid var(--border-light);
         }
         .plan-card .plan-price {
-          font-size: 3.5rem; /* Maior destaque */
+          font-size: 3.5rem;
           font-weight: 800;
           color: var(--primary-blue);
           line-height: 1;
@@ -311,6 +343,26 @@ function Home() {
             font-size: 0.95rem;
             margin-bottom: 1rem;
         }
+        
+        /* Estilos Placeholder (Reaproveitados ou Ajustados para a Home) */
+        @keyframes pulse {
+            0% { background-position: -200px 0; }
+            100% { background-position: calc(200px + 100%) 0; }
+        }
+        .placeholder-glow {
+            background-color: #e9ecef;
+            background-image: linear-gradient(90deg, #e9ecef 0%, #f9f9f9 50%, #e9ecef 100%);
+            background-size: 200px 100%;
+            background-repeat: no-repeat;
+            animation: pulse 1.5s infinite linear;
+            border-radius: 6px;
+        }
+        .plan-card.placeholder-card {
+            background-color: #f7f7f7;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+
 
         /* Roadmap */
         .roadmap-section {
@@ -377,6 +429,21 @@ function Home() {
           gap: 1.5rem;
         }
 
+        /* Reviews */
+        .review-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            text-align: center;
+        }
+        .review-card .avatar svg {
+            font-size: 2rem;
+            color: var(--medium-gray);
+            margin-bottom: 0.5rem;
+        }
+
         /* Responsividade */
         @media (max-width: 1200px) {
           .plan-card {
@@ -425,7 +492,7 @@ function Home() {
             <div className="text-center text-lg-start col-lg-7 me-lg-4">
               <h1 className="fw-bold">A Nova Era da Gestão de Agendamentos</h1>
               <p className="lead">
-                Otimize sua agenda, reduza <strong>no-shows</strong> e liberte sua equipe. O <strong>VemAgendar</strong> é a ferramenta inteligente para o sucesso do seu negócio.
+                Otimize sua agenda, reduza **no-shows** e liberte sua equipe. O **VemAgendar** é a ferramenta inteligente para o sucesso do seu negócio.
               </p>
               <button
                 className="custom-btn-hero btn px-4 shadow-lg fw-semibold"
@@ -514,7 +581,7 @@ function Home() {
             </div>
 
           {loading ? (
-            <p className="fw-bold text-primary-blue">Carregando planos...</p>
+            <PlanCardPlaceholder count={3} />
           ) : (
             <div className="plan-row">
               {planos.map((plano: Plano, index: number) => (
@@ -541,7 +608,7 @@ function Home() {
                     )}
                     {plano.is_promo && (
                       <div className="discount">
-                        <BsPatchCheckFill className="me-2" style={{color: plano.cor}} /> Economize <strong>{plano.porcentagem_promo}%</strong>!
+                        <BsPatchCheckFill className="me-2" style={{color: plano.cor}} /> Economize **{plano.porcentagem_promo}%**!
                       </div>
                     )}
                   </div>
@@ -597,7 +664,6 @@ function Home() {
           </div>
         </section>
 
-        {/* 6. FOOTER */}
         <footer className="custom-footer text-center py-5">
           <div className="container">
             <h5 className="fw-bold mb-3">VemAgendar | Simplificando o futuro.</h5>

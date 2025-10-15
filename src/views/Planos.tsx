@@ -15,6 +15,39 @@ import {Plano} from "../interfaces/Plano.tsx";
 
 type CompanyType = 'servico' | 'locacao';
 
+const PlanCardPlaceholder = ({ count }: { count: number }) => {
+    const placeholders = Array.from({ length: count });
+
+    return (
+        <div className="plan-row">
+            {placeholders.map((_, index) => (
+                <div key={index} className="plan-card placeholder-card" style={{ cursor: 'default' }}>
+                    <div className="placeholder-glow mx-auto mb-3" style={{ height: '6px', width: '100%', borderRadius: '16px 16px 0 0' }}></div>
+
+                    <div className="placeholder-glow mx-auto mb-4 mt-2" style={{ height: '1.75rem', width: '60%' }}></div>
+
+                    <div className="price-group">
+                        <div className="placeholder-glow mx-auto" style={{ height: '3.25rem', width: '70%' }}></div>
+                        <div className="placeholder-glow mx-auto mt-2" style={{ height: '1rem', width: '30%' }}></div>
+                    </div>
+
+                    <ul style={{textAlign: 'left'}}>
+                        {[...Array(5)].map((_, i) => (
+                            <li key={i} className="mb-3 d-flex align-items-center">
+                                <div className="placeholder-glow me-3" style={{ height: '1rem', width: '1rem', borderRadius: '50%' }}></div>
+                                <div className="placeholder-glow" style={{ height: '0.8rem', width: `${50 + (i * 10)}%` }}></div>
+                            </li>
+                        ))}
+                    </ul>
+
+                    <div className="placeholder-glow custom-btn mt-auto" style={{ height: '3rem', width: '100%' }}></div>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+
 function Planos() {
   const navigate = useNavigate();
   const { data, loading } = useFetch<Plano[]>(`/api/planos`);
@@ -23,7 +56,6 @@ function Planos() {
   const [companyType, setCompanyType] = useState<CompanyType>('servico');
 
   useEffect(() => {
-    console.log("data", data);
     if (!loading && data) {
       // @ts-ignore
       const rawPlanos = Array.isArray(data) ? data : data.results;
@@ -40,6 +72,8 @@ function Planos() {
               capacityFeature = `Até ${count} locaç${count !== 1 ? "ões" : "ão"} ativa${count !== 1 ? "s" : ""}`;
           }
 
+          const planNameLower = plano.nome.toLowerCase();
+
           return {
             nome: plano.nome,
             valor: plano.valor,
@@ -54,9 +88,9 @@ function Planos() {
             features: [
               `Até ${plano.quantidade_empresas} empresa${plano.quantidade_empresas !== 1 ? "s" : ""}`,
               capacityFeature,
-              ...(plano.nome.toLowerCase() !== "free trial" ? ["Agendamento Online 24/7", "Lembretes Automáticos"] : ["Acesso Limitado por 7 dias"]),
-              ...(plano.nome.toLowerCase() === "plano profissional" || plano.nome.toLowerCase() === "plano corporativo" ? ["Relatórios Básicos"] : []),
-              ...(plano.nome.toLowerCase() === "plano corporativo" ? ["API de Integração", "Suporte VIP 24h"] : []),
+              ...(planNameLower !== "free trial" ? ["Agendamento Online 24/7", "Lembretes Automáticos"] : ["Acesso Limitado por 7 dias"]),
+              ...(planNameLower === "plano profissional" || planNameLower === "plano corporativo" ? ["Relatórios Básicos"] : []),
+              ...(planNameLower === "plano corporativo" ? ["API de Integração", "Suporte VIP 24h"] : []),
             ],
           };
         });
@@ -69,13 +103,13 @@ function Planos() {
   const getPlanColor = (nome: string) => {
     switch (nome.toLowerCase()) {
       case "free trial":
-        return "#6c757d"; // Cinza
+        return "#6c757d";
       case "plano básico":
-        return "#28a745"; // Verde (Bom)
+        return "#28a745";
       case "plano profissional":
-        return "#fd7e14"; // Laranja (Destaque/Popular)
+        return "#fd7e14";
       case "plano corporativo":
-        return "#003087"; // Azul Escuro (Premium)
+        return "#003087";
       default:
         return "#6c757d";
     }
@@ -92,12 +126,11 @@ function Planos() {
     <div className="min-vh-100">
       <style>
         {`
-          /* Cores Aprimoradas */
           :root {
             --primary-blue: #003087;
             --secondary-blue: #0056b3;
             --dark-gray: #2d3748;
-            --light-gray-bg: #f5f7fa; /* Fundo mais suave */
+            --light-gray-bg: #f5f7fa;
             --white: #ffffff;
             --accent-yellow: #f6c107;
             --danger-red: #dc3545;
@@ -122,7 +155,6 @@ function Planos() {
             margin: 0 auto 3rem;
           }
 
-          /* Cards de Plano - NOVO ESTILO */
           .plan-row {
             display: flex;
             flex-wrap: wrap;
@@ -145,7 +177,7 @@ function Planos() {
             overflow: hidden;
             text-align: center;
           }
-          .plan-card:hover {
+          .plan-card:not(.placeholder-card):hover {
             transform: translateY(-8px);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
           }
@@ -155,8 +187,8 @@ function Planos() {
             top: 0;
             left: 0;
             width: 100%;
-            height: 6px; /* Linha de destaque maior */
-            background-color: var(--primary-blue); /* Padrão, será sobrescrito inline */
+            height: 6px;
+            background-color: var(--primary-blue);
             border-radius: 16px 16px 0 0;
           }
           .plan-card.highlight {
@@ -189,9 +221,9 @@ function Planos() {
               border-bottom: 1px solid #f0f0f0;
           }
           .plan-card .plan-price {
-            font-size: 3.25rem; /* Maior destaque */
+            font-size: 3.25rem;
             font-weight: 900;
-            color: var(--primary-blue); /* Será sobrescrito inline */
+            color: var(--primary-blue);
             line-height: 1;
             display: block;
           }
@@ -228,7 +260,7 @@ function Planos() {
             font-size: 0.95rem;
           }
           .plan-card ul li svg {
-            color: #28a745; /* Cor para o ícone de check */
+            color: #28a745;
             margin-right: 0.75rem;
             margin-top: 3px;
             flex-shrink: 0;
@@ -260,7 +292,24 @@ function Planos() {
             transform: none;
           }
           
-          /* Seção de Pagamento */
+          @keyframes pulse {
+              0% { background-position: -200px 0; }
+              100% { background-position: calc(200px + 100%) 0; }
+          }
+          .placeholder-glow {
+              background-color: #e9ecef;
+              background-image: linear-gradient(90deg, #e9ecef 0%, #f9f9f9 50%, #e9ecef 100%);
+              background-size: 200px 100%;
+              background-repeat: no-repeat;
+              animation: pulse 1.5s infinite linear;
+              border-radius: 6px;
+          }
+          .plan-card.placeholder-card {
+            background-color: #f7f7f7;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+          }
+
           .payment-methods-section {
             padding: 2rem 0;
             border-top: 1px solid #e0e0e0;
@@ -275,7 +324,6 @@ function Planos() {
             opacity: 0.85;
           }
 
-          /* Tabela de Expiração */
           .expiration-table-section {
             padding: 2rem 0;
             border-top: 1px solid #e0e0e0;
@@ -283,12 +331,22 @@ function Planos() {
           }
           .expiration-table {
             border: 1px solid #e0e0e0;
+            width: 100%;
+            border-collapse: collapse;
+          }
+          .expiration-table th, .expiration-table td {
+            padding: 1rem;
+            border: 1px solid #e0eeef;
+            text-align: left;
           }
           .expiration-table th {
             background-color: var(--secondary-blue);
+            color: var(--white);
+            font-weight: 700;
           }
           .expiration-table .highlight {
             color: var(--danger-red);
+            font-weight: 600;
           }
           .expiration-table p.note .highlight {
             color: var(--primary-blue);
@@ -346,7 +404,7 @@ function Planos() {
 
 
           {loading ? (
-            <p className="fw-bold text-primary-blue">Carregando planos...</p>
+            <PlanCardPlaceholder count={4} />
           ): (
             <div className="plan-row">
               {planos.map((plano: Plano, index: number) => (

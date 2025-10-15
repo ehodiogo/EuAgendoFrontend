@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Agendamento } from "../interfaces/Agendamento";
+import {Empresa} from "../interfaces/Empresa.tsx";
+import {Agendamento} from "../interfaces/Agendamento.tsx";
+
 import { useFetch } from "../functions/GetData";
-import { Empresa } from "../interfaces/Empresa";
 import AgendamentoDados from "../components/AgendamentoDados";
 import FiltrosAgendamento from "../components/FiltrosAgendamentos";
 import { FaTableList, FaCalendarDays, FaSpinner, FaPlus } from "react-icons/fa6";
+
 
 interface AgendamentosHojeProps {
   empresa: Empresa;
@@ -12,6 +14,7 @@ interface AgendamentosHojeProps {
 
 export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
   const [visualizacao, setVisualizacao] = useState<"tabela" | "quadro">("tabela");
+
   const agendamentosHoje = useFetch<Agendamento[]>(
     `/api/agendamentos-hoje/?empresa_id=${empresa.id}`
   );
@@ -34,6 +37,15 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
             </div>
         );
     }
+
+    const [openHourStr] = empresa.horario_abertura_dia_semana.split(':');
+    const [closeHourStr] = empresa.horario_fechamento_dia_semana.split(':');
+
+    const startHour = parseInt(openHourStr, 10) || 8;
+    const endHour = parseInt(closeHourStr, 10) || 18;
+
+    const totalHours = endHour - startHour;
+    const hoursArray = Array.from({ length: totalHours + 1 }, (_, i) => startHour + i);
 
   return (
     <div className="agendamentos-view-wrapper">
@@ -152,7 +164,8 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
           padding-left: 70px; /* espaço à esquerda para labels das horas */
           padding-right: 1rem;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-          min-height: 24 * 120px; /* 24h x 120px (2px/min) */
+          /* ALTURA DINÂMICA: totalHours (ex: 10 horas) * 120px/h */
+          min-height: ${totalHours * HOUR_HEIGHT}px; 
           overflow-y: auto;
           margin-top: 1rem;
           border: 1px solid #e2e8f0;
@@ -351,22 +364,33 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
             </div>
           ) : (
             <div className="quadro-container">
-              {[...Array(24)].map((_, hour) => {
-                const horaLabel = hour.toString().padStart(2, "0") + ":00";
+              {hoursArray.map((hour, index) => {
+
+                if (index === hoursArray.length - 1) {
+                  const horaLabel = hour.toString().padStart(2, "0") + ":00";
+                  return (
+                    <div key={hour} className="hora-bloco" style={{ height: 0, borderBottom: 'none' }}>
+                       <div className="hora-label" style={{ top: '-10px' }}>{horaLabel}</div>
+                    </div>
+                  )
+                }
+
+                const currentHour = hour;
+                const horaLabel = currentHour.toString().padStart(2, "0") + ":00";
 
                 // @ts-ignore
                   const agendamentosHora = agendamentosHoje.data.filter(ag => {
-                    const [agHour] = ag.hora.split(":");
-                    return parseInt(agHour, 10) === hour;
+                    const [agHour] = ag.hora.split(":").map(Number);
+                    return agHour === currentHour;
                 });
 
                 return (
-                  <div key={hour} className="hora-bloco">
-                    {hour % 1 === 0 && <div className="hora-label">{horaLabel}</div>}
+                  <div key={currentHour} className="hora-bloco">
+                    <div className="hora-label">{horaLabel}</div>
 
                     {agendamentosHora.length > 0 &&
                       agendamentosHora.map(ag => {
-                        const [ , startMin] = ag.hora.split(":").map(Number);
+                        const [, startMin] = ag.hora.split(":").map(Number);
                         const duracao = Number(ag.duracao_servico);
                         const topOffsetPx = startMin * MINUTE_SCALE;
                         const alturaPx = duracao * MINUTE_SCALE;
@@ -379,6 +403,8 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
                             ? ""
                             : `com ${ag.funcionario_nome}`;
 
+                        const agendamentoColor = `hsl(${(ag.id * 5) % 360}, 50%, 45%)`;
+
                         return (
                           <div
                             key={ag.id}
@@ -386,7 +412,7 @@ export default function AgendamentosHoje({ empresa }: AgendamentosHojeProps) {
                             style={{
                               top: `${topOffsetPx}px`,
                               height: `${alturaPx}px`,
-                              backgroundColor: `hsl(${ag.id % 360}, 50%, 45%)`,
+                              backgroundColor: agendamentoColor,
                             }}
                           >
                             <div className="agendamento-dados-inline">
