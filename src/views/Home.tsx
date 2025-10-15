@@ -492,7 +492,7 @@ function Home() {
             <div className="text-center text-lg-start col-lg-7 me-lg-4">
               <h1 className="fw-bold">A Nova Era da Gestão de Agendamentos</h1>
               <p className="lead">
-                Otimize sua agenda, reduza **no-shows** e liberte sua equipe. O **VemAgendar** é a ferramenta inteligente para o sucesso do seu negócio.
+                Otimize sua agenda, reduza <strong>no-shows</strong> e liberte sua equipe. O <strong>VemAgendar</strong> é a ferramenta inteligente para o sucesso do seu negócio.
               </p>
               <button
                 className="custom-btn-hero btn px-4 shadow-lg fw-semibold"
@@ -500,7 +500,7 @@ function Home() {
               >
                 Começar a Organizar Agora
               </button>
-              <p className="mt-3 small text-white-50">Sem cartão de crédito. Teste grátis no plano Free Trial.</p>
+              <p className="mt-3 small text-white-50">Teste grátis no plano Free Trial.</p>
             </div>
             <div className="ms-lg-5 col-lg-4 mt-4 mt-lg-0 text-center">
               <img
