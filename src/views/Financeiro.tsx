@@ -27,9 +27,9 @@ const Financeiro = () => {
             <Navbar />
             <div className="financeiro-container container">
                 <h1><FaChartBar /> Seus Dados Financeiros</h1>
-                <div className="loading-container">
-                    <FaSpinner className="fa-spin text-primary" size={30} />
-                    <p className="text-muted mt-2">Carregando empresas...</p>
+                <div className="loading-container p-5 d-flex flex-column align-items-center justify-content-center">
+                    <FaSpinner className="fa-spin text-primary mb-3" size={40} />
+                    <p className="text-muted h5">Carregando empresas...</p>
                 </div>
             </div>
         </div>
@@ -50,6 +50,8 @@ const Financeiro = () => {
           --success-green: #28a745;
           --danger-red: #dc3545;
           --border-light: #e0e0e0;
+          --skeleton-light: #e2e5e7;
+          --skeleton-dark: #c9cdd1;
         }
 
         /* Estilos gerais */
@@ -88,7 +90,7 @@ const Financeiro = () => {
           cursor: pointer;
           transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
           border: 2px solid var(--border-light);
-          margin-bottom: 0; /* A margem fica na row/col */
+          margin-bottom: 0; 
           padding: 1.5rem;
           display: flex;
           justify-content: space-between;
@@ -139,14 +141,14 @@ const Financeiro = () => {
 
         /* Cartão de dropdown (Dados Financeiros) */
         .dropdown-wrapper {
-            margin-top: 0; /* Remove a margem extra */
+            margin-top: 0;
             margin-bottom: 1.5rem;
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.5s ease-in-out;
         }
         .dropdown-wrapper.open {
-            max-height: 2000px; /* Valor grande para simular altura automática com transição */
+            max-height: 2000px;
             transition: max-height 0.7s ease-in-out;
         }
         .dropdown-card {
@@ -170,22 +172,34 @@ const Financeiro = () => {
           font-weight: 500;
         }
 
-        /* Responsividade: Cards lado a lado em telas grandes */
-        @media (min-width: 992px) {
-            .empresa-grid-item {
-                /* Para que a div do card e do dropdown fiquem na mesma linha lógica */
-                grid-column: span 1; /* Card */
-            }
-            .empresa-full-width {
-                grid-column: 1 / -1; /* Dropdown de dados financeiros (ocupa a largura total) */
-            }
-
-            .empresa-list-grid {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr); /* 2 colunas */
-                gap: 1.5rem;
-            }
+        /* ------------------------------------- */
+        /* Estilos do Skeleton Loader (para uso no FinanceiroDados) */
+        .skeleton-line {
+            background-color: var(--skeleton-light);
+            animation: pulse 1.5s infinite ease-in-out;
+            border-radius: 4px;
+            height: 15px;
+            width: 100%;
         }
+        .skeleton-line.large {
+            height: 30px;
+            width: 60%;
+            margin: 0 auto;
+        }
+        .skeleton-box {
+            height: 120px;
+            background-color: var(--skeleton-light);
+            animation: pulse 1.5s infinite ease-in-out;
+            border-radius: 8px;
+        }
+        @keyframes pulse {
+            0% { background-color: var(--skeleton-light); }
+            50% { background-color: var(--skeleton-dark); }
+            100% { background-color: var(--skeleton-light); }
+        }
+        /* ------------------------------------- */
+
+        /* Responsividade */
         @media (max-width: 991px) {
             .financeiro-container {
                 padding: 2rem 1rem;
@@ -203,8 +217,10 @@ const Financeiro = () => {
           </p>
 
           {!empresas_usuario.data || empresas_usuario.data.length === 0 ? (
-            <div className="error-container alert alert-info text-center">
-              Nenhuma empresa encontrada para este usuário.
+            <div className="error-container p-5 alert alert-info text-center d-flex flex-column align-items-center justify-content-center" style={{minHeight: '250px'}}>
+              <FaBuilding size={40} className="mb-3 text-primary" />
+              <p className="h4 text-primary">Nenhuma empresa encontrada</p>
+              <p className="text-muted mb-0">Verifique se você está logado ou se as empresas foram cadastradas no seu perfil.</p>
             </div>
           ) : (
             <div className="row">
