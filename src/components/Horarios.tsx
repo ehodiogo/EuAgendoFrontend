@@ -56,6 +56,9 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
 
   const agendamentos = agendamentosResponse.data;
 
+  const menorDuracaoServico = servicos.length > 0 ? Math.min(...servicos.map((servico) => servico.duracao as number)) : 30;
+  const intervaloMinutos = menorDuracaoServico > 0 ? menorDuracaoServico : 30;
+
   const formatarDataBR = (dataIso: string): string => {
     const [ano, mes, dia] = dataIso.split('-');
     return `${dia}/${mes}/${ano}`;
@@ -65,9 +68,6 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
     const horarios: string[] = [];
     let [hora, minuto] = inicio.split(":").map(Number);
     const [horaFim, minutoFim] = fim.split(":").map(Number);
-    // Assegura que servicos não está vazio antes de calcular o Math.min
-    const menorDuracaoServico = servicos.length > 0 ? Math.min(...servicos.map((servico) => servico.duracao as number)) : 30;
-    const intervaloMinutos = menorDuracaoServico > 0 ? menorDuracaoServico : 30;
 
     while (hora < horaFim || (hora === horaFim && minuto < minutoFim)) {
       horarios.push(`${String(hora).padStart(2, "0")}:${String(minuto).padStart(2, "0")}`);
@@ -79,6 +79,25 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
     }
     return horarios;
   };
+
+  const getHorariosOcupados = (horarioInicial: string, duracaoServico: number) => {
+      const blocosNecessarios = Math.max(1, Math.ceil(duracaoServico / intervaloMinutos));
+      const ocupados: string[] = [];
+      let [hora, minuto] = horarioInicial.split(":").map(Number);
+
+      for (let i = 0; i < blocosNecessarios; i++) {
+          if (ocupados.length > 0) {
+              minuto += intervaloMinutos;
+              if (minuto >= 60) {
+                  minuto -= 60;
+                  hora++;
+              }
+          }
+          ocupados.push(`${String(hora).padStart(2, "0")}:${String(minuto).padStart(2, "0")}`);
+      }
+      return ocupados;
+  };
+
 
   const horariosDisponiveis: Record<string, string> = {};
   const intervaloAlmoco = empresa?.para_almoco && empresa?.horario_pausa_inicio && empresa?.horario_pausa_fim;
@@ -147,7 +166,9 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
     setIsSubmitting(true);
     setFormError(null);
 
-    if (!servicoSelecionado) {
+    const servico = servicos.find(s => s.nome === servicoSelecionado);
+
+    if (!servico) {
       setFormError("Por favor, selecione um serviço.");
       setIsSubmitting(false);
       return;
@@ -168,7 +189,27 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
       return;
     }
 
-    const servicoInfo = servicos.find(s => s.nome === servicoSelecionado);
+    const duracaoServicoSelecionado = servico.duracao;
+    if (duracaoServicoSelecionado > menorDuracaoServico) {
+        const horariosOcupados = getHorariosOcupados(horarioSelecionado!, duracaoServicoSelecionado);
+
+        const blocosSubsequentes = horariosOcupados.slice(1);
+
+        for (const bloco of blocosSubsequentes) {
+            const statusBloco = horariosDisponiveis[bloco];
+
+            if (statusBloco && statusBloco !== "Disponível") {
+                setFormError(`O serviço requer ${duracaoServicoSelecionado} minutos. O bloco de horário das ${bloco} já está ${normalizeString(statusBloco).replace(/-/g, ' ').toLowerCase()}. Por favor, selecione outro horário.`);
+                setIsSubmitting(false);
+                return;
+            }
+            if (!statusBloco) {
+                setFormError(`O serviço requer ${duracaoServicoSelecionado} minutos, o que ultrapassa o horário de funcionamento da empresa.`);
+                setIsSubmitting(false);
+                return;
+            }
+        }
+    }
 
     const agendamentoData = {
       id_funcionario: funcionario_id,
@@ -178,7 +219,7 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
       cliente_nome: clienteNome,
       cliente_email: clienteEmail,
       cliente_numero: clienteNumero,
-      duracao_minima: servicoInfo?.duracao || (servicos.length > 0 ? Math.min(...servicos.map((servico) => servico.duracao)) : 30),
+      duracao_minima: menorDuracaoServico,
       descricao: descricao,
     };
 
@@ -193,6 +234,12 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
 
       if (!response.ok) {
         const errorData = await response.json();
+
+        if (response.status === 400 && errorData.erro) {
+             setFormError(`Falha no agendamento: ${errorData.erro}`);
+             return;
+        }
+
         throw new Error(`Erro: ${errorData.detail || 'Falha na comunicação com a API.'}`);
       }
 
