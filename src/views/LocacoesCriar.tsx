@@ -82,7 +82,12 @@ const LocacaoForm: React.FC = () => {
         const item = acaoSelecionada === "cadastrar" ? novaLocacao : editLocacao!;
 
         if (!item.nome.trim()) return setFormError("O nome do item de locação é obrigatório."), false;
-        if (!item.duracao.trim() || !/^\d+$/.test(String(item.duracao))) return setFormError("A duração deve ser um número inteiro de minutos."), false;
+
+        const duracaoNum = Number(item.duracao);
+        if (!item.duracao.trim() || !Number.isInteger(duracaoNum) || duracaoNum < 15 || duracaoNum % 15 !== 0) {
+            return setFormError("A duração deve ser um número inteiro, múltiplo de 15 minutos (ex: 15, 30, 45, 60, etc.), e com valor mínimo de 15 minutos."), false;
+        }
+
         if (!item.preco || !/^\d+(\.\d{1,2})?$/.test(String(item.preco))) return setFormError("O preço deve ser um valor numérico válido (ex: 99.99)."), false;
     }
 
@@ -402,14 +407,16 @@ const LocacaoForm: React.FC = () => {
                       />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label">Duração em minutos</label>
+                      <label className="form-label">Duração em minutos - (De 15 em 15 minutos)</label>
                       <input
-                        type="text"
+                        type="number"
+                        min="15"
+                        step="15"
                         name="duracao"
                         className="form-control"
                         value={novaLocacao.duracao}
                         onChange={handleChange}
-                        placeholder="Ex: 60"
+                        placeholder="Ex: 15, 30, 45, 60"
                         required
                       />
                     </div>
@@ -478,13 +485,16 @@ const LocacaoForm: React.FC = () => {
                           />
                         </div>
                         <div className="mb-3">
-                          <label className="form-label">Duração Padrão</label>
+                          <label className="form-label">Duração em Minutos - (De 15 em 15 minutos)</label>
                           <input
-                            type="text"
+                            type="number"
+                            min="15"
+                            step="15"
                             name="duracao"
                             className="form-control"
                             value={editLocacao.duracao}
                             onChange={handleEditChange}
+                            placeholder="Ex: 15, 30, 45, 60"
                             required
                           />
                         </div>

@@ -96,20 +96,35 @@ const ServicoForm: React.FC = () => {
     }));
   };
 
+  const validateDuration = (duration: string) => {
+    const duracaoNum = Number(duration);
+    if (!duration.trim() || !Number.isInteger(duracaoNum) || duracaoNum < 15 || duracaoNum % 15 !== 0) {
+        return "A duração deve ser um número inteiro, múltiplo de 15 minutos (ex: 15, 30, 45, 60, etc.), e com valor mínimo de 15 minutos.";
+    }
+    return null;
+  };
+
   const validateForm = () => {
+    setFormError(null);
     if (!acaoSelecionada) return setFormError("Selecione uma ação."), false;
     if (!empresaSelecionada) return setFormError("Selecione uma empresa."), false;
+
     if (acaoSelecionada === "cadastrar") {
       if (!servico.nome.trim()) return setFormError("O nome do serviço é obrigatório."), false;
-      if (!servico.duracao || !/^\d+$/.test(servico.duracao)) return setFormError("A duração deve ser um número inteiro (minutos)."), false;
+      const durationError = validateDuration(servico.duracao);
+      if (durationError) return setFormError(durationError), false;
       if (!servico.preco || !/^\d+(\.\d{1,2})?$/.test(servico.preco)) return setFormError("O preço deve ser um valor numérico válido (ex: 99.99)."), false;
       if (!servico.funcionarios.length) return setFormError("Selecione ao menos um funcionário."), false;
     }
+
     if ((acaoSelecionada === "adicionar" || acaoSelecionada === "remover-funcionarios") && !servicoSelecionado) return setFormError("Selecione um serviço."), false;
+
     if (acaoSelecionada === "remover" && !servicoSelecionado) return setFormError("Selecione um serviço para remover."), false;
+
     if (acaoSelecionada === "editar" && editServico) {
       if (!editServico.nome.trim()) return setFormError("O nome do serviço é obrigatório."), false;
-      if (!editServico.duracao || !/^\d+$/.test(editServico.duracao)) return setFormError("A duração deve ser um número inteiro (minutos)."), false;
+      const durationError = validateDuration(editServico.duracao);
+      if (durationError) return setFormError(durationError), false;
       if (!editServico.preco || !/^\d+(\.\d{1,2})?$/.test(editServico.preco)) return setFormError("O preço deve ser um valor numérico válido (ex: 99.99)."), false;
     }
     return true;
@@ -145,18 +160,18 @@ const ServicoForm: React.FC = () => {
           servico_valor: servico.preco,
           empresa_id: empresaSelecionada,
         };
-        await axios.post(`${url}/api/adicionar-servicos-funcionario/`, payload, {
-          headers: { Authorization: `Token ${token}`, "Content-Type": "application/json" },
+        const { data } = await axios.post(`${url}/api/adicionar-servicos-funcionario/`, payload, {
+          headers: { "Content-Type": "application/json" },
         });
-        setFormSuccess("Serviço cadastrado com sucesso!");
+        setFormSuccess(data.mensagem || "Serviço cadastrado com sucesso!");
         setServico({ nome: "", descricao: "", duracao: "", preco: "", funcionarios: [] });
         setServicosEmpresa((prev) => [
           ...prev,
-          { id: Date.now(), nome: servico.nome, descricao: servico.descricao, duracao: servico.duracao, preco: servico.preco, funcionarios: servico.funcionarios },
+          { id: data.servico_id || Date.now(), nome: servico.nome, descricao: servico.descricao, duracao: servico.duracao, preco: servico.preco, funcionarios: servico.funcionarios },
         ]);
       } catch (error) {
         // @ts-ignore
-        setFormError(`Falha ao cadastrar serviço: ${error.message}`);
+        setFormError(`Falha ao cadastrar serviço: ${error.response?.data?.erro || error.message}`);
       } finally {
         setLoading(false);
       }
@@ -168,22 +183,22 @@ const ServicoForm: React.FC = () => {
           funcionarios: servico.funcionarios,
           servico_id: servicoSelecionado!.id,
         };
-        await axios.post(`${url}/api/adicionar-servico-funcionarios/`, payload, {
-          headers: { Authorization: `Token ${token}`, "Content-Type": "application/json" },
+        const { data } = await axios.post(`${url}/api/adicionar-servico-funcionarios/`, payload, {
+          headers: { "Content-Type": "application/json" },
         });
-        setFormSuccess("Serviço adicionado aos funcionários com sucesso!");
+        setFormSuccess(data.mensagem || "Serviço adicionado aos funcionários com sucesso!");
         setServico({ nome: "", descricao: "", duracao: "", preco: "", funcionarios: [] });
         setServicoSelecionado(null);
         setServicosEmpresa((prev) =>
           prev.map((s) =>
             s.id === servicoSelecionado!.id
-              ? { ...s, funcionarios: [...s.funcionarios, ...servico.funcionarios] }
+              ? { ...s, funcionarios: Array.from(new Set([...s.funcionarios, ...servico.funcionarios])) }
               : s
           )
         );
       } catch (error) {
         // @ts-ignore
-        setFormError(`Falha ao adicionar serviço aos funcionários: ${error.message}`);
+        setFormError(`Falha ao adicionar serviço aos funcionários: ${error.response?.data?.erro || error.message}`);
       } finally {
         setLoading(false);
       }
@@ -194,15 +209,15 @@ const ServicoForm: React.FC = () => {
           empresa_id: empresaSelecionada,
           servico_id: servicoSelecionado!.id,
         };
-        await axios.post(`${url}/api/remover-servico-empresa/`, payload, {
-          headers: { Authorization: `Token ${token}`, "Content-Type": "application/json" },
+        const { data } = await axios.post(`${url}/api/remover-servico-empresa/`, payload, {
+          headers: { "Content-Type": "application/json" },
         });
-        setFormSuccess("Serviço removido com sucesso!");
+        setFormSuccess(data.mensagem || "Serviço removido com sucesso!");
         setServicoSelecionado(null);
         setServicosEmpresa((prev) => prev.filter((s) => s.id !== servicoSelecionado!.id));
       } catch (error) {
         // @ts-ignore
-        setFormError(`Falha ao remover serviço: ${error.message}`);
+        setFormError(`Falha ao remover serviço: ${error.response?.data?.erro || error.message}`);
       } finally {
         setLoading(false);
       }
@@ -214,10 +229,10 @@ const ServicoForm: React.FC = () => {
           servico_id: servicoSelecionado!.id,
           funcionarios: servico.funcionarios,
         };
-        await axios.post(`${url}/api/remover-servicos-funcionario/`, payload, {
-          headers: { Authorization: `Token ${token}`, "Content-Type": "application/json" },
+        const { data } = await axios.post(`${url}/api/remover-servicos-funcionario/`, payload, {
+          headers: { "Content-Type": "application/json" },
         });
-        setFormSuccess("Serviço removido dos funcionários com sucesso!");
+        setFormSuccess(data.mensagem || "Serviço removido dos funcionários com sucesso!");
         setServico({ nome: "", descricao: "", duracao: "", preco: "", funcionarios: [] });
         setServicoSelecionado(null);
         setServicosEmpresa((prev) =>
@@ -229,7 +244,7 @@ const ServicoForm: React.FC = () => {
         );
       } catch (error) {
         // @ts-ignore
-        setFormError(`Falha ao remover serviço dos funcionários: ${error.message}`);
+        setFormError(`Falha ao remover serviço dos funcionários: ${error.response?.data?.erro || error.message}`);
       } finally {
         setLoading(false);
       }
@@ -243,10 +258,10 @@ const ServicoForm: React.FC = () => {
           servico_duracao: editServico.duracao,
           servico_preco: editServico.preco,
         };
-        await axios.post(`${url}/api/editar-servico/`, payload, {
-          headers: { Authorization: `Token ${token}`, "Content-Type": "application/json" },
+        const { data } = await axios.post(`${url}/api/editar-servico/`, payload, {
+          headers: { "Content-Type": "application/json" },
         });
-        setFormSuccess("Serviço editado com sucesso!");
+        setFormSuccess(data.mensagem || "Serviço editado com sucesso!");
         setEditServico(null);
         setServicoSelecionado(null);
         setServicosEmpresa((prev) =>
@@ -254,7 +269,7 @@ const ServicoForm: React.FC = () => {
         );
       } catch (error) {
         // @ts-ignore
-        setFormError(`Falha ao editar serviço: ${error.message}`);
+        setFormError(`Falha ao editar serviço: ${error.response?.data?.erro || error.message}`);
       } finally {
         setLoading(false);
       }
@@ -558,14 +573,16 @@ const ServicoForm: React.FC = () => {
                       />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label">Duração (minutos)</label>
+                      <label className="form-label">Duração em minutos - (De 15 em 15 minutos)</label>
                       <input
-                        type="text"
+                        type="number"
+                        min="15"
+                        step="15"
                         name="duracao"
                         className="form-control"
                         value={servico.duracao}
                         onChange={handleChange}
-                        placeholder="Ex: 30"
+                        placeholder="Ex: 15, 30, 45, 60"
                         required
                       />
                     </div>
@@ -736,14 +753,16 @@ const ServicoForm: React.FC = () => {
                           />
                         </div>
                         <div className="mb-3">
-                          <label className="form-label">Duração (minutos)</label>
+                          <label className="form-label">Duração em minutos - (De 15 em 15 minutos)</label>
                           <input
-                            type="text"
+                            type="number"
+                            min="15"
+                            step="15"
                             name="duracao"
                             className="form-control"
                             value={editServico.duracao}
                             onChange={handleEditChange}
-                            placeholder="Ex: 30"
+                            placeholder="Ex: 15, 30, 45, 60"
                             required
                           />
                         </div>
@@ -794,11 +813,19 @@ const ServicoForm: React.FC = () => {
                       </select>
                     </div>
                     {servicoSelecionado && (
-                      <button type="submit" className="btn btn-danger w-100" disabled={loading}>
-                        {loading ? <><FaSpinner className="fa-spin me-2" />Removendo...</> : "Remover Serviço"}
-                      </button>
+                        <p className="text-center text-danger fw-bold">
+                            Tem certeza que deseja remover **{servicoSelecionado.nome}**?
+                        </p>
                     )}
+                    <button type="submit" className="btn btn-danger w-100 mt-3" disabled={loading || !servicoSelecionado}>
+                      {loading ? <><FaSpinner className="fa-spin me-2" />Removendo...</> : "Remover Serviço"}
+                    </button>
                   </div>
+                )}
+                {(!acaoSelecionada || !empresaSelecionada) && (
+                    <div className="mt-4 p-3 border rounded text-center text-muted">
+                        <FaTools className="me-2" /> Selecione uma **Ação** e uma **Empresa** acima para gerenciar os serviços.
+                    </div>
                 )}
               </form>
             </div>
