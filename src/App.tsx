@@ -40,6 +40,7 @@ const ResetPassword = lazy(() => import("./views/ResetPassword"));
 const CancelarAgendamento = lazy(() => import("./views/CancelarAgendamento"));
 const ConfirmarConta = lazy(() => import("./views/ConfirmarConta"));
 const HistoricoCliente = lazy(()=> import('./views/HistoricoCliente'));
+const PontosCliente = lazy(()=>import('./views/PontosCliente'));
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const isAuthenticated = localStorage.getItem("access_token");
@@ -84,6 +85,7 @@ function App() {
       <Route path="/agendamentos" element={<h1>Agendamentos</h1>} />
       <Route path="/agendamento/:identificador/avaliar" element={<AvaliacaoAgendamento />} />
       <Route path="/cliente/:clienteIdentificador" element={<HistoricoCliente />} />
+      <Route path="/cliente/:identificador/pontos" element={<PontosCliente />} />
 
       <Route path="/login" element={<Login />} />
       <Route path="/cadastro" element={<Register />} />

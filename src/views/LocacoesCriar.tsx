@@ -4,9 +4,18 @@ import { Empresa } from "../interfaces/Empresa";
 import axios from "axios";
 import { useFetch } from "../functions/GetData";
 import Navbar from "../components/Navbar";
-import { FaTags, FaSpinner, FaExclamationTriangle, FaCheckCircle, FaClipboardList, FaTrash } from "react-icons/fa";
+import {
+    FaTags,
+    FaSpinner,
+    FaExclamationTriangle,
+    FaCheckCircle,
+    FaClipboardList,
+    FaTrash,
+    FaGift,
+    FaChevronDown,
+    FaChevronUp
+} from "react-icons/fa";
 import { InputMask } from "@react-input/mask";
-
 
 const LocacaoForm: React.FC = () => {
   const [acaoSelecionada, setAcaoSelecionada] = useState<string>("");
@@ -15,6 +24,8 @@ const LocacaoForm: React.FC = () => {
     descricao: "",
     duracao: "",
     preco: "",
+    pontos_gerados: "",
+    pontos_resgate: "",
   });
   const [editLocacao, setEditLocacao] = useState<Locacao | null>(null);
   const [empresaSelecionada, setEmpresaSelecionada] = useState<number | null>(null);
@@ -22,6 +33,7 @@ const LocacaoForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
+  const [isFidelidadeSectionOpen, setIsFidelidadeSectionOpen] = useState(false);
 
   const token = localStorage.getItem("access_token");
   const empresas = useFetch<Empresa[]>(`/api/empresas-usuario/?usuario_token=${token}`);
@@ -41,7 +53,14 @@ const LocacaoForm: React.FC = () => {
         const { data } = await axios.get(`${url}/api/locacoes-criadas-usuario-empresa/`, {
           params: { empresa_id: empresaSelecionada, usuario_token: token },
         });
-        setLocacoesEmpresa(Array.isArray(data.locacoes) ? data.locacoes : []);
+        const locacoesComFidelidade = Array.isArray(data.locacoes)
+          ? data.locacoes.map((loc: Locacao) => ({
+              ...loc,
+              pontos_gerados: loc.pontos_gerados ?? "",
+              pontos_resgate: loc.pontos_resgate ?? "",
+            }))
+          : [];
+        setLocacoesEmpresa(locacoesComFidelidade);
         setFormError(null);
       } catch (error) {
         // @ts-ignore
@@ -55,7 +74,18 @@ const LocacaoForm: React.FC = () => {
 
   useEffect(() => {
     if (acaoSelecionada === "editar" && locacaoSelecionada) {
-      setEditLocacao(locacaoSelecionada);
+        const precoLimpo = String(locacaoSelecionada.preco).replace(',', '.');
+        setEditLocacao({
+            ...locacaoSelecionada,
+            pontos_gerados: String(locacaoSelecionada.pontos_gerados ?? ""),
+            pontos_resgate: String(locacaoSelecionada.pontos_resgate ?? ""),
+            preco: precoLimpo,
+        });
+        if (locacaoSelecionada.pontos_gerados || locacaoSelecionada.pontos_resgate) {
+            setIsFidelidadeSectionOpen(true);
+        } else {
+            setIsFidelidadeSectionOpen(false);
+        }
     } else {
       setEditLocacao(null);
     }
@@ -73,28 +103,46 @@ const LocacaoForm: React.FC = () => {
     }
   };
 
+  const handleToggleFidelidadeSection = () => {
+      setIsFidelidadeSectionOpen(prev => !prev);
+  };
+
   const validateForm = () => {
-    setFormError(null);
-    if (!acaoSelecionada) return setFormError("Selecione uma ação."), false;
-    if (!empresaSelecionada) return setFormError("Selecione uma empresa."), false;
+        setFormError(null);
+        if (!acaoSelecionada) return setFormError("Selecione uma ação."), false;
+        if (!empresaSelecionada) return setFormError("Selecione uma empresa."), false;
 
-    if (acaoSelecionada === "cadastrar" || (acaoSelecionada === "editar" && editLocacao)) {
-        const item = acaoSelecionada === "cadastrar" ? novaLocacao : editLocacao!;
+        if (acaoSelecionada === "cadastrar" || (acaoSelecionada === "editar" && editLocacao)) {
+            const item = acaoSelecionada === "cadastrar" ? novaLocacao : editLocacao!;
 
-        if (!item.nome.trim()) return setFormError("O nome do item de locação é obrigatório."), false;
+            const nomeStr = String(item.nome);
+            if (!nomeStr.trim()) return setFormError("O nome do item de locação é obrigatório."), false;
 
-        const duracaoNum = Number(item.duracao);
-        if (!item.duracao.trim() || !Number.isInteger(duracaoNum) || duracaoNum < 15 || duracaoNum % 15 !== 0) {
-            return setFormError("A duração deve ser um número inteiro, múltiplo de 15 minutos (ex: 15, 30, 45, 60, etc.), e com valor mínimo de 15 minutos."), false;
+            const duracaoStr = String(item.duracao);
+            const duracaoNum = Number(duracaoStr);
+
+            if (!duracaoStr.trim() || !Number.isInteger(duracaoNum) || duracaoNum < 15 || duracaoNum % 15 !== 0) {
+                return setFormError("A duração deve ser um número inteiro, múltiplo de 15 minutos (ex: 15, 30, 45, 60, etc.), e com valor mínimo de 15 minutos."), false;
+            }
+
+            const precoStr = String(item.preco).replace(',', '.');
+            if (!precoStr || !/^\d+(\.\d{1,2})?$/.test(precoStr)) return setFormError("O preço deve ser um valor numérico válido (ex: 99.99)."), false;
+
+            const pontosGeradosNum = Number(item.pontos_gerados);
+            const pontosResgateNum = Number(item.pontos_resgate);
+
+            if (item.pontos_gerados && (!Number.isInteger(pontosGeradosNum) || pontosGeradosNum < 0)) {
+                return setFormError("Os 'Pontos Gerados' devem ser um número inteiro não negativo (ou deixe em branco)."), false;
+            }
+            if (item.pontos_resgate && (!Number.isInteger(pontosResgateNum) || pontosResgateNum < 0)) {
+                return setFormError("Os 'Pontos para Resgate' devem ser um número inteiro não negativo (ou deixe em branco)."), false;
+            }
         }
 
-        if (!item.preco || !/^\d+(\.\d{1,2})?$/.test(String(item.preco))) return setFormError("O preço deve ser um valor numérico válido (ex: 99.99)."), false;
-    }
+        if ((acaoSelecionada === "remover" || acaoSelecionada === "editar") && !locacaoSelecionada) return setFormError("Selecione um item de locação."), false;
 
-    if ((acaoSelecionada === "remover" || acaoSelecionada === "editar") && !locacaoSelecionada) return setFormError("Selecione um item de locação."), false;
-
-    return true;
-  };
+        return true;
+    };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,27 +165,39 @@ const LocacaoForm: React.FC = () => {
 
     try {
         let endpoint = "";
-        let payload: any = { usuario_token: token };
+        let payload : Record<string, string | number | null | undefined> = { usuario_token: token };
 
         if (acaoSelecionada === "cadastrar") {
             endpoint = "/api/cadastrar-locacao/";
+
+            const pontosGerados = isFidelidadeSectionOpen && novaLocacao.pontos_gerados ? Number(novaLocacao.pontos_gerados) : null;
+            const pontosResgate = isFidelidadeSectionOpen && novaLocacao.pontos_resgate ? Number(novaLocacao.pontos_resgate) : null;
+
             payload = {
                 ...payload,
                 locacao_nome: novaLocacao.nome,
                 locacao_descricao: novaLocacao.descricao,
-                locacao_duracao: novaLocacao.duracao,
-                locacao_preco: novaLocacao.preco,
+                locacao_duracao: Number(novaLocacao.duracao),
+                locacao_preco: Number(novaLocacao.preco),
                 empresa_id: empresaSelecionada,
+                locacao_pontos_gerados: pontosGerados,
+                locacao_pontos_resgate: pontosResgate,
             };
         } else if (acaoSelecionada === "editar" && editLocacao) {
             endpoint = "/api/editar-locacao/";
+
+            const pontosGerados = isFidelidadeSectionOpen && editLocacao.pontos_gerados ? Number(editLocacao.pontos_gerados) : null;
+            const pontosResgate = isFidelidadeSectionOpen && editLocacao.pontos_resgate ? Number(editLocacao.pontos_resgate) : null;
+
             payload = {
                 ...payload,
                 locacao_id: editLocacao.id,
                 locacao_nome: editLocacao.nome,
                 locacao_descricao: editLocacao.descricao,
-                locacao_duracao: editLocacao.duracao,
-                locacao_preco: editLocacao.preco,
+                locacao_duracao: Number(editLocacao.duracao),
+                locacao_preco: Number(editLocacao.preco),
+                locacao_pontos_gerados: pontosGerados,
+                locacao_pontos_resgate: pontosResgate,
             };
         } else if (acaoSelecionada === "remover" && locacaoSelecionada) {
             endpoint = "/api/remover-locacao/";
@@ -156,16 +216,31 @@ const LocacaoForm: React.FC = () => {
         setFormSuccess(data.mensagem || "Operação realizada com sucesso!");
 
         if (acaoSelecionada === "cadastrar") {
-            setNovaLocacao({ nome: "", descricao: "", duracao: "", preco: "" });
+            setNovaLocacao({ nome: "", descricao: "", duracao: "", preco: "", pontos_gerados: "", pontos_resgate: "" });
+            setIsFidelidadeSectionOpen(false);
+
             setLocacoesEmpresa((prev) => [
                 ...prev,
-                { id: data.id || Date.now(), ...novaLocacao },
+                {
+                    id: data.id || Date.now(),
+                    ...novaLocacao,
+                    pontos_gerados: payload.locacao_pontos_gerados || "",
+                    pontos_resgate: payload.locacao_pontos_resgate || "",
+                },
             ]);
         } else if (acaoSelecionada === "editar" && editLocacao) {
+            const locacaoAtualizada = {
+                ...editLocacao,
+                pontos_gerados: payload.locacao_pontos_gerados || "",
+                pontos_resgate: payload.locacao_pontos_resgate || "",
+            };
+
             setEditLocacao(null);
             setLocacaoSelecionada(null);
+            setIsFidelidadeSectionOpen(false);
+
             setLocacoesEmpresa((prev) =>
-                prev.map((l) => (l.id === editLocacao.id ? editLocacao : l))
+                prev.map((l) => (l.id === locacaoAtualizada.id ? locacaoAtualizada : l))
             );
         } else if (acaoSelecionada === "remover") {
             setLocacaoSelecionada(null);
@@ -201,7 +276,7 @@ const LocacaoForm: React.FC = () => {
     <>
       <Navbar />
       <div className="servico-form-container">
-        <style>{`
+        <style>{`          
           /* Paleta de cores */
           :root {
             --primary-blue: #003087;
@@ -212,12 +287,43 @@ const LocacaoForm: React.FC = () => {
             --pastel-green: #b8e2c8;
             --pastel-red: #f4c7c3;
             --warning-orange: #fd7e14;
-            --accent-purple: #8e44ad; /* Nova cor para locação */
+            --accent-purple: #8e44ad;
+            --config-fidelidade: #3498db; 
           }
 
+          .btn-config-fidelidade {
+            background-color: var(--config-fidelidade);
+            border-color: var(--config-fidelidade);
+            color: var(--white);
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
+          }
+          .btn-config-fidelidade:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+            transform: translateY(-1px);
+          }
+          
+          .fidelidade-section {
+              border: 1px dashed var(--config-fidelidade);
+              padding: 1rem;
+              border-radius: 8px;
+              margin-top: 1rem;
+          }
+          
           /* Título - Ajustado para Locação */
           .servico-title {
-            color: var(--accent-purple); /* Usando um tom diferente para Locação */
+            color: var(--accent-purple); 
             font-size: 1.75rem;
             font-weight: 700;
             text-align: center;
@@ -227,26 +333,7 @@ const LocacaoForm: React.FC = () => {
             justify-content: center;
             gap: 0.5rem;
           }
-          .servico-form .form-label {
-            color: var(--accent-purple);
-            font-weight: 600;
-            font-size: 1rem;
-          }
-          .servico-form .btn-primary {
-            background-color: var(--accent-purple);
-            border-color: var(--accent-purple);
-            font-weight: 600;
-            padding: 0.75rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-          }
-          .servico-form .btn-primary:hover {
-            background-color: #9b59b6;
-            border-color: #9b59b6;
-            transform: translateY(-2px);
-          }
-          
-          /* O resto dos estilos é reutilizado do original */
+          /* ... o resto dos estilos reutilizados ... */
           .servico-form-container {
             background-color: var(--light-gray);
             padding: 3rem 1rem;
@@ -317,6 +404,7 @@ const LocacaoForm: React.FC = () => {
             font-size: 1rem;
             color: var(--dark-gray);
           }
+
         `}</style>
         <div className="servico-form-container">
           {formSuccess && (
@@ -345,9 +433,10 @@ const LocacaoForm: React.FC = () => {
                     className="form-select"
                     onChange={(e) => {
                       setAcaoSelecionada(e.target.value);
-                      setNovaLocacao({ nome: "", descricao: "", duracao: "", preco: "" });
+                      setNovaLocacao({ nome: "", descricao: "", duracao: "", preco: "", pontos_gerados: "", pontos_resgate: "" });
                       setLocacaoSelecionada(null);
                       setEditLocacao(null);
+                      setIsFidelidadeSectionOpen(false);
                     }}
                     value={acaoSelecionada}
                     required
@@ -367,6 +456,7 @@ const LocacaoForm: React.FC = () => {
                       setEmpresaSelecionada(Number(e.target.value) || null);
                       setLocacaoSelecionada(null);
                       setEditLocacao(null);
+                      setIsFidelidadeSectionOpen(false);
                     }}
                     value={empresaSelecionada || ""}
                     required
@@ -379,6 +469,22 @@ const LocacaoForm: React.FC = () => {
                     ))}
                   </select>
                 </div>
+
+                {acaoSelecionada === "cadastrar" && empresaSelecionada && (
+                    <div className="mb-4">
+                        <hr />
+                        <button
+                            type="button"
+                            className="btn btn-config-fidelidade"
+                            onClick={handleToggleFidelidadeSection}
+                        >
+                            <FaGift className="me-2" />
+                            {isFidelidadeSectionOpen ? "Ocultar Configurações de Fidelidade" : "Configurar Fidelidade (Opcional)"}
+                            {isFidelidadeSectionOpen ? <FaChevronUp /> : <FaChevronDown />}
+                        </button>
+                    </div>
+                )}
+
 
                 {acaoSelecionada === "cadastrar" && empresaSelecionada && (
                   <div className="mt-4">
@@ -433,6 +539,41 @@ const LocacaoForm: React.FC = () => {
                         required
                       />
                     </div>
+
+                    {isFidelidadeSectionOpen && (
+                        <div className="fidelidade-section">
+                            <h4 className="servico-title mb-3" style={{ fontSize: '1.25rem', color: 'var(--config-fidelidade)' }}>
+                                <FaGift className="me-2" /> Configurações de Pontos
+                            </h4>
+                            <div className="mb-3">
+                                <label className="form-label">Pontos Gerados (Ao ser locado)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    name="pontos_gerados"
+                                    className="form-control"
+                                    value={novaLocacao.pontos_gerados}
+                                    onChange={handleChange}
+                                    placeholder="Ex: 50 (Deixe em branco para não gerar)"
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label">Pontos para Resgate (Necessário para locar com pontos)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    name="pontos_resgate"
+                                    className="form-control"
+                                    value={novaLocacao.pontos_resgate}
+                                    onChange={handleChange}
+                                    placeholder="Ex: 500 (Deixe em branco para não permitir resgate)"
+                                />
+                            </div>
+                        </div>
+                    )}
+
                     <button type="submit" className="btn btn-primary w-100 mt-3" disabled={loading}>
                       {loading ? <><FaSpinner className="fa-spin me-2" />Cadastrando...</> : "Cadastrar Item de Locação"}
                     </button>
@@ -461,6 +602,22 @@ const LocacaoForm: React.FC = () => {
                         ))}
                       </select>
                     </div>
+
+                    {locacaoSelecionada && (
+                        <div className="mb-4">
+                            <hr />
+                            <button
+                                type="button"
+                                className="btn btn-config-fidelidade"
+                                onClick={handleToggleFidelidadeSection}
+                            >
+                                <FaGift className="me-2" />
+                                {isFidelidadeSectionOpen ? "Ocultar Configurações de Fidelidade" : "Configurar Fidelidade (Opcional)"}
+                                {isFidelidadeSectionOpen ? <FaChevronUp /> : <FaChevronDown />}
+                            </button>
+                        </div>
+                    )}
+
                     {editLocacao && (
                       <>
                         <div className="mb-3">
@@ -510,7 +667,43 @@ const LocacaoForm: React.FC = () => {
                             required
                           />
                         </div>
-                        <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+
+                        {/* SEÇÃO DE FIDELIDADE (SÓ APARECE AO CLICAR NO BOTÃO) - EDIÇÃO */}
+                        {isFidelidadeSectionOpen && (
+                            <div className="fidelidade-section">
+                                <h4 className="servico-title mb-3" style={{ fontSize: '1.25rem', color: 'var(--config-fidelidade)' }}>
+                                    <FaGift className="me-2" /> Configurações de Pontos
+                                </h4>
+                                <div className="mb-3">
+                                    <label className="form-label">Pontos Gerados (Ao ser locado)</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="1"
+                                        name="pontos_gerados"
+                                        className="form-control"
+                                        value={editLocacao.pontos_gerados}
+                                        onChange={handleEditChange}
+                                        placeholder="Ex: 50 (Deixe em branco para não gerar)"
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Pontos para Resgate (Necessário para locar com pontos)</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="1"
+                                        name="pontos_resgate"
+                                        className="form-control"
+                                        value={editLocacao.pontos_resgate}
+                                        onChange={handleEditChange}
+                                        placeholder="Ex: 500 (Deixe em branco para não permitir resgate)"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        <button type="submit" className="btn btn-primary w-100 mt-3" disabled={loading}>
                           {loading ? <><FaSpinner className="fa-spin me-2" />Editando...</> : "Salvar Edição"}
                         </button>
                       </>
@@ -531,6 +724,7 @@ const LocacaoForm: React.FC = () => {
                         onChange={(e) => {
                           const locacaoId = Number(e.target.value);
                           setLocacaoSelecionada(locacoesEmpresa.find((l) => l.id === locacaoId) || null);
+                          setIsFidelidadeSectionOpen(false);
                         }}
                         value={locacaoSelecionada?.id || ""}
                         required
