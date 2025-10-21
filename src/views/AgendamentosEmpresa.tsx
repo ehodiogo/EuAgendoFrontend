@@ -228,7 +228,6 @@ const EmpresasUsuario = () => {
                   <tr>
                     <th></th>
                     <th>Nome da Empresa</th>
-                    <th>CNPJ</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -243,7 +242,6 @@ const EmpresasUsuario = () => {
                           />
                         </td>
                         <td>{empresa.nome}</td>
-                        <td>{empresa.cnpj}</td>
                       </tr>
                       {dropdownAberto === empresa.id && (
                         <tr>

@@ -5,23 +5,17 @@ import { Empresa } from "../interfaces/Empresa";
 import {Locacao} from "../interfaces/Locacao.tsx";
 import Navbar from "../components/Navbar";
 import FilterModal from "../components/FilterModal";
-import { FaSearch, FaSpinner, FaExclamationCircle, FaFilter, FaMapMarkerAlt, FaPhoneAlt, FaDollarSign, FaBuilding, FaTags } from "react-icons/fa";
+import { FaSearch, FaExclamationCircle, FaFilter, FaMapMarkerAlt, FaPhoneAlt, FaDollarSign, FaBuilding, FaTags } from "react-icons/fa";
 import RatingStars from "../components/RatingStars";
 
-// =================================================================
-// 1. COMPONENTE AUXILIAR: Skeleton Loader
-// =================================================================
 const EmpresaCardSkeleton: React.FC = () => (
     <div className="col-lg-4 col-md-6 mb-4">
         <div className="card">
-            {/* Imagem/Logo */}
             <div className="card-img-container skeleton skeleton-logo"></div>
             <div className="card-body">
-                {/* Título da Empresa */}
                 <div className="skeleton skeleton-line-long" style={{ height: '1.8rem', marginBottom: '1rem' }}></div>
 
                 <div className="card-details">
-                    {/* Linha de Avaliação */}
                     <div className="d-flex align-items-center mb-3">
                         <div className="skeleton-circle"></div>
                         <div className="skeleton-circle"></div>
@@ -31,28 +25,21 @@ const EmpresaCardSkeleton: React.FC = () => (
                         <div className="skeleton skeleton-line-short" style={{ width: '30%', marginLeft: '1rem' }}></div>
                     </div>
 
-                    {/* Linhas de Detalhes */}
                     <div className="skeleton skeleton-line-medium"></div>
                     <div className="skeleton skeleton-line-long"></div>
                     <div className="skeleton skeleton-line-medium"></div>
                 </div>
 
-                {/* Lista de Serviços/Locações */}
                 <div className="skeleton skeleton-line-short" style={{ width: '40%', marginTop: '1rem' }}></div>
                 <div className="skeleton skeleton-line-long" style={{ width: '85%' }}></div>
                 <div className="skeleton skeleton-line-medium"></div>
 
-                {/* Botão */}
                 <div className="skeleton" style={{ height: '3.3rem', marginTop: 'auto' }}></div>
             </div>
         </div>
     </div>
 );
 
-
-// =================================================================
-// COMPONENTES AUXILIARES EXISTENTES
-// =================================================================
 interface Servico {
   nome: string;
   preco: number;
@@ -103,10 +90,6 @@ const ListaLocacoes: React.FC<{ locacoes?: Locacao[] }> = ({ locacoes }) => (
     </div>
 );
 
-
-// =================================================================
-// COMPONENTE PRINCIPAL: EmpresasSearch
-// =================================================================
 function EmpresasSearch() {
   const [search, setSearch] = useState("");
   const [cidade, setCidade] = useState("");
@@ -709,7 +692,7 @@ function EmpresasSearch() {
                       )}
 
                       <Link
-                        to={`/empresas/${empresa.nome}`}
+                        to={`/empresas/${empresa.slug}`}
                         className="btn btn-success"
                       >
                         Ver Detalhes e Agendar

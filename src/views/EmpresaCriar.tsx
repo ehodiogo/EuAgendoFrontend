@@ -17,7 +17,6 @@ const EmpresaForm: React.FC = () => {
 
   const [empresa, setEmpresa] = useState<EmpresaCreate>({
     nome: "",
-    cnpj: "",
     tipo: "",
     endereco: "",
     bairro: "",
@@ -51,7 +50,6 @@ const EmpresaForm: React.FC = () => {
       if (selectedEmpresa) {
         setEmpresa({
           nome: selectedEmpresa.nome || "",
-          cnpj: selectedEmpresa.cnpj || "",
           tipo:  selectedEmpresa.tipo || "",
           endereco: selectedEmpresa.endereco || "",
           bairro: selectedEmpresa.bairro || "",
@@ -109,7 +107,6 @@ const EmpresaForm: React.FC = () => {
     }
     if (acaoSelecionada === "cadastrar" || acaoSelecionada === "editar") {
       if (!empresa.nome.trim()) return setFormError("O nome da empresa é obrigatório."), false;
-      if (!empresa.cnpj || !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(empresa.cnpj)) return setFormError("CNPJ inválido."), false;
       if (!empresa.tipo.trim()) return setFormError("O tipo de empresa é obrigatório."), false;
       if (!empresa.endereco.trim()) return setFormError("O endereço é obrigatório."), false;
       if (!empresa.bairro.trim()) return setFormError("O bairro é obrigatório."), false;
@@ -172,7 +169,6 @@ const EmpresaForm: React.FC = () => {
 
         const requiredFields = [
           "nome",
-          "cnpj",
           "tipo",
           "endereco",
           "bairro",
@@ -203,7 +199,6 @@ const EmpresaForm: React.FC = () => {
         setEmpresaCriada(true);
         setEmpresa({
           nome: "",
-          cnpj: "",
           tipo: "",
           endereco: "",
           bairro: "",
@@ -245,7 +240,6 @@ const EmpresaForm: React.FC = () => {
 
         const requiredFields = [
           "nome",
-          "cnpj",
           "tipo",
           "endereco",
           "bairro",
@@ -572,18 +566,6 @@ const EmpresaForm: React.FC = () => {
                       />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label">CNPJ</label>
-                      <InputMask
-                        mask="99.999.999/9999-99"
-                        value={empresa.cnpj}
-                        onChange={handleChange}
-                        placeholder="00.000.000/0000-00"
-                        name="cnpj"
-                        className="form-control"
-                        required
-                      />
-                    </div>
-                    <div className="mb-3">
                       <label className="form-label">Tipo de Empresa</label>
                       <div className="form-check">
                         <input
@@ -852,18 +834,6 @@ const EmpresaForm: React.FC = () => {
                             value={empresa.nome}
                             onChange={handleChange}
                             placeholder="Ex: Minha Empresa"
-                            required
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <label className="form-label">CNPJ</label>
-                          <InputMask
-                            mask="99.999.999/9999-99"
-                            value={empresa.cnpj}
-                            onChange={handleChange}
-                            placeholder="00.000.000/0000-00"
-                            name="cnpj"
-                            className="form-control"
                             required
                           />
                         </div>

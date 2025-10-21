@@ -237,7 +237,6 @@ const Financeiro = () => {
                                         <FaBuilding className="card-icon" />
                                         <div>
                                             <h4 className="card-title">{empresa.nome}</h4>
-                                            <p className="card-text">CNPJ: {empresa.cnpj}</p>
                                         </div>
                                     </div>
                                     <FaChevronDown className={`toggle-icon ${isOpen ? 'open' : ''}`} />

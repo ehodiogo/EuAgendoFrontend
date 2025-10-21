@@ -10,7 +10,7 @@ interface Servico {
 export interface Empresa {
   id: number;
   nome: string;
-  cnpj: string;
+  slug: string;
 
   tipo:  string;
 
@@ -50,7 +50,6 @@ export interface Empresa {
 
 export interface EmpresaCreate {
   nome: string;
-  cnpj: string;
 
   tipo:  string;
 

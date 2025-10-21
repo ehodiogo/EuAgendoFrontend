@@ -369,7 +369,6 @@ function Dashboard() {
                     <div className="card-header-content">
                         <div>
                             <h4 className="card-title">{empresa.nome}</h4>
-                            <p className="card-text">CNPJ: {empresa.cnpj}</p>
                         </div>
                         <span className="toggle-icon">
                             {dropdownAberto === empresa.id ? <FaChevronUp /> : <FaChevronDown />}

@@ -4,9 +4,21 @@ import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import { Agendamento } from "../interfaces/Agendamento";
 import Navbar from "../components/Navbar";
-import { FaSpinner, FaQrcode, FaBuilding, FaCalendarDay, FaClock, FaUser, FaToolbox, FaArrowRightToBracket } from "react-icons/fa6";
+import {
+    FaSpinner,
+    FaQrcode,
+    FaBuilding,
+    FaCalendarDay,
+    FaClock,
+    FaUser,
+    FaToolbox,
+    FaArrowRightToBracket,
+    FaStar, // Ícone para pontos
+    FaGift, // Ícone para resgate
+    FaMoneyBillWave // Novo ícone para resgate com pontos
+} from "react-icons/fa6";
 import { QRCodeCanvas } from "qrcode.react";
-import {FaExclamationCircle} from "react-icons/fa";
+import { FaExclamationCircle } from "react-icons/fa";
 
 function CheckInEmpresa() {
   const { empresaId } = useParams<{ empresaId: string }>();
@@ -16,6 +28,8 @@ function CheckInEmpresa() {
   const [showQRCode, setShowQRCode] = useState<number | null>(null);
   const [filterType, setFilterType] = useState<"today" | "pending">("pending");
   const [isCheckingIn, setIsCheckingIn] = useState<number | null>(null);
+  // NOVO ESTADO: Para gerenciar o carregamento/status do resgate
+  const [isRedeeming, setIsRedeeming] = useState<number | null>(null);
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -36,13 +50,13 @@ function CheckInEmpresa() {
   const handleCheckIn = async (agendamentoIdentificador: string, agendamentoId: number) => {
     setIsCheckingIn(agendamentoId);
     setShowQRCode(null);
+    setIsRedeeming(null); // Garante que o estado de resgate é resetado
 
     const baseUrl = import.meta.env.VITE_API_URL;
     const endpointPath = `/api/agendamento-avaliar/${agendamentoIdentificador}/marcar-compareceu/`;
     const checkinUrl = `${baseUrl}${endpointPath}`;
 
     try {
-      console.log(`Iniciando check-in para o identificador ${agendamentoIdentificador} na URL: ${checkinUrl}`);
 
       const response = await fetch(checkinUrl, {
         method: "POST",
@@ -74,6 +88,50 @@ function CheckInEmpresa() {
     }
   };
 
+  const handleResgatarPontos = async (agendamentoIdentificador: string, agendamentoId: number) => {
+    if (!window.confirm("Tem certeza que deseja aplicar o resgate de pontos para este agendamento?")) {
+        return;
+    }
+
+    setIsRedeeming(agendamentoId);
+    setShowQRCode(null);
+    setIsCheckingIn(null);
+
+    const baseUrl = import.meta.env.VITE_API_URL;
+    const endpointPath = `/api/agendamento-avaliar/${agendamentoIdentificador}/marcar-resgatado/`;
+    const redeemUrl = `${baseUrl}${endpointPath}`;
+
+    try {
+      const response = await fetch(redeemUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Resgate Response:", data.message);
+
+        alert("Resgate de pontos aplicado com sucesso! Atualizando lista...");
+
+        window.location.reload();
+
+      } else {
+        const errorData = await response.json();
+        console.error("Erro no resgate:", errorData);
+        alert(`Erro ao resgatar pontos: ${errorData.message || response.statusText}`);
+      }
+
+    } catch (error) {
+      console.error("Erro de Rede/Fetch:", error);
+      alert(`Erro inesperado ao resgatar pontos para o identificador ${agendamentoIdentificador}.`);
+    } finally {
+      setIsRedeeming(null);
+    }
+  };
+
   return (
     <div className="min-vh-100">
       <style>{`
@@ -87,6 +145,7 @@ function CheckInEmpresa() {
           --success-green: #28a745;
           --danger-red: #dc3545;
           --warning-orange: #fd7e14;
+          --info-blue: #17a2b8; /* Adicionado para destaque de pontos */
           --gradient-blue: linear-gradient(135deg, #003087, #0056b3);
           --border-light: #e0e0e0;
         }
@@ -218,13 +277,59 @@ function CheckInEmpresa() {
             color: var(--accent-blue);
         }
 
+        /* Estilo para o alerta de pontos */
+        .resgate-alert {
+            background-color: #e6f7ff; /* Fundo azul claro */
+            border: 1px solid var(--info-blue);
+            color: var(--info-blue);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-weight: 600;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .resgate-alert.success {
+            background-color: #e6ffed; /* Fundo verde claro */
+            border-color: var(--success-green);
+            color: var(--success-green);
+        }
+        .resgate-alert.fail {
+            background-color: #fff0f0; /* Fundo vermelho claro */
+            border-color: var(--danger-red);
+            color: var(--danger-red);
+        }
+
         /* Ações e QR Code */
         .agendamento-actions {
             margin-top: 1rem;
             padding-top: 1rem;
             border-top: 1px dashed var(--border-light);
             text-align: center;
+            display: flex; /* Adicionado para melhor layout dos botões */
+            flex-wrap: wrap;
+            justify-content: center;
         }
+
+        /* Estilo para o botão de Resgate de Pontos */
+        .agendamento-card .btn-redeem {
+            background-color: var(--info-blue); /* Cor de destaque para pontos */
+            border-color: var(--info-blue);
+            padding: 0.8rem 1.5rem;
+            font-weight: 700;
+            border-radius: 8px;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+            color: var(--white);
+        }
+        .agendamento-card .btn-redeem:hover {
+            background-color: #117a8b; /* Tom mais escuro de info-blue */
+            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.4);
+        }
+
         .agendamento-card .btn-checkin {
           background-color: var(--success-green);
           border-color: var(--success-green);
@@ -233,6 +338,7 @@ function CheckInEmpresa() {
           border-radius: 8px;
           margin: 0.5rem;
           transition: all 0.3s ease;
+          color: var(--white);
         }
         .agendamento-card .btn-checkin:hover {
           background-color: #218838;
@@ -245,6 +351,7 @@ function CheckInEmpresa() {
           font-weight: 600;
           border-radius: 8px;
           margin: 0.5rem;
+          color: var(--white);
         }
         .agendamento-card .btn-qrcode:hover {
           background-color: var(--accent-blue);
@@ -305,7 +412,7 @@ function CheckInEmpresa() {
                   Gerencie os agendamentos pendentes da sua empresa com facilidade.
                 </p>
                 <p className="empresa-info">
-                  {empresa.data?.cnpj} | {empresa.data?.cidade}, {empresa.data?.estado}
+                  {empresa.data?.cidade}, {empresa.data?.estado}
                 </p>
               </>
             )}
@@ -341,81 +448,137 @@ function CheckInEmpresa() {
           ) : filteredAgendamentos && filteredAgendamentos.length > 0 ? (
 
             <div className="row justify-content-center">
-              {filteredAgendamentos.map((agendamento) => (
-                <div
-                  className="col-12 col-md-6 col-lg-4 d-flex"
-                  key={agendamento.id}
-                >
-                  <div className="agendamento-card w-100">
-                    <div className="agendamento-info">
-                      <h4 className="card-title">{agendamento.servico_nome}</h4>
+              {filteredAgendamentos.map((agendamento) => {
+                const clientePontos = agendamento.cliente_pontos ?? 0;
+                const pontosParaResgatar = agendamento.pontos_para_resgatar ?? 0;
+                // Lógica principal: só pode resgatar se os pontos do cliente forem suficientes e o resgate for necessário (> 0)
+                const podeResgatar = pontosParaResgatar > 0 && clientePontos >= pontosParaResgatar;
 
-                      <div className="info-item">
-                        <FaUser />
-                        <span><strong>Cliente</strong>: <strong>{agendamento.cliente_nome}</strong></span>
-                      </div>
+                return (
+                  <div
+                    className="col-12 col-md-6 col-lg-4 d-flex"
+                    key={agendamento.id}
+                  >
+                    <div className="agendamento-card w-100">
+                      <div className="agendamento-info">
+                        <h4 className="card-title">{agendamento.servico_nome}</h4>
 
-                      <div className="info-item">
-                        <FaToolbox />
-                        <span><strong>Funcionário:</strong> {agendamento.funcionario_nome}</span>
-                      </div>
-
-                      <div className="info-item">
-                        <FaCalendarDay />
-                        <span><strong>Data:</strong> {agendamento.data}</span>
-                      </div>
-
-                      <div className="info-item">
-                        <FaClock />
-                        <span><strong>Hora:</strong> {agendamento.hora} (Duração: {agendamento.duracao_servico} min)</span>
-                      </div>
-                    </div>
-
-                    <div className="agendamento-actions">
-                      <button
-                        className="btn btn-checkin"
-                        onClick={() => handleCheckIn(agendamento.identificador, agendamento.id)}
-                        disabled={isCheckingIn === agendamento.id}
-                      >
-                        {isCheckingIn === agendamento.id ? (
-                          <>
-                            <FaSpinner className="fa-spin me-2" /> Registrando...
-                          </>
-                        ) : (
-                          <>
-                            <FaArrowRightToBracket /> Fazer Check-In
-                          </>
-                        )}
-                      </button>
-
-                      <button
-                        className={`btn btn-qrcode ${showQRCode === agendamento.id ? 'active' : ''}`}
-                        onClick={() => setShowQRCode(showQRCode === agendamento.id ? null : agendamento.id)}
-                        disabled={isCheckingIn !== null}
-                      >
-                        <FaQrcode /> {showQRCode === agendamento.id ? 'Fechar QR Code' : 'Gerar QR Code'}
-                      </button>
-
-                      {showQRCode === agendamento.id && (
-                        <div className="qrcode-container">
-                          <QRCodeCanvas
-                            value={`https://vemagendar.com.br/agendamento/${agendamento.identificador}/avaliar`}
-                            size={180}
-                            level="H"
-                            fgColor="#003087"
-                            imageSettings={{
-                              src: empresa.data?.logo || "https://via.placeholder.com/40",
-                              height: 30,
-                              width: 30,
-                              excavate: true,
-                            }}
-                          />
+                        <div className="info-item">
+                          <FaUser />
+                          <span><strong>Cliente</strong>: <strong>{agendamento.cliente_nome}</strong></span>
                         </div>
-                      )}
+
+                        {(agendamento.cliente_pontos !== undefined || agendamento.pontos_para_resgatar !== undefined) && (
+                            <>
+                                <div className="info-item">
+                                    <FaStar />
+                                    <span><strong>Pontos do Cliente:</strong> {clientePontos} pontos</span>
+                                </div>
+                                <div className="info-item">
+                                    <FaGift />
+                                    <span><strong>Pontos para Resgate:</strong> {pontosParaResgatar} pontos</span>
+                                </div>
+
+                                {pontosParaResgatar > 0 && (
+                                    <div className={`resgate-alert ${podeResgatar ? 'success' : 'fail'}`}>
+                                        {podeResgatar ? (
+                                            <>
+                                                <FaStar />
+                                                Cliente <strong>PODE RESGATAR</strong>!
+                                            </>
+                                        ) : (
+                                            <>
+                                                <FaExclamationCircle />
+                                              Resgate <strong>NÃO DISPONÍVEL</strong>. Faltam {(pontosParaResgatar - clientePontos)} pontos.
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                            </>
+                        )}
+                        {/* Fim dos Novos Itens */}
+
+                        <div className="info-item mt-3">
+                          <FaToolbox />
+                          <span><strong>Funcionário:</strong> {agendamento.funcionario_nome}</span>
+                        </div>
+
+                        <div className="info-item">
+                          <FaCalendarDay />
+                          <span><strong>Data:</strong> {agendamento.data}</span>
+                        </div>
+
+                        <div className="info-item">
+                          <FaClock />
+                          <span><strong>Hora:</strong> {agendamento.hora} (Duração: {agendamento.duracao_servico} min)</span>
+                        </div>
+                      </div>
+
+                      <div className="agendamento-actions">
+
+                        {podeResgatar && (
+                            <button
+                                className="btn btn-redeem"
+                                onClick={() => handleResgatarPontos(agendamento.identificador, agendamento.id)}
+                                disabled={isRedeeming === agendamento.id || isCheckingIn !== null}
+                            >
+                                {isRedeeming === agendamento.id ? (
+                                    <>
+                                        <FaSpinner className="fa-spin me-2" /> Resgatando...
+                                    </>
+                                ) : (
+                                    <>
+                                        <FaMoneyBillWave /> Resgatar com Pontos
+                                    </>
+                                )}
+                            </button>
+                        )}
+
+                        <button
+                          className="btn btn-checkin"
+                          onClick={() => handleCheckIn(agendamento.identificador, agendamento.id)}
+                          disabled={isCheckingIn === agendamento.id || isRedeeming !== null}
+                        >
+                          {isCheckingIn === agendamento.id ? (
+                            <>
+                              <FaSpinner className="fa-spin me-2" /> Registrando...
+                            </>
+                          ) : (
+                            <>
+                              <FaArrowRightToBracket /> Fazer Check-In
+                            </>
+                          )}
+                        </button>
+
+                        <button
+                          className={`btn btn-qrcode ${showQRCode === agendamento.id ? 'active' : ''}`}
+                          onClick={() => setShowQRCode(showQRCode === agendamento.id ? null : agendamento.id)}
+                          disabled={isCheckingIn !== null || isRedeeming !== null}
+                        >
+                          <FaQrcode /> {showQRCode === agendamento.id ? 'Fechar QR Code' : 'Gerar QR Code'}
+                        </button>
+
+                        {showQRCode === agendamento.id && (
+                          <div className="qrcode-container">
+                            <QRCodeCanvas
+                              value={`https://vemagendar.com.br/agendamento/${agendamento.identificador}/avaliar`}
+                              size={180}
+                              level="H"
+                              fgColor="#003087"
+                              imageSettings={{
+                                src: empresa.data?.logo || "https://via.placeholder.com/40",
+                                height: 30,
+                                width: 30,
+                                excavate: true,
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="message warning">

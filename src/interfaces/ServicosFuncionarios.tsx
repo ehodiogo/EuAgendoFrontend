@@ -14,6 +14,5 @@ export interface FuncionarioServicos {
 }
 export interface ServicosFuncionariosEmpresa {
     nome: string;
-    cnpj: string;
     funcionarios: FuncionarioServicos[];
 }

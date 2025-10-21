@@ -108,14 +108,13 @@ const EmpresaDetailsSkeleton: React.FC = () => (
 
 function EmpresaDetails() {
   const { empresa: empresaNome } = useParams<{ empresa: string }>();
-  const { data: empresasData, loading: empresasLoading } = useFetch<Empresa[]>(`/api/empresa/?q=${empresaNome}`);
-  const { data: funcionariosData, loading: funcionariosLoading } = useFetch<Funcionario[]>(`/api/funcionario/?empresa_nome=${empresaNome}`);
+  const { data: empresasData, loading: empresasLoading } = useFetch<Empresa[]>(`/api/empresa/buscar/?q=${empresaNome}`);
+  const { data: funcionariosData, loading: funcionariosLoading } = useFetch<Funcionario[]>(`/api/funcionario/?empresa_slug=${empresaNome}`);
 
   const empresa = empresasData?.find(
-    (e) => e.nome.toLowerCase() === empresaNome?.toLowerCase()
+    (e) => e.slug.toLowerCase() === empresaNome?.toLowerCase()
   );
 
-  // Se não estiver carregando e a empresa não for encontrada
   if (!empresasLoading && !empresa) {
       return (
         <div className="message error">
@@ -431,7 +430,7 @@ function EmpresaDetails() {
                   <div className="cta-box">
                       <p className="mb-3 fw-bold">Pronto para {isLocacao ? "reservar" : "começar"}?</p>
                       <Link
-                          to={`/agendar/${empresa.nome}`}
+                          to={`/agendar/${empresa.slug}`}
                           className="btn btn-cta"
                       >
                           <FaCalendarAlt className="me-2" />
@@ -444,9 +443,6 @@ function EmpresaDetails() {
                           <FaRegAddressCard /> Detalhes Corporativos
                       </h4>
                       <ul className="list-group info-list">
-                          <li className="list-group-item">
-                              <strong>CNPJ:</strong> <span className="text-end">{empresa.cnpj || "Não Informado"}</span>
-                          </li>
                           <li className="list-group-item">
                               <strong>Tipo:</strong> <span className="text-end">{empresa.tipo || "Não Informado"}</span>
                           </li>

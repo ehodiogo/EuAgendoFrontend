@@ -68,7 +68,7 @@ const Agendar = () => {
   const [funcionarioSelecionado, setFuncionarioSelecionado] = useState<number | null>(null);
   const [locacaoSelecionadaId, setLocacaoSelecionadaId] = useState<number | null>(null);
 
-  const API_UNIFICADA = `/api/empresaservico/?empresa_nome=${empresaNome}`;
+  const API_UNIFICADA = `/api/empresaservico/?empresa_slug=${empresaNome}`;
   const dadosAgendamento = useFetch<EmpresaGeral[]>(API_UNIFICADA);
 
   const empresaDataFinal = dadosAgendamento.data ? dadosAgendamento.data[0] : null;

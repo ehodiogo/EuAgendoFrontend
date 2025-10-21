@@ -437,8 +437,15 @@ const ServicoForm: React.FC = () => {
               margin-top: 1rem;
           }
           
-          /* O resto dos estilos é reutilizado do original */
-
+          .employee-photo {
+            width: 40px;      /* Largura fixa */
+            height: 40px;     /* Altura fixa */
+            border-radius: 50%; /* Transforma em círculo */
+            object-fit: cover;  /* Garante que a imagem preencha o espaço sem distorcer */
+            margin-left: 0.5rem;
+            vertical-align: middle; /* Alinha com o texto */
+          }
+          
           /* Container */
           .servico-form-container {
             background-color: var(--light-gray);

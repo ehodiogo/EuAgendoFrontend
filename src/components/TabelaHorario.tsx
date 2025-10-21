@@ -25,10 +25,10 @@ const HorariosTabela = ({ funcionario_id, servicos, locacoes, locacao_id }: Hora
   });
   const [assinaturaVencida, setAssinaturaVencida] = useState(false);
 
-  const API_EMPRESA = `/api/empresa/?q=${empresaNome}`;
+  const API_EMPRESA = `/api/empresa/buscar/?q=${empresaNome}`;
   const empresaInterfaceList = useFetch<Empresa[]>(API_EMPRESA);
   const empresa = empresaInterfaceList.data?.find(
-    (e) => e.nome === empresaNome
+    (e) => e.slug === empresaNome
   );
 
   useEffect(() => {

@@ -14,4 +14,7 @@ export interface Agendamento {
   duracao_servico: number;
   compareceu_agendamento: boolean;
   observacao?: string;
+
+  cliente_pontos?: number;
+  pontos_para_resgatar?: number;
 }

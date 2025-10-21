@@ -293,7 +293,6 @@ function CheckIn() {
                       </div>
                       <div className="empresa-card-content">
                         <h4 className="card-title">{empresa.nome}</h4>
-                        <p className="card-text text-muted">CNPJ: {empresa.cnpj}</p>
                         <p className="card-location">
                           <FaLocationDot className="text-success-green" />
                           {empresa.cidade}, {empresa.estado}
