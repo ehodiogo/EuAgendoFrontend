@@ -472,6 +472,18 @@ function EmpresaDetails() {
                                   <strong><FaMapMarkerAlt className="me-1" /> Endereço:</strong>
                                   <span className="text-end">{empresa.endereco || "Não Informado"}</span>
                               </div>
+                              <div className="contact-item">
+                                      <strong><FaRegAddressCard className="me-1" /> Atendimento:</strong>
+                                      <span className="text-end">
+                                          {empresa.is_online ? (
+                                              <span className="badge bg-success">Online</span>
+                                          ) : empresa.endereco ? (
+                                              <span className="badge bg-primary">Presencial</span>
+                                          ) : (
+                                              "N/I"
+                                          )}
+                                      </span>
+                                  </div>
                               <div className="contact-item invisible">.</div>
                           </div>
                       </div>

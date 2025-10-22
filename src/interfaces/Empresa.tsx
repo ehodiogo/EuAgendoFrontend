@@ -46,6 +46,8 @@ export interface Empresa {
 
   avaliacoes_empresa:  number;
   nota_empresa:  number;
+
+  is_online: boolean;
 }
 
 export interface EmpresaCreate {
@@ -77,4 +79,6 @@ export interface EmpresaCreate {
   para_almoco: boolean;
   horario_pausa_inicio: string;
   horario_pausa_fim: string;
+
+  is_online: boolean;
 }

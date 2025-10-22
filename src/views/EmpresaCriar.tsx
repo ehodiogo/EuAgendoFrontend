@@ -14,6 +14,7 @@ const EmpresaForm: React.FC = () => {
   const [temPausa, setTemPausa] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
+  const [, setIsOnline] = useState(false);
 
   const [empresa, setEmpresa] = useState<EmpresaCreate>({
     nome: "",
@@ -36,6 +37,7 @@ const EmpresaForm: React.FC = () => {
     para_almoco: false,
     horario_pausa_inicio: "",
     horario_pausa_fim: "",
+    is_online: false,
   });
   const [empresaCriada, setEmpresaCriada] = useState(false);
   const [empresaSelecionada, setEmpresaSelecionada] = useState<number | null>(null);
@@ -69,6 +71,7 @@ const EmpresaForm: React.FC = () => {
           para_almoco: selectedEmpresa.para_almoco || false,
           horario_pausa_inicio: selectedEmpresa.horario_pausa_inicio?.slice(0, 5) || "",
           horario_pausa_fim: selectedEmpresa.horario_pausa_fim?.slice(0, 5) || "",
+          is_online: selectedEmpresa.is_online || false,
         });
       }
     }
@@ -83,6 +86,7 @@ const EmpresaForm: React.FC = () => {
     if (name === "abre_sabado") setAbreSabado(checked);
     if (name === "abre_domingo") setAbreDomingo(checked);
     if (name === "para_almoco") setTemPausa(checked);
+    if (name === "is_online") setIsOnline(checked);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -188,6 +192,7 @@ const EmpresaForm: React.FC = () => {
         formData.append("abre_sabado", empresa.abre_sabado.toString());
         formData.append("abre_domingo", empresa.abre_domingo.toString());
         formData.append("para_almoco", empresa.para_almoco.toString());
+        formData.append("is_online", empresa.is_online.toString());
         formData.append("usuario_token", localStorage.getItem("access_token") || "");
 
         const response = await fetch(`${url}/api/empresa-create/`, {
@@ -218,6 +223,7 @@ const EmpresaForm: React.FC = () => {
           para_almoco: false,
           horario_pausa_inicio: "",
           horario_pausa_fim: "",
+          is_online: false,
         });
       } catch (error: unknown) {
         if (error instanceof Error) {
@@ -259,6 +265,7 @@ const EmpresaForm: React.FC = () => {
         formData.append("abre_sabado", empresa.abre_sabado.toString());
         formData.append("abre_domingo", empresa.abre_domingo.toString());
         formData.append("para_almoco", empresa.para_almoco.toString());
+        formData.append("is_online", empresa.is_online.toString());
         formData.append("usuario_token", localStorage.getItem("access_token") || "");
         formData.append("empresa_id", empresaSelecionada!.toString());
 
@@ -565,6 +572,16 @@ const EmpresaForm: React.FC = () => {
                         required
                       />
                     </div>
+                    <div className="form-check mb-3">
+                        <input
+                            type="checkbox"
+                            name="is_online"
+                            className="form-check-input"
+                            checked={empresa.is_online}
+                            onChange={handleChange}
+                        />
+                        <label className="form-check-label ms-2">Atendimento é realizado online?</label>
+                    </div>
                     <div className="mb-3">
                       <label className="form-label">Tipo de Empresa</label>
                       <div className="form-check">
@@ -837,6 +854,16 @@ const EmpresaForm: React.FC = () => {
                             required
                           />
                         </div>
+                        <div className="form-check mb-3">
+                          <input
+                              type="checkbox"
+                              name="is_online"
+                              className="form-check-input"
+                              checked={empresa.is_online}
+                              onChange={handleChange}
+                          />
+                          <label className="form-check-label ms-2">Atendimento é realizado online?</label>
+                      </div>
                         <div className="mb-3">
                           <label className="form-label">Tipo de Empresa</label>
                           <div className="form-check">
