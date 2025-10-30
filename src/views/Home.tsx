@@ -540,8 +540,8 @@ function Home() {
             <div className="row mt-4 justify-content-center">
               {[
                 { name: "Helena D. (CEO, Salão)", review: "O VemAgendar revolucionou meu negócio! Nunca foi tão fácil organizar meus clientes.", stars: 5 },
-                { name: "Paulo B. (Consultor)", review: "Reduziu o tempo de organizar meus atendimentos em 90% com a facilidade para visualizar horários.", stars: 5 },
-                { name: "Luciana D. (Esteticista)", review: "Prático, eficiente e muito intuitivo. A melhor ferramenta para autônomos!", stars: 5 },
+                { name: "Pietro P. (Consultor)", review: "Reduziu o tempo de organizar meus atendimentos em 90% com a facilidade para visualizar horários.", stars: 5 },
+                { name: "Yasmin P. (Esteticista)", review: "Prático, eficiente e muito intuitivo. A melhor ferramenta para autônomos!", stars: 5 },
               ].map((item, index) => (
                 <div key={index} className="col-md-4 d-flex mb-4">
                   <div className="review-card d-flex flex-column h-100 p-4">
