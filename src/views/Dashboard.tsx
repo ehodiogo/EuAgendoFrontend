@@ -88,7 +88,7 @@ function Dashboard() {
     { to: "/financeiro", icon: FaMoneyBillWave, label: "Relatório Financeiro", description: "Acompanhe seu rendimento, serviços mais e menos rentáveis.", variant: "success" },
     { to: "/minhas-empresas", icon: FaCalendarAlt, label: "Agendamentos de Hoje", description: "Verifique os agendamentos de suas empresas para o dia atual.", variant: "warning" },
     { to: "/validar-plano", icon: FaCheckSquare, label: "Verificar Plano", description: "Verifique o status do seu plano se ele ainda não está ativo.", variant: "danger" },
-    { to: "/cadastros-usuario", icon: FaEdit, label: "Cadastros & Serviços", description: "Crie, altere e exclua empresas, serviços e funcionários.", variant: "info" },
+    { to: "/cadastros", icon: FaEdit, label: "Cadastros & Serviços", description: "Crie, altere e exclua empresas, serviços e funcionários.", variant: "info" },
     { to: "/checkin", icon: FaSignInAlt, label: "Gerenciar Checkins", description: "Controle as entradas e saídas de clientes em suas empresas.", variant: "dark" },
   ];
 
@@ -390,7 +390,7 @@ function Dashboard() {
               ))}
               {empresas_usuario.data?.length === 0 && !empresas_usuario.loading && (
                 <div className="alert alert-info text-center mt-3">
-                    Você ainda não possui empresas cadastradas. <Link to="/cadastros-usuario">Cadastre sua primeira empresa!</Link>
+                    Você ainda não possui empresas cadastradas. <Link to="/cadastros">Cadastre sua primeira empresa!</Link>
                 </div>
               )}
             </div>

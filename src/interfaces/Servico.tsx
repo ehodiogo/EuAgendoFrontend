@@ -4,13 +4,18 @@ export interface Servico {
   descricao: string;
   duracao: string;
   preco: string;
-  funcionarios: number[]; 
+  funcionarios: number[];
+  pontos_gerados?: string | number;
+  pontos_resgate?: string | number;
 }
 
 export interface ServicoCreate {
+  id?:  number | null;
   nome: string;
   descricao: string;
   duracao: string;
   preco: string;
-  funcionarios: number[]; 
+  funcionarios: number[];
+  pontos_gerados?: string | number;
+  pontos_resgate?: string | number;
 }

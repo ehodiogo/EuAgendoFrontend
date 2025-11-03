@@ -1,5 +1,5 @@
 export interface Locacao {
-    id?: number;
+    id?: number | null;
     nome: string;
     descricao: string;
     duracao: string;

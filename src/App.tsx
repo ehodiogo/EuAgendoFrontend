@@ -7,7 +7,7 @@ const Home = lazy(() => import("./views/Home"));
 const EmpresasSearch = lazy(() => import("./views/EmpresasSearch"));
 const Agendar = lazy(() => import("./views/Agendar"));
 const EmpresaDetails = lazy(() => import("./views/Empresa"));
-
+const Cadastros = lazy(()=>import('./views/./Cadastros'));
 const Sobre = lazy(() => import("./views/Sobre"));
 const Planos = lazy(() => import("./views/Planos"));
 const Termos = lazy(() => import("./views/Termos"));
@@ -27,12 +27,7 @@ const FailurePage = lazy(() => import("./views/Failure"));
 const PendingPage = lazy(() => import("./views/Pending"));
 const ValidarPlano = lazy(() => import("./views/ValidarPlano"));
 const Roadmap = lazy(() => import("./views/Roadmap"));
-const CadastrosUsuario = lazy(() => import("./views/CadastrosUsuario"));
 const AvaliacaoAgendamento = lazy(() => import("./views/AvaliarAgendamento"))
-const EmpresaCreate = lazy(() => import("./views/EmpresaCriar"));
-const FuncionarioCreate = lazy(() => import("./views/FuncionarioCriar"));
-const ServicoCreate = lazy(() => import("./views/ServicosCriar"));
-const LocacaoCreate = lazy(() => import("./views/LocacoesCriar"));
 const Configuracao = lazy(() => import("./views/Configuracoes"));
 const Checkin = lazy(() => import("./views/Checkin"));
 const CheckinEmpresa = lazy(() => import("./views/CheckinEmpresa"));
@@ -93,42 +88,6 @@ function App() {
       <Route path="/confirmar-conta" element={<ConfirmarConta />} />
 
       <Route
-        path="/criar-empresa"
-        element={
-          <ProtectedRoute>
-            <EmpresaCreate />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/criar-funcionario/:empresa?"
-        element={
-          <ProtectedRoute>
-            <FuncionarioCreate />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/criar-locacao/:empresa?"
-        element={
-          <ProtectedRoute>
-            <LocacaoCreate />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/criar-servico/:funcionario?"
-        element={
-          <ProtectedRoute>
-            <ServicoCreate />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
         path="/minhas-empresas"
         element={
           <ProtectedRoute>
@@ -165,14 +124,6 @@ function App() {
         element={
           <ProtectedRoute>
             <Confirmacao />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/cadastros-usuario"
-        element={
-          <ProtectedRoute>
-            <CadastrosUsuario />
           </ProtectedRoute>
         }
       />
@@ -243,6 +194,13 @@ function App() {
                 <CheckinEmpresa />
             </ProtectedRoute>
            }
+       />
+
+        <Route path="/cadastros"  element={
+            <ProtectedRoute>
+                <Cadastros />
+            </ProtectedRoute>
+        }
        />
 
       <Route path="/contato" element={<Contato />} />
