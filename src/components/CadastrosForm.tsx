@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Form, Button, Card, Row, Col, InputGroup, Tab, Tabs, Alert, Badge, Image, Spinner
+  Form, Button, Card, Row, Col, InputGroup, Tab, Tabs, Alert, Badge, Image, Spinner, Tooltip, OverlayTrigger
 } from 'react-bootstrap';
 import { Funcionario } from "../interfaces/Funcionario.tsx";
 import { ServicoCreate } from "../interfaces/Servico.tsx";
@@ -8,6 +8,7 @@ import { Locacao } from "../interfaces/Locacao.tsx";
 import { EmpresaCreate } from "../interfaces/Empresa.tsx";
 import { Empresa } from "../interfaces/Empresa.tsx";
 import { useFetch } from "../functions/GetData.tsx";
+import {BsInfoCircleFill} from "react-icons/bs";
 
 interface SubmitResponse {
   success: boolean;
@@ -122,8 +123,6 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
           method: 'GET',
         });
 
-        console.log("Response", response);
-
         if (!response.ok) {
           throw new Error("Falha ao buscar limites.");
         }
@@ -131,7 +130,6 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
         const data = await response.json();
         setLimites(data.limites);
       } catch (error) {
-        console.error("Erro ao carregar limites:", error);
         setErroLimites("Não foi possível carregar os limites de criação.");
       } finally {
         setLoadingLimites(false);
@@ -159,6 +157,7 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
             .filter((id): id is number => id != null);
 
           const servico: ServicoCreate = {
+            id: s.id ?? null,
             nome: s.nome ?? "",
             preco: String(s.preco ?? ""),
             duracao: String(s.duracao ?? ""),
@@ -293,10 +292,15 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
   const handleDeleteEmpresa = async () => {
     if (!window.confirm(`Tem certeza que deseja EXCLUIR permanentemente a empresa "${empresa.nome}"?`)) return;
 
+    const formData = new FormData();
+    formData.append("usuario_token", localStorage.getItem("access_token") || "");
+    formData.append("acao", "excluir");
+    formData.append("empresa_id", selectedEmpresaId.toString());
+
     try {
-      const response = await fetch(`${url}/api/empresa-salvar/?id=${selectedEmpresaId}&acao=excluir`, {
+      const response = await fetch(`${url}/api/empresa-salvar/?id=${selectedEmpresaId}`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+        body: formData,
       });
       if (response.ok) {
         alert("Empresa excluída com sucesso!");
@@ -308,7 +312,6 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
       }
     } catch (err) {
       alert("Erro ao excluir empresa.");
-      console.error(err);
     }
   };
 
@@ -347,13 +350,10 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
     if (empresa.tipo === "Serviço") {
       formData.append("servicos_json", JSON.stringify(servicos));
     } else if (empresa.tipo === "Locação") {
-      console.log("Locacoes", locacoes);
       formData.append("locacoes_json", JSON.stringify(locacoes));
     }
 
     if (!isNew) formData.append("empresa_id", selectedEmpresaId.toString());
-    console.log("Empresa selecionada: ", selectedEmpresaId.toString());
-    console.log("Is new?", isNew);
     formData.append("acao", isNew ? "cadastrar" : "editar");
 
     formData.append("usuario_token", localStorage.getItem("access_token") || "");
@@ -364,7 +364,6 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
         body: formData,
       });
       if (response.ok) {
-        console.log("Response: ", response);
         setSubmitStatus('success');
         onSubmit({ success: true, data: await response.json() });
       } else {
@@ -372,7 +371,6 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
       }
     } catch (err) {
       setSubmitStatus('error');
-      console.error(err);
     } finally {
       setIsSubmitting(false);
     }
@@ -756,8 +754,11 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
                           Profissionais que realizam este serviço
                         </Form.Label>
                         <div className="d-flex flex-wrap gap-2">
+                          <span className="text-muted small">O funcionário ainda não cadastrado e salvo não pode ser adicionado ao serviço.</span>
+                        </div>
+                        <div className="d-flex flex-wrap gap-2">
                           {funcionarios.length === 0 ? (
-                            <span className="text-muted small">Nenhum profissional cadastrado</span>
+                              <span className="text-muted small"><strong>Nenhum profissional cadastrado.</strong></span>
                           ) : (
                             funcionarios.map(func => {
                               const funcId = func.id;

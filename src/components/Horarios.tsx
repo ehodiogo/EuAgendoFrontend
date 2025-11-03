@@ -553,7 +553,9 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              <FaCalendarCheck /> Agendar Serviço
+              <FaCalendarCheck />{' '}
+              {empresa.tipo === 'Serviço' && 'Agendar Serviço'}
+              {empresa.tipo === 'Locação' && 'Agendar Locação'}
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -562,7 +564,11 @@ const HorariosDoDia = ({ empresa, data_selecionada, funcionario_id, servicos, lo
             </p>
 
             <div className="radio-group">
-              <h5><FaTag className="me-1" /> Escolha o Serviço</h5>
+              <h5>
+                <FaTag className="me-1" />{' '}
+                {empresa.tipo === 'Serviço' && 'Escolha o Serviço'}
+                {empresa.tipo === 'Locação' && 'Escolha a Locação'}
+              </h5>
               {servicos.map((servico) => (
                 <div key={servico.id} className="form-check">
                   <input

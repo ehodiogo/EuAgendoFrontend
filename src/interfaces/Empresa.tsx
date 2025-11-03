@@ -2,6 +2,7 @@ import { Funcionario } from "./Funcionario";
 import { Locacao} from "./Locacao.tsx";
 
 interface Servico {
+  id?: number | null;
   descricao: string |  null;
   nome: string;
   preco: number;
