@@ -394,7 +394,7 @@ const Agendar = () => {
 
                   <section className="horarios-section container">
                     <h2 className="section-heading">
-                      <span className="me-2 text-primary-blue">2.</span> <FaCalendarAlt /> Selecione a Data de Retirada
+                      <span className="me-2 text-primary-blue">2.</span> <FaCalendarAlt /> Selecione a Data da Locação
                     </h2>
 
                     <div className="horarios-content">
