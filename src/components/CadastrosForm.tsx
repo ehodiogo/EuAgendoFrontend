@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Form, Button, Card, Row, Col, InputGroup, Tab, Tabs, Alert, Badge, Image, Spinner, Tooltip, OverlayTrigger
+  Form, Button, Card, Row, Col, InputGroup, Tab, Tabs, Alert, Badge, Image, Spinner
 } from 'react-bootstrap';
 import { Funcionario } from "../interfaces/Funcionario.tsx";
 import { ServicoCreate } from "../interfaces/Servico.tsx";
@@ -8,7 +8,6 @@ import { Locacao } from "../interfaces/Locacao.tsx";
 import { EmpresaCreate } from "../interfaces/Empresa.tsx";
 import { Empresa } from "../interfaces/Empresa.tsx";
 import { useFetch } from "../functions/GetData.tsx";
-import {BsInfoCircleFill} from "react-icons/bs";
 
 interface SubmitResponse {
   success: boolean;
@@ -130,6 +129,7 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
         const data = await response.json();
         setLimites(data.limites);
       } catch (error) {
+        console.error("Erro ao carregar limites:", error);
         setErroLimites("Não foi possível carregar os limites de criação.");
       } finally {
         setLoadingLimites(false);
@@ -312,6 +312,7 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
       }
     } catch (err) {
       alert("Erro ao excluir empresa.");
+      console.error(err);
     }
   };
 
@@ -371,6 +372,7 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
       }
     } catch (err) {
       setSubmitStatus('error');
+      console.error(err);
     } finally {
       setIsSubmitting(false);
     }

@@ -221,7 +221,8 @@ function Planos() {
               border-bottom: 1px solid #f0f0f0;
           }
           .plan-card .plan-price {
-            font-size: 3.25rem;
+            /* ALTERAÇÃO 1: Reduzi o tamanho padrão de 3.25rem para 3rem */
+            font-size: 3rem; 
             font-weight: 900;
             color: var(--primary-blue);
             line-height: 1;
@@ -373,7 +374,8 @@ function Planos() {
             .custom-section h1 {
                 font-size: 2.5rem;
             }
-            .plan-card .plan-price {
+            /* ALTERAÇÃO 2: Redução adicional do tamanho da fonte em telas menores */
+            .plan-card .plan-price { 
                 font-size: 2.75rem;
             }
           }
