@@ -222,7 +222,7 @@ function Planos() {
           }
           .plan-card .plan-price {
             /* ALTERAÇÃO 1: Reduzi o tamanho padrão de 3.25rem para 3rem */
-            font-size: 3rem; 
+            font-size: 2rem; 
             font-weight: 900;
             color: var(--primary-blue);
             line-height: 1;
@@ -376,7 +376,7 @@ function Planos() {
             }
             /* ALTERAÇÃO 2: Redução adicional do tamanho da fonte em telas menores */
             .plan-card .plan-price { 
-                font-size: 2.75rem;
+                font-size: 1.5rem;
             }
           }
         `}
