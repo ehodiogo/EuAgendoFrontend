@@ -8,6 +8,8 @@ interface Servico {
   preco: number;
   duracao: string;
   funcionarios?: Funcionario[] | null;
+    pontos_gerados?: string | number;
+  pontos_resgate?: string | number;
 }
 
 export interface Empresa {

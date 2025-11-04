@@ -162,7 +162,9 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
             preco: String(s.preco ?? ""),
             duracao: String(s.duracao ?? ""),
             funcionarios: idsFuncionarios,
-            descricao: s.descricao ?? ""
+            descricao: s.descricao ?? "",
+            pontos_gerados: s.pontos_gerados ?? 0,
+            pontos_resgate: s.pontos_resgate ?? 0
           };
 
           return servico;
