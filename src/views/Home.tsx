@@ -235,7 +235,7 @@ function Home() {
           font-size: 1rem;
         }
 
-        /* Planos - REVISADO */
+        /* Planos - REVISADO (Ajustado) */
         .plan-row {
           display: flex;
           flex-wrap: wrap;
@@ -247,7 +247,7 @@ function Home() {
           background-color: var(--white);
           box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
-          padding: 2.5rem;
+          padding: 2.5rem 1.5rem; /* Ajuste: Diminuído o padding lateral para otimizar o espaço */
           position: relative;
           display: flex;
           flex-direction: column;
@@ -292,35 +292,41 @@ function Home() {
             margin-bottom: 1.5rem;
             padding: 1rem 0;
             border-bottom: 1px solid var(--border-light);
+            /* Ajuste: Garantir que o grupo de preço ocupe a largura total */
+            width: 100%; 
         }
         .plan-card .plan-price {
-          font-size: 3.5rem;
+          /* Ajuste: Redução da fonte para evitar quebra de linha */
+          font-size: 2.8rem; 
           font-weight: 800;
           color: var(--primary-blue);
-          line-height: 1;
+          line-height: 1.1; /* Ajuste: linha um pouco maior para espaçamento */
+          /* Adiciona um espaço para que R$ e o preço não fiquem colados */
+          white-space: nowrap; 
+          display: inline-block; 
         }
         .plan-card .plan-price small {
-            font-size: 1rem;
+            font-size: 0.9rem; /* Levemente menor */
             font-weight: 600;
             color: var(--medium-gray);
             margin-left: 0.25rem;
         }
         .plan-card .full-price {
-          font-size: 1.2rem;
+          font-size: 1rem; /* Levemente menor */
           color: var(--danger-red);
           text-decoration: line-through;
-          margin-top: 0.25rem;
+          margin-top: 0.5rem; /* Mais espaçamento */
           display: block;
         }
         .plan-card .discount {
-          font-size: 1.1rem;
+          font-size: 1rem;
           color: var(--success-green);
           font-weight: 700;
           margin-bottom: 0.5rem;
         }
         .plan-card ul {
           list-style: none;
-          padding: 0;
+          padding: 0 0.5rem; /* Ajuste: Padding interno para as features */
           margin-bottom: 2rem;
           color: var(--medium-gray);
           flex-grow: 1;
@@ -330,7 +336,7 @@ function Home() {
           margin-bottom: 0.75rem;
           display: flex;
           align-items: center;
-          font-size: 1rem;
+          font-size: 0.95rem; /* Levemente menor para caber mais texto */
         }
         .plan-card ul li svg {
           color: var(--success-green);
@@ -340,7 +346,7 @@ function Home() {
         .plan-card .plan-desc {
             color: var(--dark-gray);
             font-style: italic;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             margin-bottom: 1rem;
         }
         
