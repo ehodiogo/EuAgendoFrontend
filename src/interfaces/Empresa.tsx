@@ -53,6 +53,7 @@ export interface Empresa {
   nota_empresa:  number;
 
   is_online: boolean;
+  aberto_agora?: boolean;
 }
 
 export interface EmpresaCreate {

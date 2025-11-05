@@ -4,9 +4,162 @@ import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import {Locacao} from "../interfaces/Locacao.tsx";
 import Navbar from "../components/Navbar";
-import FilterModal from "../components/FilterModal";
-import { FaSearch, FaExclamationCircle, FaFilter, FaMapMarkerAlt, FaPhoneAlt, FaDollarSign, FaBuilding, FaTags } from "react-icons/fa";
+import { FaSearch, FaExclamationCircle, FaFilter, FaMapMarkerAlt, FaPhoneAlt, FaDollarSign, FaBuilding, FaTags, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import RatingStars from "../components/RatingStars";
+
+interface Servico {
+  nome: string;
+  preco: number;
+  duracao: string;
+}
+
+interface FilterModalProps {
+  show: boolean;
+  onClose: () => void;
+  onApply: () => void;
+  onClear: () => void;
+  cidade: string;
+  setCidade: (c: string) => void;
+  estado: string;
+  setEstado: (e: string) => void;
+  bairro: string;
+  setBairro: (b: string) => void;
+  pais: string;
+  setPais: (p: string) => void;
+  tipoEmpresa: string;
+  setTipoEmpresa: (t: string) => void;
+  abertoAgoraFilter: boolean;
+  setAbertoAgoraFilter: (a: boolean) => void;
+  tiposDisponiveis: string[];
+  estados: string[];
+}
+
+const FilterModal: React.FC<FilterModalProps> = ({
+  show,
+  onClose,
+  onApply,
+  onClear,
+  cidade,
+  setCidade,
+  estado,
+  setEstado,
+  bairro,
+  setBairro,
+  pais,
+  setPais,
+  tipoEmpresa,
+  setTipoEmpresa,
+  abertoAgoraFilter,
+  setAbertoAgoraFilter,
+  tiposDisponiveis,
+  estados,
+}) => {
+  if (!show) return null;
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <button className="btn-close" onClick={onClose}>
+          &times;
+        </button>
+        <h3><FaFilter /> Filtros Avançados</h3>
+
+        <div className="row">
+          <div className="col-md-6 form-group">
+            <label htmlFor="tipoEmpresaSelect">Tipo de Empresa</label>
+            <select
+              id="tipoEmpresaSelect"
+              className="form-select"
+              value={tipoEmpresa}
+              onChange={(e) => setTipoEmpresa(e.target.value)}
+            >
+              <option value="">Todos</option>
+              {tiposDisponiveis.map((tipo) => (
+                <option key={tipo} value={tipo}>
+                  {tipo}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="col-md-6 form-group">
+            <label htmlFor="estadoSelect">Estado</label>
+            <select
+              id="estadoSelect"
+              className="form-select"
+              value={estado}
+              onChange={(e) => setEstado(e.target.value)}
+            >
+              <option value="">Todos</option>
+              {estados.map((est) => (
+                <option key={est} value={est}>
+                  {est}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-md-6 form-group">
+            <label htmlFor="cidadeInput">Cidade</label>
+            <input
+              id="cidadeInput"
+              type="text"
+              className="form-control"
+              value={cidade}
+              onChange={(e) => setCidade(e.target.value)}
+            />
+          </div>
+          <div className="col-md-6 form-group">
+            <label htmlFor="bairroInput">Bairro</label>
+            <input
+              id="bairroInput"
+              type="text"
+              className="form-control"
+              value={bairro}
+              onChange={(e) => setBairro(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="row">
+            <div className="col-md-6 form-group">
+                <label htmlFor="paisInput">País</label>
+                <input
+                    id="paisInput"
+                    type="text"
+                    className="form-control"
+                    value={pais}
+                    onChange={(e) => setPais(e.target.value)}
+                />
+            </div>
+        </div>
+
+        <div className="form-group form-check mt-3 mb-4">
+            <input
+                type="checkbox"
+                className="form-check-input"
+                id="abertoAgoraCheck"
+                checked={abertoAgoraFilter}
+                onChange={(e) => setAbertoAgoraFilter(e.target.checked)}
+            />
+            <label className="form-check-label" htmlFor="abertoAgoraCheck">
+                Apenas empresas <strong>abertas agora</strong>
+            </label>
+        </div>
+
+        <div className="d-flex justify-content-between mt-4">
+          <button className="btn btn-warning" onClick={onClear}>
+            Limpar Filtros
+          </button>
+          <button className="btn btn-primary" onClick={onApply}>
+            Aplicar Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const EmpresaCardSkeleton: React.FC = () => (
     <div className="col-lg-4 col-md-6 mb-4">
@@ -32,19 +185,11 @@ const EmpresaCardSkeleton: React.FC = () => (
 
                 <div className="skeleton skeleton-line-short" style={{ width: '40%', marginTop: '1rem' }}></div>
                 <div className="skeleton skeleton-line-long" style={{ width: '85%' }}></div>
-                <div className="skeleton skeleton-line-medium"></div>
-
                 <div className="skeleton" style={{ height: '3.3rem', marginTop: 'auto' }}></div>
             </div>
         </div>
     </div>
 );
-
-interface Servico {
-  nome: string;
-  preco: number;
-  duracao: string;
-}
 
 const ListaServicos: React.FC<{ servicos?: Servico[] }> = ({ servicos }) => (
     <div className="list-servicos">
@@ -90,6 +235,53 @@ const ListaLocacoes: React.FC<{ locacoes?: Locacao[] }> = ({ locacoes }) => (
     </div>
 );
 
+const timeToMinutes = (time: string): number => {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+};
+
+const isEmpresaOpenNow = (empresa: Empresa): boolean => {
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    let abreHora, fechaHora;
+
+    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+        abreHora = timeToMinutes(empresa.horario_abertura_dia_semana);
+        fechaHora = timeToMinutes(empresa.horario_fechamento_dia_semana);
+    } else if (dayOfWeek === 6 && empresa.abre_sabado) {
+        abreHora = timeToMinutes(empresa.horario_abertura_fim_de_semana);
+        fechaHora = timeToMinutes(empresa.horario_fechamento_fim_de_semana);
+    } else if (dayOfWeek === 0 && empresa.abre_domingo) {
+        abreHora = timeToMinutes(empresa.horario_abertura_fim_de_semana);
+        fechaHora = timeToMinutes(empresa.horario_fechamento_fim_de_semana);
+    } else {
+        return false;
+    }
+
+    const estaAbertoGeral = fechaHora > abreHora
+        ? (currentMinutes >= abreHora && currentMinutes < fechaHora)
+        : (currentMinutes >= abreHora || currentMinutes < fechaHora);
+
+    if (!estaAbertoGeral) {
+        return false;
+    }
+
+    if (empresa.para_almoco && empresa.horario_pausa_inicio && empresa.horario_pausa_fim) {
+        const abreAlmoco = timeToMinutes(empresa.horario_pausa_inicio);
+        const fechaAlmoco = timeToMinutes(empresa.horario_pausa_fim);
+
+        const emPausa = currentMinutes >= abreAlmoco && currentMinutes < fechaAlmoco;
+
+        if (emPausa) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
 function EmpresasSearch() {
   const [search, setSearch] = useState("");
   const [cidade, setCidade] = useState("");
@@ -97,19 +289,33 @@ function EmpresasSearch() {
   const [bairro, setBairro] = useState("");
   const [pais, setPais] = useState("");
   const [tipoEmpresa, setTipoEmpresa] = useState("");
+  const [abertoAgoraFilter, setAbertoAgoraFilter] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const empresas = useFetch<Empresa[]>("/api/empresa");
 
   const tiposDisponiveis = ["Serviço", "Locação"];
 
-  const filteredEmpresas = empresas.data?.filter((empresa: Empresa) =>
-    empresa.nome.toLowerCase().includes(search.toLowerCase()) &&
-    (cidade ? empresa.cidade.toLowerCase().includes(cidade.toLowerCase()) : true) &&
-    (estado ? empresa.estado.toLowerCase().includes(estado.toLowerCase()) : true) &&
-    (bairro ? empresa.bairro.toLowerCase().includes(bairro.toLowerCase()) : true) &&
-    (pais ? empresa.pais.toLowerCase().includes(pais.toLowerCase()) : true) &&
-    (tipoEmpresa ? empresa.tipo.toLowerCase() === tipoEmpresa.toLowerCase() : true)
-  );
+  const filteredEmpresas = empresas.data?.filter((empresa: Empresa) => {
+    const estaAberta = isEmpresaOpenNow(empresa);
+
+    const matchesSearch = empresa.nome.toLowerCase().includes(search.toLowerCase());
+    const matchesCidade = cidade ? empresa.cidade.toLowerCase().includes(cidade.toLowerCase()) : true;
+    const matchesEstado = estado ? empresa.estado.toLowerCase().includes(estado.toLowerCase()) : true;
+    const matchesBairro = bairro ? empresa.bairro.toLowerCase().includes(bairro.toLowerCase()) : true;
+    const matchesPais = pais ? empresa.pais.toLowerCase().includes(pais.toLowerCase()) : true;
+    const matchesTipoEmpresa = tipoEmpresa ? empresa.tipo.toLowerCase() === tipoEmpresa.toLowerCase() : true;
+    const matchesAbertoAgora = abertoAgoraFilter ? estaAberta : true;
+
+    return (
+        matchesSearch &&
+        matchesCidade &&
+        matchesEstado &&
+        matchesBairro &&
+        matchesPais &&
+        matchesTipoEmpresa &&
+        matchesAbertoAgora
+    );
+  });
 
   const estados = [
     "Acre", "Alagoas", "Amapá", "Amazonas", "Bahia", "Ceará", "Distrito Federal",
@@ -126,6 +332,7 @@ function EmpresasSearch() {
     setBairro("");
     setPais("");
     setTipoEmpresa("");
+    setAbertoAgoraFilter(false);
     setShowModal(false);
   };
 
@@ -136,27 +343,24 @@ function EmpresasSearch() {
   return (
     <div className="min-vh-100">
       <style>{`
-        /* Paleta de cores */
         :root {
-          --primary-blue: #003087; /* Azul Principal */
-          --accent-blue: #0056b3; /* Azul para destaques/hover */
-          --light-blue: #e0f2f7; /* Azul claro de fundo */
-          --dark-gray: #333333; /* Texto principal */
-          --medium-gray: #666666; /* Texto secundário */
-          --light-gray-bg: #f9f9f9; /* Fundo de seções */
+          --primary-blue: #003087;
+          --accent-blue: #0056b3;
+          --light-blue: #e0f2f7;
+          --dark-gray: #333333;
+          --medium-gray: #666666;
+          --light-gray-bg: #f9f9f9;
           --white: #ffffff;
           --success-green: #28a745;
           --danger-red: #dc3545;
           --warning-orange: #fd7e14;
-          --border-light: #e0e0e0; /* Borda sutil (usado no skeleton) */
+          --border-light: #e0e0e0;
         }
 
-        /* Estilos gerais */
         .custom-bg {
           background-color: var(--light-gray-bg);
         }
 
-        /* Header */
         .empresas-header {
           background-color: var(--primary-blue);
           color: var(--white);
@@ -181,7 +385,6 @@ function EmpresasSearch() {
           line-height: 1.6;
         }
 
-        /* Busca e Filtros */
         .search-section {
           padding: 2.5rem 0;
           text-align: center;
@@ -229,7 +432,6 @@ function EmpresasSearch() {
           box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        /* --- Modal (Estilos para o FilterModal) --- */
         .modal-overlay {
           position: fixed;
           top: 0;
@@ -330,28 +532,27 @@ function EmpresasSearch() {
         }
 
 
-        /* --- Lista de Empresas (CARDS MELHORADOS) --- */
         .empresas-list {
           padding: 3rem 0;
         }
         .empresas-list .card {
           background-color: var(--white);
-          border-radius: 15px; /* Bordas mais arredondadas */
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Sombra mais profunda */
+          border-radius: 15px;
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
           height: 100%;
           display: flex;
           flex-direction: column;
-          border: none; /* Remove a borda padrão do Bootstrap */
-          overflow: hidden; /* Garante que nada vaze */
+          border: none;
+          overflow: hidden;
         }
         .empresas-list .card:hover {
-          transform: translateY(-8px); /* Efeito de elevação maior */
-          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2); /* Sombra mais pronunciada no hover */
+          transform: translateY(-8px);
+          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
         }
         .empresas-list .card-img-container {
           width: 100%;
-          height: 220px; /* Altura um pouco maior para a imagem */
+          height: 220px;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -360,7 +561,7 @@ function EmpresasSearch() {
           overflow: hidden;
         }
         .empresas-list .card-img-top {
-          max-width: 90%; /* Logo um pouco menor para não preencher tudo */
+          max-width: 90%;
           max-height: 90%;
           object-fit: contain;
           margin: auto;
@@ -368,10 +569,10 @@ function EmpresasSearch() {
           transition: transform 0.3s ease;
         }
         .empresas-list .card:hover .card-img-top {
-            transform: scale(1.05); /* Zoom sutil na imagem */
+            transform: scale(1.05);
         }
         .empresas-list .card-body {
-          padding: 1.8rem; /* Padding interno maior */
+          padding: 1.8rem;
           text-align: left;
           flex-grow: 1;
           display: flex;
@@ -380,7 +581,7 @@ function EmpresasSearch() {
         .empresas-list .card-title {
           color: var(--primary-blue);
           font-weight: 700;
-          font-size: 1.8rem; /* Título maior */
+          font-size: 1.8rem;
           margin-bottom: 0.75rem;
           line-height: 1.3;
         }
@@ -393,8 +594,8 @@ function EmpresasSearch() {
             gap: 0.5rem;
         }
         .empresas-list .card-details {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
             border-bottom: 1px solid var(--border-light);
         }
         .empresas-list .card-details p {
@@ -402,8 +603,8 @@ function EmpresasSearch() {
             font-size: 0.95rem;
             color: var(--dark-gray);
             display: flex;
-            align-items: flex-start; /* Alinha o texto ao topo, caso o ícone seja maior */
-            gap: 0.75rem; /* Espaço entre ícone e texto */
+            align-items: flex-start;
+            gap: 0.75rem;
         }
         .empresas-list .card-details p strong {
             color: var(--primary-blue);
@@ -412,11 +613,39 @@ function EmpresasSearch() {
         .empresas-list .card-details p .icon {
             color: var(--accent-blue);
             font-size: 1.1rem;
-            flex-shrink: 0; /* Impede o ícone de encolher */
+            flex-shrink: 0;
             position: relative;
             top: 2px;
         }
 
+        .status-aberto {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem !important;
+            font-size: 1rem !important;
+        }
+        .status-aberto .icon-status {
+            font-size: 1.2rem;
+        }
+        .status-aberto.open {
+            color: var(--success-green);
+        }
+        .status-aberto.closed {
+            color: var(--danger-red);
+        }
+        .empresas-list .card-details p:has(.status-aberto) {
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem !important;
+        }
+        .empresas-list .card-details {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
         .empresas-list .list-servicos {
             margin-bottom: 1.5rem;
         }
@@ -430,8 +659,8 @@ function EmpresasSearch() {
             gap: 0.5rem;
         }
         .empresas-list .list-servicos ul {
-            padding-left: 1.2rem; /* Indentação para os itens da lista */
-            list-style: none; /* Remove bullet padrão */
+            padding-left: 1.2rem;
+            list-style: none;
         }
         .empresas-list .list-servicos ul li {
             position: relative;
@@ -441,7 +670,7 @@ function EmpresasSearch() {
             color: var(--medium-gray);
         }
         .empresas-list .list-servicos ul li::before {
-            content: "•"; /* Bullet customizado */
+            content: "•";
             color: var(--success-green);
             position: absolute;
             left: 0;
@@ -450,25 +679,24 @@ function EmpresasSearch() {
         .empresas-list .btn-success {
           background-color: var(--success-green);
           border-color: var(--success-green);
-          padding: 0.9rem; /* Botão maior */
-          font-weight: 700; /* Texto mais forte */
+          padding: 0.9rem;
+          font-weight: 700;
           border-radius: 8px;
-          margin-top: auto; /* Empurra para o final do card */
+          margin-top: auto;
           transition: all 0.3s ease;
           width: 100%;
           font-size: 1.05rem;
         }
         .empresas-list .btn-success:hover {
-          background-color: #218838; /* Verde mais escuro no hover */
+          background-color: #218838;
           border-color: #1e7e34;
           transform: translateY(-3px);
           box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
         }
         .empresas-list .rating-container {
-          margin-bottom: 1rem; /* Espaço para separar dos outros detalhes */
+          margin-bottom: 1rem;
         }
 
-        /* Mensagens (Erro, Vazio) */
         .message {
           font-size: 1.2rem;
           padding: 2rem;
@@ -483,21 +711,12 @@ function EmpresasSearch() {
           gap: 1rem;
           font-weight: 500;
         }
-        .message.error {
-          color: var(--danger-red);
-          background-color: #ffebeb;
-          border: 1px solid var(--danger-red);
-        }
         .message.warning {
           color: var(--warning-orange);
           background-color: #fff8e1;
           border: 1px solid var(--warning-orange);
         }
 
-
-        /* ======================================= */
-        /* --- ESTILOS DO SKELETON LOADER NOVO --- */
-        /* ======================================= */
         @keyframes shimmer {
             0% { background-position: -468px 0; }
             100% { background-position: 468px 0; }
@@ -508,7 +727,6 @@ function EmpresasSearch() {
             border-radius: 8px;
             height: 1.2rem;
             margin-bottom: 0.75rem;
-            /* Efeito de brilho (Shimmer) */
             background-image: linear-gradient(to right, var(--border-light) 0%, #ececec 20%, var(--border-light) 40%, var(--border-light) 100%);
             background-repeat: no-repeat;
             background-size: 800px 104px;
@@ -535,8 +753,7 @@ function EmpresasSearch() {
         }
 
 
-        /* Responsividade */
-        @media (max-width: 991px) { /* Tablets e menores */
+        @media (max-width: 991px) {
           .empresas-header { padding: 2.5rem 0; }
           .empresas-header h1 { font-size: 2.3rem; }
           .empresas-header .lead { font-size: 1.15rem; }
@@ -547,7 +764,7 @@ function EmpresasSearch() {
           .empresas-list .card-body { padding: 1.5rem; }
         }
 
-        @media (max-width: 767px) { /* Celulares */
+        @media (max-width: 767px) {
           .empresas-header { padding: 2rem 1rem; }
           .empresas-header h1 { font-size: 2rem; gap: 0.5rem; }
           .empresas-header .lead { font-size: 1rem; }
@@ -633,16 +850,14 @@ function EmpresasSearch() {
           setPais={setPais}
           tipoEmpresa={tipoEmpresa}
           setTipoEmpresa={setTipoEmpresa}
+          abertoAgoraFilter={abertoAgoraFilter}
+          setAbertoAgoraFilter={setAbertoAgoraFilter}
           tiposDisponiveis={tiposDisponiveis}
           estados={estados}
         />
 
         <section className="empresas-list container">
           {empresas.loading ? (
-            // =================================================================
-            // 2. APLICAÇÃO DO SKELETON LOADER
-            // Renderiza 6 esqueletos enquanto carrega
-            // =================================================================
             <div className="row">
                 {[...Array(6)].map((_, index) => (
                     <EmpresaCardSkeleton key={index} />
@@ -650,57 +865,74 @@ function EmpresasSearch() {
             </div>
           ) : filteredEmpresas && filteredEmpresas.length > 0 ? (
             <div className="row">
-              {filteredEmpresas.map((empresa, index) => (
-                <div key={index} className="col-lg-4 col-md-6 mb-4">
-                  <div className="card">
-                    <div className="card-img-container">
-                      <img
-                        src={empresa.logo || "https://via.placeholder.com/220x220?text=Sem+Logo"}
-                        alt={empresa.nome}
-                        className="card-img-top"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="card-body">
-                      <h5 className="card-title">{empresa.nome}</h5>
+              {filteredEmpresas.map((empresa, index) => {
+                const estaAberta = isEmpresaOpenNow(empresa);
 
-                      <div className="card-details">
-                          <RatingStars
-                            score={empresa.nota_empresa}
-                            ratingCount={empresa.avaliacoes_empresa}
-                          />
-                          <p>
-                            <FaBuilding className="icon" />
-                            <strong>Tipo:</strong> {empresa.tipo}
-                          </p>
-                          <p>
-                            <FaMapMarkerAlt className="icon" />
-                            <strong>Localidade:</strong> {empresa.cidade}, {empresa.estado}, {empresa.pais}
-                          </p>
-                          {empresa.telefone && (
-                              <p>
-                                <FaPhoneAlt className="icon" />
-                                <strong>Telefone:</strong> {empresa.telefone}
-                              </p>
-                          )}
+                return (
+                  <div key={index} className="col-lg-4 col-md-6 mb-4">
+                    <div className="card">
+                      <div className="card-img-container">
+                        <img
+                          src={empresa.logo || "https://via.placeholder.com/220x220?text=Sem+Logo"}
+                          alt={empresa.nome}
+                          className="card-img-top"
+                          loading="lazy"
+                        />
                       </div>
+                      <div className="card-body">
+                        <h5 className="card-title">{empresa.nome}</h5>
 
-                      {empresa.tipo === "Locação" ? (
-                          <ListaLocacoes locacoes={empresa.locacoes} />
-                      ) : (
-                          <ListaServicos servicos={empresa.servicos} />
-                      )}
+                        <div className="card-details">
+                            <RatingStars
+                              score={empresa.nota_empresa}
+                              ratingCount={empresa.avaliacoes_empresa}
+                            />
+                            <p className={`status-aberto ${estaAberta ? 'open' : 'closed'}`}>
+                                {estaAberta ? (
+                                    <>
+                                        <FaCheckCircle className="icon-status" />
+                                        <strong>Aberto Agora</strong>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FaTimesCircle className="icon-status" />
+                                        <strong>Fechado Agora</strong>
+                                    </>
+                                )}
+                            </p>
+                            <p>
+                              <FaBuilding className="icon" />
+                              <strong>Tipo:</strong> {empresa.tipo}
+                            </p>
+                            <p>
+                              <FaMapMarkerAlt className="icon" />
+                              <strong>Localidade:</strong> {empresa.cidade}, {empresa.estado}, {empresa.pais}
+                            </p>
+                            {empresa.telefone && (
+                                <p>
+                                  <FaPhoneAlt className="icon" />
+                                  <strong>Telefone:</strong> {empresa.telefone}
+                                </p>
+                            )}
+                        </div>
 
-                      <Link
-                        to={`/empresas/${empresa.slug}`}
-                        className="btn btn-success"
-                      >
-                        Ver Detalhes e Agendar
-                      </Link>
+                        {empresa.tipo === "Locação" ? (
+                            <ListaLocacoes locacoes={empresa.locacoes} />
+                        ) : (
+                            <ListaServicos servicos={empresa.servicos} />
+                        )}
+
+                        <Link
+                          to={`/empresas/${empresa.slug}`}
+                          className="btn btn-success"
+                        >
+                          Ver Detalhes e Agendar
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="message warning">

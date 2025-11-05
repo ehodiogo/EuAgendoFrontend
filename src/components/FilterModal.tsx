@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaFilter, FaTimes, FaGlobe, FaCity, FaMap, FaHome, FaBuilding, FaBroom } from 'react-icons/fa';
+import { FaFilter, FaTimes, FaGlobe, FaCity, FaMap, FaHome, FaBuilding, FaBroom, FaClock } from 'react-icons/fa'; // Importei FaClock
 
 interface FilterModalProps {
     show: boolean;
@@ -16,6 +16,8 @@ interface FilterModalProps {
     setPais: React.Dispatch<React.SetStateAction<string>>;
     tipoEmpresa: string;
     setTipoEmpresa: React.Dispatch<React.SetStateAction<string>>;
+    abertoAgoraFilter: boolean;
+    setAbertoAgoraFilter: React.Dispatch<React.SetStateAction<boolean>>;
     tiposDisponiveis: string[];
     estados: string[];
 }
@@ -23,7 +25,9 @@ interface FilterModalProps {
 const FilterModal: React.FC<FilterModalProps> = ({
     show, onClose, onApply, onClear,
     cidade, setCidade, estado, setEstado, bairro, setBairro, pais, setPais,
-    tipoEmpresa, setTipoEmpresa, tiposDisponiveis, estados
+    tipoEmpresa, setTipoEmpresa,
+    abertoAgoraFilter, setAbertoAgoraFilter,
+    tiposDisponiveis, estados
 }) => {
     if (!show) {
         return null;
@@ -109,6 +113,19 @@ const FilterModal: React.FC<FilterModalProps> = ({
                                 onChange={(e) => setPais(e.target.value)}
                             />
                         </div>
+                    </div>
+
+                    <div className="form-group form-check mt-3 mb-4">
+                        <input
+                            type="checkbox"
+                            className="form-check-input"
+                            id="abertoAgoraCheck"
+                            checked={abertoAgoraFilter}
+                            onChange={(e) => setAbertoAgoraFilter(e.target.checked)}
+                        />
+                        <label className="form-check-label" htmlFor="abertoAgoraCheck">
+                            <FaClock className="me-2" /> Apenas empresas <strong>abertas agora</strong>
+                        </label>
                     </div>
 
                     <div className="d-grid gap-2 mt-4">
