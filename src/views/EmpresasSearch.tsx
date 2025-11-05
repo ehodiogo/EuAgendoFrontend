@@ -235,53 +235,6 @@ const ListaLocacoes: React.FC<{ locacoes?: Locacao[] }> = ({ locacoes }) => (
     </div>
 );
 
-const timeToMinutes = (time: string): number => {
-    const [hours, minutes] = time.split(':').map(Number);
-    return hours * 60 + minutes;
-};
-
-const isEmpresaOpenNow = (empresa: Empresa): boolean => {
-    const now = new Date();
-    const dayOfWeek = now.getDay();
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-    let abreHora, fechaHora;
-
-    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-        abreHora = timeToMinutes(empresa.horario_abertura_dia_semana);
-        fechaHora = timeToMinutes(empresa.horario_fechamento_dia_semana);
-    } else if (dayOfWeek === 6 && empresa.abre_sabado) {
-        abreHora = timeToMinutes(empresa.horario_abertura_fim_de_semana);
-        fechaHora = timeToMinutes(empresa.horario_fechamento_fim_de_semana);
-    } else if (dayOfWeek === 0 && empresa.abre_domingo) {
-        abreHora = timeToMinutes(empresa.horario_abertura_fim_de_semana);
-        fechaHora = timeToMinutes(empresa.horario_fechamento_fim_de_semana);
-    } else {
-        return false;
-    }
-
-    const estaAbertoGeral = fechaHora > abreHora
-        ? (currentMinutes >= abreHora && currentMinutes < fechaHora)
-        : (currentMinutes >= abreHora || currentMinutes < fechaHora);
-
-    if (!estaAbertoGeral) {
-        return false;
-    }
-
-    if (empresa.para_almoco && empresa.horario_pausa_inicio && empresa.horario_pausa_fim) {
-        const abreAlmoco = timeToMinutes(empresa.horario_pausa_inicio);
-        const fechaAlmoco = timeToMinutes(empresa.horario_pausa_fim);
-
-        const emPausa = currentMinutes >= abreAlmoco && currentMinutes < fechaAlmoco;
-
-        if (emPausa) {
-            return false;
-        }
-    }
-
-    return true;
-};
-
 function EmpresasSearch() {
   const [search, setSearch] = useState("");
   const [cidade, setCidade] = useState("");
@@ -296,7 +249,7 @@ function EmpresasSearch() {
   const tiposDisponiveis = ["Serviço", "Locação"];
 
   const filteredEmpresas = empresas.data?.filter((empresa: Empresa) => {
-    const estaAberta = isEmpresaOpenNow(empresa);
+    const estaAberta = empresa.aberto_agora;
 
     const matchesSearch = empresa.nome.toLowerCase().includes(search.toLowerCase());
     const matchesCidade = cidade ? empresa.cidade.toLowerCase().includes(cidade.toLowerCase()) : true;
@@ -866,7 +819,7 @@ function EmpresasSearch() {
           ) : filteredEmpresas && filteredEmpresas.length > 0 ? (
             <div className="row">
               {filteredEmpresas.map((empresa, index) => {
-                const estaAberta = isEmpresaOpenNow(empresa);
+                const estaAberta = empresa.aberto_agora;
 
                 return (
                   <div key={index} className="col-lg-4 col-md-6 mb-4">
