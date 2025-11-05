@@ -484,6 +484,16 @@ function EmpresaDetails() {
                                           )}
                                       </span>
                                   </div>
+                              <div className="contact-item">
+                                      <strong><FaRegAddressCard className="me-1" /> Empresa está aberta?</strong>
+                                      <span className="text-end">
+                                          {empresa.aberto_agora ? (
+                                              <span className="badge bg-success">Aberta</span>
+                                          ) : (
+                                              <span className="badge bg-success">Fechada</span>
+                                          )}
+                                      </span>
+                                  </div>
                               <div className="contact-item invisible">.</div>
                           </div>
                       </div>
