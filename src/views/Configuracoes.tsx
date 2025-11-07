@@ -1,20 +1,13 @@
 import { useState, useEffect } from "react";
-import { FaSpinner, FaEnvelope, FaLink, FaGear, FaCopy } from "react-icons/fa6";
-import {FaCheckCircle, FaExclamationCircle} from "react-icons/fa";
+import { FaSpinner, FaCopy, FaCheck, FaExclamation, FaCrown } from "react-icons/fa6";
 import Navbar from "../components/Navbar";
 import axios from "axios";
-import { PerfilUsuario} from "../interfaces/PerfilUsuario.tsx";
+import { PerfilUsuario } from "../interfaces/PerfilUsuario.tsx";
 
 const SettingsView = () => {
   const [settings, setSettings] = useState<PerfilUsuario>({
     id: 0,
-    usuario: {
-      id: 0,
-      first_name: "",
-      email: "",
-      username: "",
-      password: ""
-    },
+    usuario: { id: 0, first_name: "", email: "", username: "", password: "" },
     codigo_afiliado: "",
     codigo_usado: "",
     receive_email_notifications: false,
@@ -23,6 +16,7 @@ const SettingsView = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
   const [copyStatus, setCopyStatus] = useState<"copied" | null>(null);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
   const baseURL = import.meta.env.VITE_API_URL;
   const token = localStorage.getItem("access_token");
@@ -38,7 +32,6 @@ const SettingsView = () => {
 
       setIsLoading(true);
       try {
-
         const response = await axios.get(`${baseURL}/api/perfil-usuario/me/`, {
           params: { usuario_token: token },
         });
@@ -61,27 +54,23 @@ const SettingsView = () => {
   }, [token, baseURL]);
 
   const handleToggleEmailNotifications = () => {
-    setSettings((prev : PerfilUsuario) => ({
+    setSettings(prev => ({
       ...prev,
       receive_email_notifications: !prev.receive_email_notifications,
     }));
   };
 
   const handleGenerateAffiliateCode = async () => {
-    if (!token) {
-      console.error("Token de autenticação não encontrado");
-      setSubmitStatus("error");
-      return;
-    }
+    if (!token) return setSubmitStatus("error");
 
-    setIsSubmitting(true);
+    setIsGenerating(true);
     setSubmitStatus(null);
     try {
       const response = await axios.post(
         `${baseURL}/api/perfil-usuario/affiliate-code/`,
         { usuario_token: token },
       );
-      setSettings((prev: PerfilUsuario) => ({
+      setSettings(prev => ({
         ...prev,
         codigo_afiliado: response.data.codigo_afiliado ?? "",
       }));
@@ -91,25 +80,21 @@ const SettingsView = () => {
       console.error("Error generating affiliate code:", error);
       setSubmitStatus("error");
     } finally {
-      setIsSubmitting(false);
+      setIsGenerating(false);
     }
   };
 
   const handleCopyCode = () => {
-      if (settings.codigo_afiliado) {
-          navigator.clipboard.writeText(settings.codigo_afiliado);
-          setCopyStatus("copied");
-          setTimeout(() => setCopyStatus(null), 2000);
-      }
-  }
+    if (settings.codigo_afiliado) {
+      navigator.clipboard.writeText(settings.codigo_afiliado);
+      setCopyStatus("copied");
+      setTimeout(() => setCopyStatus(null), 2000);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) {
-      console.error("Token de autenticação não encontrado");
-      setSubmitStatus("error");
-      return;
-    }
+    if (!token) return setSubmitStatus("error");
 
     setIsSubmitting(true);
     setSubmitStatus(null);
@@ -136,368 +121,377 @@ const SettingsView = () => {
       <Navbar />
       <div className="settings-container min-h-screen">
         <style>{`
-          /* Variaveis e Layout Base */
           :root {
-            --primary-blue: #003087;
-            --accent-blue: #0056b3;
-            --dark-gray: #212529;
-            --medium-gray: #6c757d;
-            --light-gray-bg: #f5f7fa;
+            --primary: #003087;
+            --primary-dark: #00205b;
+            --accent: #f6c107;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #fd7e14;
+            --info: #0056b3;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-600: #6c757d;
             --white: #ffffff;
-            --success-green: #28a745;
-            --danger-red: #dc3545;
-            --warning-orange: #fd7e14;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-md: 0 8px 25px rgba(0,0,0,0.15);
+            --shadow-lg: 0 15px 40px rgba(0,0,0,0.25);
+            --radius: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           }
 
-          .settings-container {
-            background-color: var(--light-gray-bg);
-            padding-top: 80px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start; /* Alinha ao topo para evitar gap visual */
-            width: 100%;
-            padding: 4rem 1rem;
-          }
+          @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+          @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+          @keyframes shimmer { 0% { background-position: -468px 0; } 100% { background-position: 468px 0; } }
 
-          /* Card Principal */
-          .settings-container .settings-card {
-            background-color: var(--white);
-            border: 1px solid rgba(0, 48, 135, 0.05);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 3rem;
-            max-width: 760px;
-            width: 100%;
+          .hero-gradient {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 4rem 0 3rem;
             text-align: center;
+            position: relative;
+            overflow: hidden;
           }
-
-          .settings-container .settings-card h2 {
-            color: var(--dark-gray);
+          .hero-gradient::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(246,193,7,0.15), transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1), transparent 50%);
+            pointer-events: none;
+          }
+          .hero-gradient h1 {
+            font-size: 3rem;
             font-weight: 800;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 1rem;
-            letter-spacing: -0.04em;
+            animation: fadeInUp 0.8s ease-out;
           }
-          .settings-container .settings-card h2 svg {
-              color: var(--primary-blue);
-              font-size: 2.75rem;
-          }
-
-          /* Seções de Configuração */
-          .settings-container .settings-section {
-            background-color: var(--white);
-            border: 1px solid #e0e0e0;
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2.5rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
-            text-align: left;
-          }
-          .settings-container .settings-section h3 {
-              color: var(--accent-blue);
-              font-size: 1.5rem;
-              font-weight: 700;
-              margin-bottom: 1.5rem;
-              display: flex;
-              align-items: center;
-              gap: 0.75rem;
-              border-bottom: 2px solid var(--light-gray-bg);
-              padding-bottom: 0.75rem;
+          .hero-gradient .lead {
+            font-size: 1.25rem;
+            max-width: 800px;
+            margin: 1rem auto 0;
+            opacity: 0.95;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
           }
 
-          /* Toggle para Email */
-          .settings-container .toggle-group {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              padding: 1rem 0;
+          .settings-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
           }
-          .settings-container .toggle-group label {
-            color: var(--dark-gray);
-            font-size: 1.15rem;
-            font-weight: 500;
+
+          .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-200);
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.6s ease-out;
+          }
+          .card h3 {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--gray-200);
+          }
+
+          .toggle-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 0;
+          }
+          .toggle-label {
+            font-weight: 600;
+            color: #212529;
+            font-size: 1.1rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
           }
-          .settings-container .toggle-switch {
-            width: 50px;
-            height: 28px;
+          .toggle-switch {
+            position: relative;
+            width: 56px;
+            height: 32px;
           }
-          .settings-container .slider {
-            border-radius: 34px;
+          .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+          }
+          .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
             background-color: #ccc;
+            transition: var(--transition);
+            border-radius: 34px;
           }
-          .settings-container .slider:before {
-            height: 20px;
-            width: 20px;
+          .slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
             left: 4px;
             bottom: 4px;
+            background-color: white;
+            transition: var(--transition);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
           }
-          .settings-container input:checked + .slider {
-            background-color: var(--success-green); /* Verde para 'Ativado' */
+          input:checked + .slider {
+            background-color: var(--success);
           }
-          .settings-container input:checked + .slider:before {
-            transform: translateX(22px);
+          input:checked + .slider:before {
+            transform: translateX(24px);
           }
 
-          /* Seção de Afiliado */
-          .affiliate-group {
-              margin-top: 1.5rem;
-              padding-top: 1.5rem;
-              border-top: 1px dashed #e0e0e0;
+          .affiliate-section {
+            padding: 2rem;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 16px;
+            border: 1px dashed var(--primary);
+            text-align: center;
           }
-          .affiliate-group p {
-              color: var(--medium-gray);
-              margin-bottom: 1rem;
-              font-size: 0.95rem;
+          .affiliate-section p {
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+            font-size: 0.98rem;
           }
-          .affiliate-code-display {
+          .code-display {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            background-color: var(--light-gray-bg);
-            border: 2px solid var(--primary-blue);
-            border-radius: 12px;
-            padding: 0.75rem 1.25rem;
-            font-size: 1.25rem;
+            justify-content: center;
+            gap: 1rem;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 14px;
+            padding: 1rem 1.5rem;
             font-weight: 700;
-            color: var(--primary-blue);
+            font-size: 1.3rem;
+            color: var(--primary);
             margin-bottom: 1.5rem;
-            overflow: hidden;
+            box-shadow: var(--shadow-sm);
           }
-          .affiliate-code-display span {
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
+          .code-display span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 280px;
           }
           .copy-btn {
-              background-color: var(--accent-blue);
-              color: var(--white);
-              padding: 0.5rem 1rem;
-              border-radius: 8px;
-              font-weight: 600;
-              font-size: 0.9rem;
-              transition: background-color 0.3s ease;
-              display: flex;
-              align-items: center;
-              gap: 0.5rem;
-              flex-shrink: 0;
+            background: var(--info);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
           }
           .copy-btn:hover {
-              background-color: var(--primary-blue);
+            background: var(--primary);
+            transform: translateY(-2px);
           }
           .generate-btn {
-              background-color: var(--warning-orange);
-              color: var(--dark-gray);
-              font-weight: 700;
-              padding: 0.75rem 1.5rem;
-              border-radius: 10px;
-              transition: all 0.3s ease;
-          }
-          .generate-btn:hover {
-              background-color: #e07412;
-              transform: translateY(-2px);
-              box-shadow: 0 4px 8px rgba(253, 126, 20, 0.4);
-          }
-          .generate-btn:disabled {
-              background-color: #ccc;
-              color: var(--dark-gray);
-              cursor: not-allowed;
-              opacity: 0.8;
-          }
-
-          /* Botão de Salvar */
-          .settings-container .submit-btn {
-            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
-            color: var(--white);
-            padding: 1rem 3rem;
+            background: var(--warning);
+            color: #212529;
+            border: none;
+            padding: 0.9rem 2rem;
             border-radius: 12px;
-            font-size: 1.2rem;
             font-weight: 700;
-            transition: all 0.3s ease;
-            display: inline-flex;
+            font-size: 1rem;
+            display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.75rem;
             width: 100%;
-            max-width: 320px;
-            margin-top: 1rem;
+            transition: var(--transition);
+          }
+          .generate-btn:hover:not(:disabled) {
+            background: #e07412;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(253, 126, 20, 0.4);
+          }
+          .generate-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.8;
+          }
+
+          .submit-btn {
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            color: white;
+            border: none;
+            padding: 1.1rem 3rem;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1.15rem;
+            width: 100%;
+            max-width: 360px;
+            margin: 2rem auto 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: var(--transition);
             box-shadow: 0 6px 16px rgba(0, 48, 135, 0.25);
           }
-          .settings-container .submit-btn:hover {
-            background: linear-gradient(135deg, var(--accent-blue), var(--primary-blue));
+          .submit-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--info), var(--primary));
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0, 48, 135, 0.35);
           }
-          .settings-container .submit-btn:disabled {
+          .submit-btn:disabled {
             background: #d1d5db;
-            color: var(--dark-gray);
+            color: var(--gray-600);
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
           }
 
-          /* Mensagens de Status */
-          .settings-container .message {
-            font-size: 1.1rem;
-            padding: 1rem;
-            border-radius: 10px;
+          .status-message {
+            margin-top: 1.5rem;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.75rem;
-            font-weight: 600;
-            margin-top: 1.5rem;
-            max-width: 500px;
-            width: 100%;
-            margin-left: auto;
-            margin-right: auto;
+            animation: fadeInUp 0.4s ease-out;
           }
-          .settings-container .message.success {
-            color: var(--success-green);
-            background-color: rgba(40, 167, 69, 0.1);
-            border: 1px solid var(--success-green);
+          .status-success {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
           }
-          .settings-container .message.error {
-            color: var(--danger-red);
-            background-color: rgba(220, 53, 69, 0.1);
-            border: 1px solid var(--danger-red);
+          .status-error {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
           }
-          .settings-container .message.loading {
-            color: var(--dark-gray);
-            background-color: var(--white);
-            border: 1px solid var(--dark-gray);
+
+          .loading-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--gray-600);
           }
-          
-          /* Responsividade */
+          .spinner {
+            animation: spin 1s linear infinite;
+          }
+          @keyframes spin { to { transform: rotate(360deg); } }
+
           @media (max-width: 768px) {
-            .settings-container {
-              padding: 2rem 1rem;
-            }
-            .settings-container .settings-card {
-              padding: 2rem 1.5rem;
-              border-radius: 16px;
-            }
-            .settings-container .settings-card h2 {
-              font-size: 2rem;
-              margin-bottom: 2rem;
-            }
-            .settings-container .settings-section {
-              padding: 1.5rem;
-            }
-            .settings-container .toggle-group label {
-              font-size: 1rem;
-            }
-            .affiliate-code-display {
-                font-size: 1.1rem;
-                padding: 0.6rem 1rem;
-            }
-            .copy-btn {
-                font-size: 0.8rem;
-                padding: 0.4rem 0.8rem;
-            }
-            .settings-container .submit-btn {
-              font-size: 1.1rem;
-              padding: 0.8rem 2.5rem;
-              max-width: 280px;
-            }
+            .hero-gradient h1 { font-size: 2.2rem; }
+            .settings-content { padding: 2rem 1rem; }
+            .card { padding: 2rem 1.5rem; }
+            .code-display { font-size: 1.1rem; flex-direction: column; }
+            .copy-btn { width: 100%; justify-content: center; }
+            .submit-btn { font-size: 1.05rem; padding: 1rem 2.5rem; }
           }
         `}</style>
-        <section className="settings-card" aria-labelledby="settings-title">
+
+        {/* HERO */}
+        <header className="hero-gradient">
+          <div className="container">
+            <h1>Configurações</h1>
+            <p className="lead">
+              Personalize suas preferências, gerencie notificações e ative seu programa de afiliados.
+            </p>
+          </div>
+        </header>
+
+        <section className="container settings-content">
           {isLoading ? (
-            <div className="message loading">
-              <FaSpinner className="fa-spin text-xl" aria-hidden="true" /> Carregando configurações...
+            <div className="loading-state">
+              <FaSpinner className="spinner" size={40} />
+              <p className="mt-3">Carregando suas configurações...</p>
             </div>
           ) : (
-            <>
-              <h2 id="settings-title">
-                <FaGear aria-hidden="true" /> Configurações de Usuário
-              </h2>
-              <form onSubmit={handleSubmit} aria-label="Formulário de configurações">
-
-                <div className="settings-section">
-                    <h3><FaEnvelope /> Notificações</h3>
-                    <div className="toggle-group">
-                        <label htmlFor="email-notifications" className="cursor-pointer">
-                            Receber e-mails de agendamentos
-                        </label>
-                        <div className="toggle-switch">
-                            <input
-                            type="checkbox"
-                            id="email-notifications"
-                            checked={settings.receive_email_notifications}
-                            onChange={handleToggleEmailNotifications}
-                            aria-label="Ativar/desativar e-mails de agendamentos"
-                            />
-                            <span className="slider"></span>
-                        </div>
-                    </div>
+            <form onSubmit={handleSubmit}>
+              {/* NOTIFICAÇÕES */}
+              <div className="card">
+                <h3>Notificações por E-mail</h3>
+                <div className="toggle-group">
+                  <label htmlFor="email-toggle" className="toggle-label">
+                    Receber alertas de agendamentos
+                  </label>
+                  <label className="toggle-switch">
+                    <input
+                      type="checkbox"
+                      id="email-toggle"
+                      checked={settings.receive_email_notifications}
+                      onChange={handleToggleEmailNotifications}
+                    />
+                    <span className="slider"></span>
+                  </label>
                 </div>
+              </div>
 
-                <div className="settings-section affiliate-group">
-                    <h3><FaLink /> Programa de Afiliados</h3>
-                    <p>Compartilhe seu código de afiliado para que novos usuários usem e ganhem benefícios.</p>
+              {/* AFILIADOS */}
+              <div className="card">
+                <h3>Programa de Afiliados</h3>
+                <div className="affiliate-section">
+                  <p>
+                    Ganhe com indicações! Compartilhe seu código único e receba benefícios a cada novo cadastro.
+                  </p>
 
-                    <div className="affiliate-code-display" id="affiliate-code">
-                        <span>{settings.codigo_afiliado || "Nenhum código gerado"}</span>
-                        {settings.codigo_afiliado && (
-                            <button
-                                type="button"
-                                className="copy-btn"
-                                onClick={handleCopyCode}
-                                aria-label="Copiar código de afiliado"
-                            >
-                                <FaCopy /> {copyStatus === "copied" ? "Copiado!" : "Copiar"}
-                            </button>
-                        )}
-                    </div>
+                  <div className="code-display">
+                    <span>{settings.codigo_afiliado || "Nenhum código gerado"}</span>
+                    {settings.codigo_afiliado && (
+                      <button type="button" className="copy-btn" onClick={handleCopyCode}>
+                        {copyStatus === "copied" ? <FaCheck /> : <FaCopy />} {copyStatus === "copied" ? "Copiado!" : "Copiar"}
+                      </button>
+                    )}
+                  </div>
 
-                    <button
-                        type="button"
-                        className="settings-btn generate-btn"
-                        onClick={handleGenerateAffiliateCode}
-                        disabled={isSubmitting}
-                        aria-label="Gerar novo código de afiliado"
-                    >
-                        {isSubmitting ? (
-                            <FaSpinner className="fa-spin inline mr-2 text-xl" aria-hidden="true" />
-                        ) : (
-                            "Gerar/Renovar Código"
-                        )}
-                    </button>
+                  <button
+                    type="button"
+                    className="generate-btn"
+                    onClick={handleGenerateAffiliateCode}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? (
+                      <FaSpinner className="spinner" />
+                    ) : (
+                      <>
+                        <FaCrown /> Gerar Novo Código
+                      </>
+                    )}
+                  </button>
                 </div>
+              </div>
 
-                <button
-                  type="submit"
-                  className="settings-btn submit-btn"
-                  disabled={isSubmitting}
-                  aria-label="Salvar configurações"
-                >
-                  {isSubmitting ? (
-                    <FaSpinner className="fa-spin inline mr-2 text-xl" aria-hidden="true" />
-                  ) : (
-                    "Salvar Configurações"
-                  )}
-                </button>
-              </form>
+              {/* SALVAR */}
+              <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                {isSubmitting ? <FaSpinner className="spinner" /> : "Salvar Alterações"}
+              </button>
 
+              {/* STATUS */}
               {submitStatus === "success" && (
-                <div className="message success">
-                  <FaCheckCircle className="text-xl" aria-hidden="true" /> Configurações salvas com sucesso!
+                <div className="status-message status-success">
+                  <FaCheck /> Configurações salvas com sucesso!
                 </div>
               )}
               {submitStatus === "error" && (
-                <div className="message error">
-                  <FaExclamationCircle className="text-xl" aria-hidden="true" /> Erro ao salvar configurações. Tente novamente.
+                <div className="status-message status-error">
+                  <FaExclamation /> Erro ao salvar. Tente novamente.
                 </div>
               )}
-            </>
+            </form>
           )}
         </section>
       </div>

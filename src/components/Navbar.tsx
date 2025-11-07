@@ -1,18 +1,17 @@
 import { useNavigate } from "react-router-dom";
-import { FaShoppingCart, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
+import { FaShoppingCart, FaSignOutAlt, FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
 import { useEffect, useState } from "react";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [cartItemCount, setCartItemCount] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
 
   const isAuthenticated =
     localStorage.getItem("access_token") !== null &&
     localStorage.getItem("refresh_token") !== null;
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-
     const updateCartCount = () => {
       const cart = JSON.parse(localStorage.getItem("carrinho") || "[]");
       setCartItemCount(cart.length);
@@ -21,14 +20,17 @@ const Navbar = () => {
     updateCartCount();
 
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "carrinho") {
-        updateCartCount();
-      }
+      if (e.key === "carrinho") updateCartCount();
     };
 
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "unset";
+    return () => { document.body.style.overflow = "unset"; };
+  }, [isOpen]);
 
   const handleLogout = () => {
     localStorage.removeItem("access_token");
@@ -37,268 +39,236 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  const handleLinkClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    path: string
-  ) => {
-    if (e.shiftKey || e.ctrlKey) {
-      return;
-    }
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    if (e.shiftKey || e.ctrlKey) return;
     e.preventDefault();
-    navigate(path);
+    setIsOpen(false);
+    setTimeout(() => navigate(path), 150);
   };
 
   return (
-    <div className="navbar-container">
+    <>
       <style>{`
-        .navbar-container .custom-navbar {
-          background-color: #003087 !important;
-          padding: 1rem 0;
-          transition: all 0.3s ease;
+        :root {
+          --primary: #003087;
+          --accent: #f6c107;
+          --white: #ffffff;
+          --shadow-sm: 0 4px 12px rgba(0,0,0,0.08);
+          --transition: all 0.3s ease;
+        }
+
+        .navbar-custom {
+          background: var(--primary) !important;
+          padding: 0.75rem 0;
+          min-height: 68px;
+          box-shadow: var(--shadow-sm);
           position: sticky;
           top: 0;
-          z-index: 1000;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-          max-height: 70px; /* Fixed navbar height */
+          z-index: 1050;
         }
-        .navbar-container .navbar-brand {
+
+        .navbar-brand {
+          font-weight: 700;
           font-size: 1.5rem;
-          color: #ffffff !important;
-          transition: color 0.3s ease;
-          padding: 0rem !important; /* Removed padding to save space */
+          color: white !important;
           display: flex;
-          align-items: center; /* Center logo vertically */
-          overflow: hidden; /* Prevent logo from overflowing */
+          align-items: center;
+          text-decoration: none;
         }
-        .navbar-container .navbar-brand:hover {
-          color: #e6f0fa !important;
+        .navbar-brand:hover { color: var(--accent) !important; }
+
+        .logo-img {
+          height: 42px;
+          margin-right: 0.75rem;
         }
-        .navbar-container .nav-link {
-          color: #ffffff !important;
+
+        .nav-link {
+          color: white !important;
           font-weight: 500;
           padding: 0.5rem 1rem !important;
-          transition: color 0.3s ease, background-color 0.3s ease;
-        }
-        .navbar-container .nav-link:hover {
-          color: #4dabf7 !important;
-          background-color: rgba(255, 255, 255, 0.1);
-          border-radius: 4px;
-        }
-        .navbar-container .btn-outline-primary {
-          border-color: #4dabf7;
-          color: #4dabf7;
           border-radius: 8px;
-          transition: all 0.3s ease;
+          transition: var(--transition);
         }
-        .navbar-container .btn-primary {
-          background-color: #003087;
-          border-color: #003087;
-          border-radius: 8px;
-          transition: all 0.3s ease;
+        .nav-link:hover {
+          color: var(--accent) !important;
+          background: rgba(255,255,255,0.1);
         }
-        .navbar-container .btn-outline-danger {
-          border-color: #dc3545;
-          color: #dc3545;
-          border-radius: 8px;
-          transition: all 0.3s ease;
-        }
-        .navbar-container .btn-outline-primary:hover,
-        .navbar-container .btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 2px 8px rgba(0, 48, 135, 0.3);
-          background-color: #0040c1;
-          border-color: #0040c1;
-          color: #ffffff;
-        }
-        .navbar-container .btn-outline-danger:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
-          background-color: #dc3545;
-          color: #ffffff;
-        }
-        .navbar-container .cart-badge {
-          font-size: 0.7rem;
-          padding: 4px 6px;
-          line-height: 1;
-          background-color: #dc3545;
-        }
-        .navbar-container .navbar-toggler {
+
+        .btn-cta {
+          background: var(--accent);
+          color: #212529;
+          font-weight: 700;
+          padding: 0.65rem 1.8rem;
+          border-radius: 12px;
+          font-size: 0.95rem;
           border: none;
-          padding: 0.5rem;
+          box-shadow: 0 4px 15px rgba(246,193,7,0.3);
+          transition: var(--transition);
         }
-        .navbar-container .navbar-toggler:focus {
-          outline: none;
-          box-shadow: none;
+        .btn-cta:hover {
+          background: #e0a800;
+          transform: translateY(-3px);
+          box-shadow: 0 8px 20px rgba(246,193,7,0.4);
         }
-        .navbar-container .dropdown-menu {
-          background-color: #ffffff;
+
+        .cart-btn {
+          position: relative;
+          width: 44px; height: 44px;
+          background: rgba(255,255,255,0.15);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          transition: var(--transition);
+        }
+        .cart-btn:hover {
+          background: var(--accent);
+          color: #212529;
+        }
+
+        .cart-badge {
+          position: absolute;
+          top: -6px; right: -6px;
+          background: #dc3545;
+          color: white;
+          font-size: 0.65rem;
+          font-weight: 700;
+          min-width: 18px; height: 18px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: pop 0.3s ease-out;
+        }
+        @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+
+        .user-btn {
+          background: none;
           border: none;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          border-radius: 8px;
-          min-width: 200px;
-          z-index: 1001; /* Ensure dropdown appears above navbar */
-          position: absolute; /* Ensure dropdown is positioned correctly */
-          top: 100%; /* Position below the toggle button */
-          right: 0; /* Align to the right */
+          color: white;
+          width: 44px; height: 44px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
-        .navbar-container .dropdown-item {
-          padding: 0.75rem 1.25rem;
-          transition: background-color 0.3s ease;
-          color: #003087;
+        .user-btn:hover { background: rgba(255,255,255,0.15); }
+
+        .hamburger {
+          width: 44px; height: 44px;
+          background: rgba(255,255,255,0.15);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          border: none;
         }
-        .navbar-container .dropdown-item:hover {
-          background-color: rgba(77, 171, 247, 0.1);
-          color: #003087;
+        .hamburger:hover {
+          background: var(--accent);
+          color: #212529;
         }
-        .navbar-container .logo-img {
-          width: 120px; /* Increased logo size */
-          height: 120px;
-          object-fit: contain; /* Ensure logo scales without stretching navbar */
+
+        /* MOBILE MENU */
+        .mobile-overlay {
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0,0,0,0.5);
+          z-index: 1040;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.3s ease;
         }
-        @media (max-width: 991px) {
-          .navbar-container .custom-navbar {
-            max-height: none; /* Allow navbar to expand on mobile */
-          }
-          .navbar-container .navbar-nav {
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-          }
-          .navbar-container .nav-item {
-            margin-bottom: 0.5rem;
-          }
-          .navbar-container .btn {
-            width: 100%;
-            text-align: left;
-            justify-content: start;
-          }
-          .navbar-container .dropdown-menu {
-            position: static !important;
-            transform: none !important;
-            background-color: rgba(255, 255, 255, 0.95);
-            z-index: 1001; /* Ensure visibility on mobile */
-          }
-          .navbar-container .logo-img {
-            width: 100px; /* Slightly smaller logo on mobile */
-            height: 100px;
-          }
+        .mobile-overlay.open {
+          opacity: 1;
+          visibility: visible;
+        }
+
+        .mobile-menu {
+          position: fixed;
+          top: 0; right: -100%;
+          width: 280px; height: 100vh;
+          background: var(--primary);
+          z-index: 1041;
+          padding: 5rem 1.5rem 2rem;
+          transition: right 0.4s ease;
+          box-shadow: -8px 0 25px rgba(0,0,0,0.2);
+        }
+        .mobile-menu.open { right: 0; }
+
+        .mobile-menu .nav-link {
+          color: white;
+          font-size: 1.3rem;
+          font-weight: 500;
+          padding: 0.75rem 0;
+          border-bottom: 1px solid rgba(255,255,255,0.1);
+          display: block;
+        }
+        .mobile-menu .btn-cta {
+          margin-top: 1.5rem;
+          width: 100%;
         }
       `}</style>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm custom-navbar">
+
+      {/* NAVBAR */}
+      <nav className="navbar navbar-expand-lg navbar-custom">
         <div className="container-fluid px-4">
-          <a className="navbar-brand d-flex align-items-center" href="/">
-            <img
-              src="/vem-agendar.png"
-              alt="Logo VemAgendar"
-              className="me-2 logo-img"
-            />
+          {/* LOGO */}
+          <a href="/" className="navbar-brand" onClick={(e) => handleLinkClick(e, "/")}>
+            <img src="/vem-agendar.png" alt="VemAgendar" className="logo-img" />
+            VemAgendar
           </a>
+
+          {/* TOGGLE MOBILE */}
           <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
+            className="d-lg-none hamburger"
+            onClick={() => setIsOpen(!isOpen)}
           >
-            <span className="navbar-toggler-icon"></span>
+            {isOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
           </button>
+
+          {/* DESKTOP MENU */}
           <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav ms-auto align-items-center">
+            <ul className="navbar-nav ms-auto align-items-center gap-2">
               <li className="nav-item">
-                <a
-                  className="nav-link text-light px-3"
-                  href="/sobre"
-                  onClick={(e) => handleLinkClick(e, "/sobre")}
-                  aria-label="Navegar para a página Sobre"
-                >
-                  Sobre
-                </a>
+                <a className="nav-link" href="/sobre" onClick={(e) => handleLinkClick(e, "/sobre")}>Sobre</a>
               </li>
               <li className="nav-item">
-                <a
-                  className="nav-link text-light px-3"
-                  href="/planos"
-                  onClick={(e) => handleLinkClick(e, "/planos")}
-                  aria-label="Navegar para a página Planos"
-                >
-                  Planos
-                </a>
+                <a className="nav-link" href="/planos" onClick={(e) => handleLinkClick(e, "/planos")}>Planos</a>
               </li>
               <li className="nav-item">
-                <a
-                  className="nav-link text-light px-3"
-                  href="/contato"
-                  onClick={(e) => handleLinkClick(e, "/contato")}
-                  aria-label="Navegar para a página Contato"
-                >
-                  Contato
-                </a>
+                <a className="nav-link" href="/contato" onClick={(e) => handleLinkClick(e, "/contato")}>Contato</a>
               </li>
+
               {isAuthenticated ? (
                 <>
                   <li className="nav-item">
-                    <a
-                      className="btn btn-primary px-4 mx-2 fw-semibold"
-                      href="/dashboard"
-                      onClick={(e) => handleLinkClick(e, "/dashboard")}
-                      aria-label="Navegar para o Dashboard"
-                    >
+                    <a href="/dashboard" className="btn-cta" onClick={(e) => handleLinkClick(e, "/dashboard")}>
                       Dashboard
                     </a>
                   </li>
-                  <li className="nav-item position-relative">
-                    <a
-                      className="btn btn-outline-light mx-2 position-relative"
-                      href="/carrinho"
-                      onClick={(e) => handleLinkClick(e, "/carrinho")}
-                      aria-label={`Navegar para o carrinho com ${cartItemCount} itens`}
-                    >
+                  <li className="nav-item">
+                    <a href="/carrinho" className="cart-btn" onClick={(e) => handleLinkClick(e, "/carrinho")}>
                       <FaShoppingCart size={20} />
-                      {cartItemCount > 0 && (
-                        <span className="badge rounded-pill position-absolute top-0 start-100 translate-middle cart-badge">
-                          {cartItemCount}
-                        </span>
-                      )}
+                      {cartItemCount > 0 && <span className="cart-badge">{cartItemCount}</span>}
                     </a>
                   </li>
                   <li className="nav-item dropdown">
                     <button
-                      className="btn btn-link nav-link dropdown-toggle d-flex align-items-center text-light px-3"
-                      id="userDropdown"
+                      className="user-btn"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
-                      aria-label="Menu do usuário"
                     >
-                      <FaUserCircle size={24} className="me-2" />
+                      <FaUserCircle size={26} />
                     </button>
-                    <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                      <li>
-                        <a
-                          className="dropdown-item"
-                          href="/perfil"
-                          onClick={(e) => handleLinkClick(e, "/perfil")}
-                        >
-                          Perfil
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          className="dropdown-item"
-                          href="/configuracoes"
-                          onClick={(e) => handleLinkClick(e, "/configuracoes")}
-                        >
-                          Configurações
-                        </a>
-                      </li>
+                    <ul className="dropdown-menu dropdown-menu-end">
+                      <li><a className="dropdown-item" href="/perfil" onClick={(e) => handleLinkClick(e, "/perfil")}>Perfil</a></li>
+                      <li><a className="dropdown-item" href="/configuracoes" onClick={(e) => handleLinkClick(e, "/configuracoes")}>Configurações</a></li>
                       <li><hr className="dropdown-divider" /></li>
                       <li>
-                        <button
-                          className="dropdown-item text-danger d-flex align-items-center"
-                          onClick={handleLogout}
-                        >
-                          <FaSignOutAlt className="me-2" />
-                          Sair
+                        <button className="dropdown-item text-danger d-flex align-items-center" onClick={handleLogout}>
+                          <FaSignOutAlt className="me-2" /> Sair
                         </button>
                       </li>
                     </ul>
@@ -306,12 +276,7 @@ const Navbar = () => {
                 </>
               ) : (
                 <li className="nav-item">
-                  <a
-                    className="btn btn-outline-primary px-4 mx-2 fw-semibold"
-                    href="/login"
-                    onClick={(e) => handleLinkClick(e, "/login")}
-                    aria-label="Navegar para a página de login"
-                  >
+                  <a href="/login" className="btn-cta" onClick={(e) => handleLinkClick(e, "/login")}>
                     Entrar
                   </a>
                 </li>
@@ -320,7 +285,30 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-    </div>
+
+      {/* MOBILE MENU LATERAL */}
+      <div className={`mobile-overlay ${isOpen ? 'open' : ''}`} onClick={() => setIsOpen(false)}></div>
+      <div className={`mobile-menu ${isOpen ? 'open' : ''}`}>
+        <a className="nav-link" href="/sobre" onClick={(e) => handleLinkClick(e, "/sobre")}>Sobre</a>
+        <a className="nav-link" href="/planos" onClick={(e) => handleLinkClick(e, "/planos")}>Planos</a>
+        <a className="nav-link" href="/contato" onClick={(e) => handleLinkClick(e, "/contato")}>Contato</a>
+        {isAuthenticated ? (
+          <>
+            <a className="nav-link" href="/dashboard" onClick={(e) => handleLinkClick(e, "/dashboard")}>Dashboard</a>
+            <a className="nav-link d-flex align-items-center gap-2" href="/carrinho" onClick={(e) => handleLinkClick(e, "/carrinho")}>
+              <FaShoppingCart /> Carrinho {cartItemCount > 0 && `(${cartItemCount})`}
+            </a>
+            <button className="nav-link text-danger text-start border-0 bg-transparent p-0" onClick={handleLogout}>
+              <FaSignOutAlt className="me-2" /> Sair
+            </button>
+          </>
+        ) : (
+          <a href="/login" className="btn-cta d-block text-center" onClick={(e) => handleLinkClick(e, "/login")}>
+            Entrar
+          </a>
+        )}
+      </div>
+    </>
   );
 };
 

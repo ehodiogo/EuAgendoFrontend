@@ -3,318 +3,389 @@ import { Link } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
 import Navbar from "../components/Navbar";
-import { FaBuilding, FaSpinner, FaMagnifyingGlass, FaLocationDot } from "react-icons/fa6";
+import { FaBuilding, FaMagnifyingGlass, FaLocationDot } from "react-icons/fa6";
 import {FaExclamationCircle} from "react-icons/fa";
+
+const SkeletonCard: React.FC = () => (
+  <div className="empresa-card">
+    <div className="card-img-container">
+      <div className="skeleton skeleton-img"></div>
+    </div>
+    <div className="skeleton skeleton-title mt-3" style={{ height: '1.5rem', width: '80%' }}></div>
+    <div className="skeleton skeleton-text mt-2" style={{ height: '1rem', width: '60%' }}></div>
+  </div>
+);
 
 function CheckIn() {
   const token = localStorage.getItem("access_token");
-  const empresas_usuario = useFetch<Empresa[]>(
+  const { data: empresas_usuario, loading } = useFetch<Empresa[]>(
     `/api/empresas-usuario/?usuario_token=${token}`
   );
   const [search, setSearch] = useState("");
 
-  const filteredEmpresas = empresas_usuario.data?.filter((empresa: Empresa) =>
+  const filteredEmpresas = empresas_usuario?.filter((empresa: Empresa) =>
     empresa.nome.toLowerCase().includes(search.toLowerCase()) ||
     empresa.cidade.toLowerCase().includes(search.toLowerCase()) ||
     empresa.estado.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="min-vh-100">
+    <div className="hero-bg min-vh-100">
       <style>{`
-        /* Paleta de cores (Consistente com a anterior) */
         :root {
-          --primary-blue: #003087;
-          --accent-blue: #0056b3;
-          --dark-gray: #212529;
-          --medium-gray: #6c757d;
-          --light-gray-bg: #f5f7fa;
+          --primary: #003087;
+          --primary-dark: #00205b;
+          --accent: #f6c107;
+          --success: #28a745;
+          --danger: #dc3545;
+          --info: #0056b3;
+          --gray-100: #f8f9fa;
+          --gray-200: #e9ecef;
+          --gray-600: #6c757d;
           --white: #ffffff;
-          --success-green: #28a745;
-          --danger-red: #dc3545;
-          --warning-orange: #fd7e14;
-          --gradient-blue: linear-gradient(135deg, #003087, #0056b3);
-          --border-light: #e0e0e0;
+          --shadow-sm: 0 4px 12px rgba(0,0,0,0.08);
+          --shadow-md: 0 8px 25px rgba(0,0,0,0.15);
+          --shadow-lg: 0 15px 40px rgba(0,0,0,0.25);
+          --radius: 24px;
+          --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Estilos gerais */
-        .custom-bg {
-          background-color: var(--light-gray-bg);
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shimmer { 0% { background-position: -468px 0; } 100% { background-position: 468px 0; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+        .hero-bg {
+          background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+          min-height: 100vh;
+          position: relative;
+          overflow: hidden;
+        }
+        .hero-bg::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at 20% 80%, rgba(246,193,7,0.15), transparent 50%),
+                      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1), transparent 50%);
+          pointer-events: none;
         }
 
-        /* Header */
         .checkin-header {
-          background: var(--gradient-blue);
-          color: var(--white);
-          padding: 3rem 0;
+          padding: 3rem 1rem;
           text-align: center;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+          color: white;
+          position: relative;
+          z-index: 1;
+          animation: fadeInUp 0.8s ease-out;
         }
         .checkin-header h1 {
           font-weight: 800;
-          font-size: 2.5rem;
-          margin-bottom: 0.5rem;
+          font-size: 2.6rem;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.75rem;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          gap: 1rem;
+          text-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-        .checkin-header .lead {
+        .checkin-header p {
           font-size: 1.2rem;
-          font-weight: 300;
-          max-width: 700px;
-          margin: 0 auto;
+          opacity: 0.9;
+          max-width: 800px;
+          margin: 1rem auto 0;
         }
 
-        /* Seção de Busca */
         .search-section {
-          padding: 2.5rem 0 1.5rem;
-          text-align: center;
-          background-color: var(--white);
-          border-bottom: 1px solid var(--border-light);
+          background: white;
+          padding: 2.5rem 1rem;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+          position: relative;
+          z-index: 1;
         }
-        .search-section .input-group-custom {
+        .search-wrapper {
           max-width: 700px;
           margin: 0 auto;
           display: flex;
+          gap: 0.75rem;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+        .search-input-group {
+          flex: 1;
+          min-width: 280px;
+          display: flex;
+          border: 2px solid var(--gray-200);
+          border-radius: 16px;
+          overflow: hidden;
+          transition: var(--transition);
+        }
+        .search-input-group:focus-within {
+          border-color: var(--info);
+          box-shadow: 0 0 0 4px rgba(0, 86, 179, 0.2);
+        }
+        .search-input-group .input-prefix {
+          background: var(--gray-100);
+          padding: 0 1rem;
+          display: flex;
           align-items: center;
+          color: var(--info);
         }
-        .search-section .form-control {
-          border-radius: 8px 0 0 8px;
-          border: 1px solid var(--border-light);
-          padding: 0.75rem 1.5rem;
-          font-size: 1rem;
-          color: var(--dark-gray);
-          box-shadow: none;
-          transition: all 0.3s ease;
-          position: relative;
-          z-index: 1; /* Para garantir que o foco seja visível */
+        .search-input {
+          border: none;
+          padding: 1rem;
+          font-size: 1.1rem;
+          flex: 1;
+          outline: none;
         }
-        .search-section .form-control:focus {
-          border-color: var(--primary-blue);
-          box-shadow: 0 0 0 2px rgba(0, 48, 135, 0.2);
-        }
-        .search-section .btn-clear {
-          background-color: var(--warning-orange);
-          border-color: var(--warning-orange);
-          border-radius: 0 8px 8px 0;
-          padding: 0.75rem 1.5rem;
-          font-weight: 600;
-          color: var(--white);
-          transition: background-color 0.3s ease;
-          flex-shrink: 0;
-        }
-        .search-section .btn-clear:hover {
-          background-color: #e06800;
-        }
-
-        /* Container & Título da Lista */
-        .checkin-container {
-          padding: 3rem 0;
-        }
-        .checkin-container h2 {
-          color: var(--dark-gray);
-          font-weight: 700;
-          font-size: 1.8rem;
-          margin-bottom: 2rem;
-          text-align: center;
-        }
-
-        /* Cartões de empresa (Novo Design) */
-        .empresa-card {
-          background-color: var(--white);
+        .btn-clear {
+          background: var(--info);
+          color: white;
+          border: none;
+          padding: 0 1.5rem;
           border-radius: 12px;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-          cursor: pointer;
-          transition: transform 0.3s ease, box-shadow 0.3s ease, border-left 0.3s ease;
-          margin-bottom: 1.5rem;
+          font-weight: 700;
+          transition: var(--transition);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        .btn-clear:hover {
+          background: #004494;
+          transform: translateY(-2px);
+        }
+
+        .checkin-container {
+          padding: 3rem 1rem;
+          position: relative;
+          z-index: 1;
+        }
+        .section-title {
+          text-align: center;
+          color: white;
+          font-weight: 700;
+          font-size: 1.9rem;
+          margin-bottom: 2.5rem;
+          text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .empresas-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 2rem;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .empresa-card {
+          background: white;
+          border-radius: var(--radius);
           padding: 2rem;
-          border-left: 5px solid var(--primary-blue);
-          text-decoration: none;
-          color: inherit;
+          box-shadow: var(--shadow-md);
+          border-top: 6px solid var(--accent);
+          transition: var(--transition);
           display: flex;
           flex-direction: column;
           align-items: center;
-          height: 100%;
+          text-decoration: none;
+          color: inherit;
+          animation: fadeInUp 0.6s ease-out;
         }
         .empresa-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-          border-left: 5px solid var(--success-green);
+          transform: translateY(-8px);
+          box-shadow: var(--shadow-lg);
+          border-top-color: var(--info);
         }
-        .empresa-card-content {
-            flex-grow: 1;
-        }
-        .empresa-card .card-img-container {
-          width: 70px;
-          height: 70px;
-          margin: 0 auto 1.5rem;
+
+        .card-img-container {
+          width: 80px;
+          height: 80px;
           border-radius: 50%;
           overflow: hidden;
-          background-color: var(--light-gray-bg);
-          border: 3px solid var(--border-light);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
+          margin-bottom: 1.5rem;
+          border: 4px solid var(--info);
+          box-shadow: var(--shadow-sm);
         }
-        .empresa-card .card-img {
+        .card-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
         }
-        .empresa-card .card-title {
-          color: var(--primary-blue);
+        .card-img-placeholder {
+          width: 100%;
+          height: 100%;
+          background: var(--gray-100);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--info);
+          font-size: 2.5rem;
+        }
+
+        .card-title {
+          color: var(--primary);
           font-weight: 700;
           font-size: 1.5rem;
-          margin-bottom: 0.5rem;
+          margin: 0 0 0.5rem;
           text-align: center;
         }
-        .empresa-card .card-text {
-          color: var(--medium-gray);
-          font-size: 1rem;
-          text-align: center;
-          margin-bottom: 0.5rem;
+        .card-location {
+          color: var(--gray-600);
+          font-size: 1.1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 1.5rem;
         }
-        .empresa-card .card-location {
-          color: var(--dark-gray);
-          font-size: 1rem;
-          font-weight: 500;
-          text-align: center;
+
+        .btn-checkin {
+          background: linear-gradient(135deg, var(--success), #1e7e34);
+          color: white;
+          padding: 0.75rem 2rem;
+          border-radius: 16px;
+          font-weight: 700;
+          font-size: 1.1rem;
+          width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
-          margin-top: 1rem;
+          border: none;
+          box-shadow: 0 6px 16px rgba(40,167,69,0.3);
+          transition: var(--transition);
+        }
+        .btn-checkin:hover {
+          background: linear-gradient(135deg, #1e7e34, var(--success));
+          transform: translateY(-3px);
+          box-shadow: 0 10px 25px rgba(40,167,69,0.4);
         }
 
-        /* Mensagens */
         .message {
-          font-size: 1.1rem;
-          padding: 2rem;
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          max-width: 700px;
-          margin: 0 auto;
+          background: white;
+          border-radius: var(--radius);
+          padding: 3rem;
           text-align: center;
-          background-color: var(--white);
+          box-shadow: var(--shadow-md);
+          max-width: 600px;
+          margin: 2rem auto;
+          border-top: 6px solid var(--accent);
+          animation: fadeInUp 0.6s ease-out;
         }
         .message.loading {
-          color: var(--primary-blue);
-          border: 1px solid var(--border-light);
+          color: var(--info);
         }
         .message.warning {
-          color: var(--warning-orange);
-          background-color: #fff3cd;
-          border: 1px solid #ffeeba;
+          color: #d97706;
+          border-top-color: #fbbf24;
+        }
+        .message svg {
+          font-size: 2.5rem;
+          margin-bottom: 1rem;
         }
 
-        /* Responsividade */
-        @media (max-width: 991px) {
-            .search-section .input-group-custom {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            .search-section .form-control {
-                border-radius: 8px;
-            }
-            .search-section .btn-clear {
-                width: 100%;
-                border-radius: 8px;
-            }
+        .skeleton {
+          background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+          background-size: 200% 100%;
+          animation: shimmer 1.5s infinite;
+          border-radius: 12px;
+        }
+        .skeleton-img { width: 80px; height: 80px; border-radius: 50%; }
+        .skeleton-title { height: 1.5rem; border-radius: 8px; }
+        .skeleton-text { height: 1rem; border-radius: 8px; }
+
+        @media (max-width: 768px) {
+          .checkin-header h1 { font-size: 2.2rem; }
+          .search-wrapper { flex-direction: column; align-items: stretch; }
+          .search-input-group { min-width: auto; }
+          .empresas-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 576px) {
-          .checkin-header h1 { font-size: 2.2rem; }
-          .checkin-header .lead { font-size: 1.1rem; }
-          .checkin-container h2 { font-size: 1.6rem; }
-          .empresa-card .card-title { font-size: 1.3rem; }
-          .empresa-card .card-img-container { width: 50px; height: 50px; }
+          .checkin-header { padding: 2rem 1rem; }
+          .checkin-header h1 { font-size: 1.9rem; }
+          .search-section { padding: 2rem 1rem; }
+          .empresa-card { padding: 1.5rem; }
+          .card-img-container { width: 60px; height: 60px; }
+          .card-title { font-size: 1.3rem; }
         }
       `}</style>
-      <div className="custom-bg min-vh-100">
-        <Navbar />
-        <header className="checkin-header">
-          <div className="container">
-            <h1>
-              <FaBuilding /> Painel de Check-In
-            </h1>
-            <p className="lead">
-              Selecione uma de suas empresas ativas para iniciar o gerenciamento de check-ins de agendamento.
-            </p>
-          </div>
-        </header>
 
-        <section className="search-section container">
-          <div className="input-group-custom">
-            <div className="input-group">
-                <span className="input-group-text bg-white border-end-0"><FaMagnifyingGlass className="text-primary-blue" /></span>
-                <input
-                    type="text"
-                    className="form-control border-start-0"
-                    placeholder="Pesquisar por nome, cidade ou estado da empresa..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
+      <Navbar />
+
+      <header className="checkin-header">
+        <div className="container">
+          <h1>
+            <FaBuilding /> Painel de Check-In
+          </h1>
+          <p>
+            Selecione uma empresa para gerenciar os check-ins de hoje.
+          </p>
+        </div>
+      </header>
+
+      <section className="search-section">
+        <div className="container">
+          <div className="search-wrapper">
+            <div className="search-input-group">
+              <span className="input-prefix"><FaMagnifyingGlass /></span>
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Buscar por nome, cidade ou estado..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                aria-label="Buscar empresas"
+              />
             </div>
-            <button
-              className="btn btn-clear"
-              onClick={() => setSearch("")}
-            >
-              Limpar Busca
-            </button>
+            {search && (
+              <button className="btn-clear" onClick={() => setSearch("")}>
+                Limpar
+              </button>
+            )}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <div className="checkin-container container">
-          <h2>
-            Empresas Encontradas
-          </h2>
-          {empresas_usuario.loading ? (
-            <div className="message loading">
-              <FaSpinner className="fa-spin me-2" /> Carregando lista de empresas...
+      <div className="checkin-container">
+        <div className="container">
+          <h2 className="section-title">Suas Empresas</h2>
+
+          {loading ? (
+            <div className="empresas-grid">
+              {[...Array(6)].map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
             </div>
           ) : filteredEmpresas && filteredEmpresas.length > 0 ? (
-
-            <div className="row justify-content-center">
-              {filteredEmpresas.map((empresa: Empresa) => (
-                <div
-                  className="col-12 col-md-6 col-lg-4 d-flex"
+            <div className="empresas-grid">
+              {filteredEmpresas.map((empresa) => (
+                <Link
                   key={empresa.id}
+                  to={`/checkin/empresa/${empresa.id}`}
+                  className="text-decoration-none"
                 >
-                  <Link to={`/checkin/empresa/${empresa.id}`} className="w-100 text-decoration-none">
-                    <div className="empresa-card">
-                      <div className="card-img-container">
-                        <img
-                          src={empresa.logo || "https://via.placeholder.com/80x80?text=Logo"}
-                          alt={empresa.nome}
-                          className="card-img"
-                        />
-                      </div>
-                      <div className="empresa-card-content">
-                        <h4 className="card-title">{empresa.nome}</h4>
-                        <p className="card-location">
-                          <FaLocationDot className="text-success-green" />
-                          {empresa.cidade}, {empresa.estado}
-                        </p>
-                      </div>
-                      <p className="mt-3 mb-0 fw-bold text-success-green">Acessar Check-In</p>
+                  <div className="empresa-card">
+                    <div className="card-img-container">
+                      {empresa.logo ? (
+                        <img src={empresa.logo} alt={empresa.nome} className="card-img" />
+                      ) : (
+                        <div className="card-img-placeholder"><FaBuilding /></div>
+                      )}
                     </div>
-                  </Link>
-                </div>
+                    <h3 className="card-title">{empresa.nome}</h3>
+                    <p className="card-location">
+                      <FaLocationDot /> {empresa.cidade}, {empresa.estado}
+                    </p>
+                    <button className="btn-checkin">
+                      Acessar Check-In
+                    </button>
+                  </div>
+                </Link>
               ))}
             </div>
           ) : (
             <div className="message warning">
-              <FaExclamationCircle className="me-2" /> Nenhuma empresa encontrada com os critérios de busca.
+              <FaExclamationCircle />
+              <p>Nenhuma empresa encontrada.</p>
             </div>
           )}
         </div>
-        <footer className="checkin-footer">
-          <div className="container">
-            <p>&copy; 2025 VemAgendar. Todos os direitos reservados.</p>
-          </div>
-        </footer>
       </div>
     </div>
   );

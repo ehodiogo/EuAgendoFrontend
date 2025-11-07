@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { FaEnvelope, FaLockOpen, FaSpinner, FaArrowLeft } from "react-icons/fa6";
+import { FaEnvelope, FaLockOpen, FaSpinner, FaArrowLeft, FaCheck, FaExclamation, FaPaperPlane } from "react-icons/fa6";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -18,19 +18,10 @@ function ForgotPassword() {
 
     try {
       const url = import.meta.env.VITE_API_URL;
-
-      const response = await axios.post(url + "/api/password-recovery/", {
-        email: email,
-      });
-
-      if (response.status === 200) {
-        setSuccess(true);
-      }
+      await axios.post(`${url}/api/password-recovery/`, { email });
+      setSuccess(true);
     } catch (err: any) {
-      setError(
-        err.response?.data?.detail ||
-          "Erro ao enviar o link de recuperação. Verifique o e-mail e tente novamente."
-      );
+      setError(err.response?.data?.detail || "Erro ao enviar o link. Tente novamente.");
       console.error("Erro no envio do link", err);
     } finally {
       setLoading(false);
@@ -40,267 +31,309 @@ function ForgotPassword() {
   return (
     <div className="min-vh-100">
       <style>{`
-        /* Cores Aprimoradas */
         :root {
-          --primary-blue: #003087;
-          --accent-blue: #0056b3;
-          --dark-gray: #212529;
-          --light-gray-bg: #f5f7fa;
+          --primary: #003087;
+          --primary-dark: #00205b;
+          --accent: #f6c107;
+          --success: #28a745;
+          --danger: #dc3545;
+          --info: #0056b3;
+          --gray-100: #f8f9fa;
+          --gray-200: #e9ecef;
+          --gray-600: #6c757d;
           --white: #ffffff;
-          --success-green: #28a745;
-          --danger-red: #dc3545;
-          --shadow-color: rgba(0, 0, 0, 0.15);
+          --shadow-sm: 0 4px 12px rgba(0,0,0,0.08);
+          --shadow-md: 0 8px 25px rgba(0,0,0,0.15);
+          --shadow-lg: 0 15px 40px rgba(0,0,0,0.25);
+          --radius: 24px;
+          --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .custom-bg {
-          background-color: var(--light-gray-bg);
-          background-image: linear-gradient(135deg, var(--light-gray-bg) 0%, var(--white) 100%);
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-        .forgot-password-container {
+        .hero-bg {
+          background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+          min-height: 100vh;
           display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: calc(100vh - 70px);
-          padding: 2rem 1rem;
-        }
-
-        /* Cartão de recuperação */
-        .forgot-password-card {
-          background-color: var(--white);
-          border-radius: 20px;
-          box-shadow: 0 10px 30px var(--shadow-color);
-          padding: 3rem;
-          max-width: 420px;
-          width: 100%;
-          transition: transform 0.4s ease, box-shadow 0.4s ease;
-          border-top: 5px solid var(--primary-blue);
-        }
-        .forgot-password-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-        }
-        .forgot-password-card h2 {
-          color: var(--dark-gray);
-          font-weight: 800;
-          font-size: 2.25rem;
-          margin-bottom: 2rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.75rem;
-          letter-spacing: -0.04em;
-        }
-        .forgot-password-card h2 svg {
-            color: var(--primary-blue);
-            font-size: 2.5rem;
-        }
-        .forgot-password-card p {
-            color: var(--dark-gray);
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 0.95rem;
-        }
-
-        /* Formulário */
-        .form-label {
-          color: var(--dark-gray);
-          font-weight: 700;
-          font-size: 1.05rem;
-          margin-bottom: 0.5rem;
-          display: block;
-          text-align: left;
-        }
-        /* Input com Ícone Aprimorado */
-        .input-icon {
+          flex-direction: column;
           position: relative;
+          overflow: hidden;
+        }
+        .hero-bg::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at 20% 80%, rgba(246,193,7,0.15), transparent 50%),
+                      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1), transparent 50%);
+          pointer-events: none;
+        }
+
+        .recovery-content {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem 1rem;
+          position: relative;
+          z-index: 1;
+        }
+
+        .recovery-card {
+          background: white;
+          border-radius: var(--radius);
+          padding: 3rem 2.5rem;
+          max-width: 460px;
+          width: 100%;
+          box-shadow: var(--shadow-lg);
+          border-top: 6px solid var(--accent);
+          animation: fadeInUp 0.8s ease-out;
+          position: relative;
+          overflow: hidden;
+        }
+        .recovery-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0;
+          width: 100%; height: 6px;
+          background: linear-gradient(90deg, var(--primary), var(--info), var(--accent));
+        }
+
+        .recovery-header {
+          text-align: center;
+          margin-bottom: 2.5rem;
+        }
+        .recovery-header h1 {
+          color: #1a1a1a;
+          font-weight: 800;
+          font-size: 2.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 1rem;
+          margin: 0;
+        }
+        .recovery-header .icon {
+          color: var(--primary);
+          font-size: 2.8rem;
+        }
+        .recovery-header p {
+          color: var(--gray-600);
+          margin-top: 0.75rem;
+          font-size: 1.05rem;
+          line-height: 1.5;
+        }
+
+        .form-group {
           margin-bottom: 1.5rem;
         }
-        .input-icon .left-icon {
+        .form-label {
+          display: block;
+          color: #212529;
+          font-weight: 600;
+          font-size: 1rem;
+          margin-bottom: 0.5rem;
+        }
+
+        .input-wrapper {
+          position: relative;
+        }
+        .input-icon {
           position: absolute;
-          top: 50%;
           left: 1rem;
+          top: 50%;
           transform: translateY(-50%);
-          color: var(--accent-blue);
-          font-size: 1.1rem;
+          color: var(--info);
+          font-size: 1.2rem;
           pointer-events: none;
-          transition: color 0.3s ease;
-          z-index: 10;
+          transition: var(--transition);
         }
         .form-control {
-          border: 1px solid #d1d5db;
-          border-radius: 10px;
-          padding: 1rem 1rem 1rem 3rem;
-          font-size: 1rem;
           width: 100%;
-          transition: border-color 0.3s ease, box-shadow 0.3s ease;
+          padding: 1rem 1rem 1rem 3rem;
+          border: 2px solid var(--gray-200);
+          border-radius: 14px;
+          font-size: 1rem;
+          transition: var(--transition);
+          background: white;
         }
         .form-control:focus {
-          border-color: var(--primary-blue);
-          box-shadow: 0 0 0 3px rgba(0, 48, 135, 0.2);
+          border-color: var(--primary);
+          box-shadow: 0 0 0 4px rgba(0, 48, 135, 0.15);
           outline: none;
         }
-        .form-control:focus + .left-icon {
-            color: var(--primary-blue);
+        .form-control:focus ~ .input-icon {
+          color: var(--primary);
         }
-        .form-control::placeholder {
-          color: #a0aec0;
-        }
-        
-        /* Botão de Submit com Gradiente */
+
         .submit-btn {
-          background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
-          color: var(--white);
-          font-weight: 700;
-          padding: 1rem;
-          border-radius: 10px;
-          transition: all 0.3s ease;
+          background: linear-gradient(135deg, var(--primary), var(--info));
+          color: white;
           border: none;
-          width: 100%;
+          padding: 1.1rem;
+          border-radius: 14px;
+          font-weight: 700;
           font-size: 1.15rem;
+          width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 0.75rem;
-          box-shadow: 0 4px 15px rgba(0, 48, 135, 0.3);
-          margin-top: 0.5rem;
+          margin-top: 1rem;
+          transition: var(--transition);
+          box-shadow: 0 6px 16px rgba(0, 48, 135, 0.25);
         }
-        .submit-btn:hover {
-          background: linear-gradient(135deg, var(--accent-blue), var(--primary-blue));
+        .submit-btn:hover:not(:disabled) {
+          background: linear-gradient(135deg, var(--info), var(--primary));
           transform: translateY(-3px);
-          box-shadow: 0 6px 20px rgba(0, 48, 135, 0.4);
+          box-shadow: 0 8px 20px rgba(0, 48, 135, 0.35);
         }
         .submit-btn:disabled {
-          background: #ccc;
-          color: var(--dark-gray);
+          background: #d1d5db;
+          color: var(--gray-600);
           cursor: not-allowed;
-          opacity: 0.8;
           transform: none;
           box-shadow: none;
         }
 
-        /* Mensagens de erro e sucesso */
-        .alert-danger {
-          background-color: #fcebeb;
-          color: var(--danger-red);
-          border: 1px solid #f9d7da;
-          padding: 1rem;
-          border-radius: 8px;
+        .alert {
+          padding: 1rem 1.25rem;
+          border-radius: 12px;
           margin-top: 1.5rem;
-          text-align: center;
           font-weight: 600;
-        }
-        .alert-success {
-          background-color: #d4edda;
-          color: var(--success-green);
-          border: 1px solid #c3e6cb;
-          padding: 1rem;
-          border-radius: 8px;
-          margin-top: 1.5rem;
-          text-align: center;
-          font-weight: 600;
-        }
-
-        /* Links */
-        .link-container {
-          display: flex;
-          justify-content: center;
-          margin-top: 1.5rem;
-          padding-top: 1rem;
-          border-top: 1px solid #e2e8f0;
-          font-size: 0.95rem;
-        }
-        .link-container a {
-          color: var(--accent-blue);
-          font-weight: 600;
-          text-decoration: none;
           display: flex;
           align-items: center;
-          gap: 0.5rem;
+          justify-content: center;
+          gap: 0.75rem;
+          animation: fadeInUp 0.4s ease-out;
+          text-align: center;
         }
-        .link-container a:hover {
-          color: var(--primary-blue);
+        .alert-success {
+          background: rgba(40, 167, 69, 0.1);
+          color: var(--success);
+          border: 1px solid var(--success);
+        }
+        .alert-danger {
+          background: rgba(220, 53, 69, 0.1);
+          color: var(--danger);
+          border: 1px solid var(--danger);
+        }
+
+        .footer-links {
+          text-align: center;
+          margin-top: 2rem;
+          padding-top: 1.5rem;
+          border-top: 1px dashed var(--gray-200);
+        }
+        .footer-links a {
+          color: var(--info);
+          font-weight: 600;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          transition: var(--transition);
+        }
+        .footer-links a:hover {
+          color: var(--primary);
           text-decoration: underline;
         }
 
-        /* Responsividade */
+        .brand-footer {
+          text-align: center;
+          padding: 1.5rem;
+          color: rgba(255,255,255,0.8);
+          font-size: 0.9rem;
+        }
+
         @media (max-width: 576px) {
-          .forgot-password-card {
+          .recovery-card {
             padding: 2rem 1.5rem;
+            margin: 1rem;
           }
-          .forgot-password-card h2 {
-            font-size: 1.75rem;
+          .recovery-header h1 {
+            font-size: 2rem;
           }
           .form-control {
-            font-size: 0.9rem;
-            padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+            padding: 0.9rem 0.9rem 0.9rem 2.8rem;
+          }
+          .input-icon {
+            left: 0.9rem;
+            font-size: 1.1rem;
           }
           .submit-btn {
             font-size: 1.05rem;
-            padding: 0.8rem;
-          }
-          .input-icon .left-icon {
-            font-size: 1rem;
-            left: 0.75rem;
+            padding: 1rem;
           }
         }
       `}</style>
-      <div className="custom-bg min-vh-100">
+
+      <div className="hero-bg">
         <Navbar />
-        <div className="forgot-password-container">
-          <div className="forgot-password-card">
-            <h2>
-              <FaLockOpen /> Redefinir Senha
-            </h2>
-            <p>
-                Insira o endereço de e-mail associado à sua conta e enviaremos um link para redefinir sua senha.
-            </p>
+
+        <div className="recovery-content">
+          <div className="recovery-card">
+            <div className="recovery-header">
+              <h1>
+                <FaLockOpen className="icon" /> Recuperar Senha
+              </h1>
+              <p>
+                Sem problemas! Digite seu e-mail e enviaremos um link seguro para redefinir sua senha em minutos.
+              </p>
+            </div>
+
             <form onSubmit={handlePasswordRecovery}>
-              <div className="input-icon">
-                <label htmlFor="email" className="form-label">
-                  E-mail
-                </label>
-                <FaEnvelope className="left-icon" />
-                <input
-                  type="email"
-                  className="form-control"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="exemplo@empresa.com"
-                  required
-                />
+              <div className="form-group">
+                <label htmlFor="email" className="form-label">E-mail da conta</label>
+                <div className="input-wrapper">
+                  <FaEnvelope className="input-icon" />
+                  <input
+                    type="email"
+                    id="email"
+                    className="form-control"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="seu@email.com"
+                    required
+                  />
+                </div>
               </div>
-              <button
-                type="submit"
-                className="submit-btn"
-                disabled={loading}
-                aria-label="Enviar link de recuperação de senha"
-              >
+
+              <button type="submit" className="submit-btn" disabled={loading}>
                 {loading ? (
                   <>
                     <FaSpinner className="fa-spin" /> Enviando...
                   </>
                 ) : (
-                  "Enviar Link de Recuperação"
+                  <>
+                    Enviar Link <FaPaperPlane />
+                  </>
                 )}
               </button>
             </form>
 
             {success && (
-              <div className="alert-success">
-                Link de recuperação enviado com sucesso! <strong>Verifique sua caixa de entrada</strong> (e spam) para prosseguir.
+              <div className="alert alert-success">
+                <FaCheck /> Link enviado! Verifique sua caixa de entrada e spam.
               </div>
             )}
-            {error && <div className="alert-danger">{error}</div>}
+            {error && (
+              <div className="alert alert-danger">
+                <FaExclamation /> {error}
+              </div>
+            )}
 
-            <div className="link-container">
+            <div className="footer-links">
               <Link to="/login">
-                <FaArrowLeft /> Voltar ao Login
+                <FaArrowLeft /> Voltar ao login
               </Link>
             </div>
           </div>
         </div>
+
+        <footer className="brand-footer">
+          Recuperação segura • Link válido por 15 min • Suporte 24h
+        </footer>
       </div>
     </div>
   );

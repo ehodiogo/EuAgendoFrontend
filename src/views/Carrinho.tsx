@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import {FaTrash, FaArrowRight, FaCreditCard, FaLock } from "react-icons/fa6";
-import {FaShoppingCart} from "react-icons/fa";
+import { FaTrash, FaArrowRight, FaLock, FaStar } from "react-icons/fa6";
+import {FaCheckCircle} from "react-icons/fa";
+import { FaShoppingCart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 function Carrinho() {
   interface Plano {
     nome: string;
     valor: number;
+    cor?: string;
   }
 
   const [carrinho, setCarrinho] = useState<Plano[]>([]);
@@ -17,8 +19,20 @@ function Carrinho() {
 
   useEffect(() => {
     const itensCarrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
-    setCarrinho(itensCarrinho);
+    const planosComCor = itensCarrinho.map((p: Plano) => ({
+      ...p,
+      cor: getPlanColor(p.nome),
+    }));
+    setCarrinho(planosComCor);
   }, []);
+
+  const getPlanColor = (nome: string) => {
+    const n = nome.toLowerCase();
+    if (n.includes('básico')) return '#28a745';
+    if (n.includes('profissional')) return '#fd7e14';
+    if (n.includes('corporativo')) return '#003087';
+    return '#6c757d';
+  };
 
   const total = carrinho.reduce((acc, plano) => acc + plano.valor, 0);
 
@@ -57,7 +71,6 @@ function Carrinho() {
         setCarrinho([]);
         window.location.href = response.data.url;
       }
-      // @ts-ignore
     } catch (error: any) {
       setError(
         error.response?.data?.detail ||
@@ -71,262 +84,352 @@ function Carrinho() {
   return (
     <div className="min-vh-100">
       <style>{`
-        /* Paleta de cores */
         :root {
-          --primary-blue: #003087;
-          --accent-blue: #0056b3;
-          --dark-gray: #212529;
-          --light-gray-bg: #f5f7fa;
+          --primary: #003087;
+          --primary-dark: #00205b;
+          --accent: #f6c107;
+          --success: #28a745;
+          --warning: #fd7e14;
+          --danger: #dc3545;
+          --gray-100: #f8f9fa;
+          --gray-200: #e9ecef;
+          --gray-600: #6c757d;
           --white: #ffffff;
-          --success-green: #28a745;
-          --danger-red: #dc3545;
-          --shadow-color: rgba(0, 0, 0, 0.1);
+          --shadow-sm: 0 4px 12px rgba(0,0,0,0.08);
+          --shadow-md: 0 8px 25px rgba(0,0,0,0.15);
+          --shadow-lg: 0 15px 40px rgba(0,0,0,0.25);
+          --radius: 20px;
+          --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Estilos gerais */
-        .custom-bg {
-          background-color: var(--light-gray-bg);
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
         }
-        
-        /* Container */
-        .cart-container {
+        @keyframes pulseGlow {
+          0%, 100% { box-shadow: 0 0 20px rgba(253, 126, 20, 0.4); }
+          50% { box-shadow: 0 0 40px rgba(253, 126, 20, 0.8); }
+        }
+        @keyframes slideIn {
+          from { transform: translateX(-20px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+
+        .animate-fadeInUp { animation: fadeInUp 0.6s ease-out forwards; }
+        .animate-slideIn { animation: slideIn 0.5s ease-out forwards; }
+
+        .hero-gradient {
+          background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+          color: white;
           padding: 4rem 0;
+          text-align: center;
         }
-        .cart-container h1 {
-          color: var(--dark-gray);
+        .hero-gradient h1 {
+          font-size: 2.8rem;
           font-weight: 800;
-          font-size: 2.75rem;
-          margin-bottom: 3rem;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 1rem;
-          letter-spacing: -0.05em;
         }
-        .cart-container h1 svg {
-            color: var(--primary-blue);
+        .hero-gradient svg {
+          color: var(--accent);
         }
 
-        /* Layout Grid */
+        .cart-container {
+          padding: 4rem 0;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
         .cart-grid {
-            display: grid;
-            grid-template-columns: 2fr 1.2fr; /* Coluna do carrinho maior que a do resumo */
-            gap: 2rem;
-            max-width: 1000px;
-            margin: 0 auto;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2.5rem;
+          margin-top: 2rem;
         }
 
-        /* Cartões */
         .cart-card {
-          background-color: var(--white);
-          border-radius: 16px;
-          box-shadow: 0 8px 25px var(--shadow-color);
-          padding: 2rem;
+          background: white;
+          border-radius: var(--radius);
+          padding: 2.5rem;
+          box-shadow: var(--shadow-md);
+          border: 1px solid var(--gray-200);
+          position: relative;
+          overflow: hidden;
         }
-        .summary-card {
-            position: sticky;
-            top: 100px; /* Para fixar a barra lateral */
-            height: fit-content;
+        .cart-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0;
+          width: 100%; height: 6px;
+          background: var(--plan-color, var(--primary));
+          border-radius: var(--radius) var(--radius) 0 0;
         }
 
-        /* Lista de itens */
         .item-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
         }
         .cart-item {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 1rem 0;
-          border-bottom: 1px solid #e2e8f0;
-          transition: background-color 0.3s ease;
+          padding: 1.5rem 0;
+          border-bottom: 1px dashed var(--gray-200);
+          animation: slideIn 0.5s ease-out forwards;
         }
         .cart-item:last-child {
           border-bottom: none;
         }
-        .cart-item-details h6 {
-          color: var(--primary-blue);
+        .cart-item-details {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+        .plan-badge {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          background: var(--plan-color);
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           font-weight: 700;
-          font-size: 1.15rem;
+          font-size: 0.9rem;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .cart-item-details h6 {
           margin: 0;
+          font-weight: 700;
+          font-size: 1.2rem;
+          color: var(--plan-color);
         }
         .cart-item-details small {
-          color: var(--medium-gray);
-          font-weight: 500;
-          font-size: 1rem;
+          color: var(--gray-600);
+          font-size: 0.95rem;
         }
-        .cart-item .btn-remove {
-          background-color: transparent;
-          border: none;
-          color: var(--danger-red);
-          padding: 0.5rem;
-          border-radius: 50%;
-          transition: all 0.3s ease;
-        }
-        .cart-item .btn-remove:hover {
-          background-color: rgba(220, 53, 69, 0.1);
-          color: var(--danger-red);
-          transform: scale(1.1);
+        .price-tag {
+          font-size: 1.4rem;
+          font-weight: 800;
+          color: var(--plan-color);
         }
 
-        /* Resumo e Total */
-        .summary-card h3 {
-            color: var(--dark-gray);
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 0.75rem;
+        .btn-remove {
+          background: transparent;
+          border: none;
+          color: var(--danger);
+          padding: 0.6rem;
+          border-radius: 50%;
+          transition: var(--transition);
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
-        .total-row {
+        .btn-remove:hover {
+          background: rgba(220, 53, 69, 0.1);
+          transform: scale(1.15);
+        }
+
+        .summary-card {
+          position: sticky;
+          top: 100px;
+          height: fit-content;
+        }
+        .summary-card h3 {
+          color: var(--primary);
+          font-weight: 800;
+          font-size: 1.6rem;
+          margin-bottom: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        .summary-row {
           display: flex;
           justify-content: space-between;
-          align-items: center;
-          margin-top: 1.5rem;
-          padding-top: 1rem;
-          border-top: 2px solid var(--primary-blue);
+          padding: 0.75rem 0;
+          font-size: 1.1rem;
         }
-        .total-row h4 {
-          color: var(--primary-blue);
+        .summary-row.total {
+          border-top: 2px solid var(--primary);
+          padding-top: 1.25rem;
+          margin-top: 1rem;
+          font-size: 1.35rem;
           font-weight: 800;
-          font-size: 1.75rem;
-          margin: 0;
-        }
-        .total-row span {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: var(--primary-blue);
+          color: var(--primary);
         }
 
-        /* Botão de checkout */
         .checkout-btn {
-          background-color: var(--success-green);
-          color: var(--white);
+          background: linear-gradient(135deg, var(--success), #218838);
+          color: white;
           font-weight: 700;
-          padding: 1rem 2rem;
-          border-radius: 10px;
-          transition: all 0.3s ease;
+          padding: 1.3rem;
+          border-radius: 16px;
           border: none;
-          width: 100%;
+          font-size: 1.2rem;
+          transition: var(--transition);
           margin-top: 2rem;
-          font-size: 1.15rem;
+          width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 0.75rem;
-          box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+          box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+          position: relative;
+          overflow: hidden;
+        }
+        .checkout-btn::before {
+          content: '';
+          position: absolute;
+          top: 50%; left: 50%;
+          width: 0; height: 0;
+          background: rgba(255,255,255,0.3);
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          transition: width 0.6s, height 0.6s;
+        }
+        .checkout-btn:hover::before {
+          width: 300px; height: 300px;
         }
         .checkout-btn:hover {
-          background-color: #218838;
-          transform: translateY(-3px);
-          box-shadow: 0 6px 16px rgba(40, 167, 69, 0.5);
+          transform: translateY(-4px);
+          box-shadow: 0 12px 35px rgba(40, 167, 69, 0.4);
         }
         .checkout-btn:disabled {
-          background-color: #6c757d;
+          background: var(--gray-600);
           cursor: not-allowed;
-          opacity: 0.8;
           transform: none;
           box-shadow: none;
         }
 
-        /* Mensagens */
-        .alert-danger {
-          background-color: #f8d7da;
-          color: var(--danger-red);
-          border: 1px solid #f5c6cb;
-          padding: 1rem;
-          border-radius: 10px;
-          margin-bottom: 1.5rem;
+        .security-note {
           text-align: center;
-          font-weight: 600;
+          margin-top: 1rem;
+          color: var(--gray-600);
+          font-size: 0.9rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
         }
 
-        /* Mensagem de carrinho vazio */
         .empty-cart {
           text-align: center;
-          color: var(--dark-gray);
-          font-size: 1.25rem;
-          padding: 3rem 1rem;
+          padding: 4rem 2rem;
+          color: var(--gray-600);
         }
         .empty-cart h5 {
+          font-size: 1.6rem;
           font-weight: 700;
+          color: var(--primary);
           margin-bottom: 1rem;
-          color: var(--primary-blue);
         }
         .empty-cart a {
-          color: var(--accent-blue);
+          color: var(--accent);
           text-decoration: none;
-          font-weight: 600;
-          transition: color 0.3s;
+          font-weight: 700;
+          font-size: 1.1rem;
           display: inline-flex;
           align-items: center;
           gap: 0.5rem;
+          transition: var(--transition);
         }
         .empty-cart a:hover {
-          color: var(--primary-blue);
+          color: #e0a800;
           text-decoration: underline;
         }
 
-        /* Responsividade */
-        @media (max-width: 768px) {
+        .alert-danger {
+          background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+          color: var(--danger);
+          padding: 1.2rem;
+          border-radius: 16px;
+          margin: 1.5rem auto;
+          max-width: 800px;
+          text-align: center;
+          font-weight: 600;
+          border: 1px solid #f5c6cb;
+          box-shadow: 0 4px 12px rgba(220, 53, 69, 0.1);
+        }
+
+        @media (max-width: 992px) {
           .cart-grid {
             grid-template-columns: 1fr;
-            gap: 1.5rem;
-          }
-          .cart-container {
-            padding: 3rem 1rem;
-          }
-          .cart-container h1 {
-            font-size: 2.25rem;
-            margin-bottom: 2rem;
           }
           .summary-card {
             position: static;
           }
-          .cart-item-details h6 {
-              font-size: 1.05rem;
+        }
+        @media (max-width: 768px) {
+          .hero-gradient h1 {
+            font-size: 2.2rem;
+          }
+          .cart-container {
+            padding: 3rem 1rem;
+          }
+          .cart-card {
+            padding: 2rem;
           }
         }
       `}</style>
-      <div className="custom-bg min-vh-100">
-        <Navbar />
-        <div className="cart-container container">
-          <h1>
-            <FaShoppingCart /> Resumo da Compra
-          </h1>
 
-          {error && <div className="alert-danger" style={{ maxWidth: '800px', margin: '0 auto 1.5rem auto' }}>{error}</div>}
+      <div className="bg-light min-vh-100">
+        <Navbar />
+
+        {/* HERO */}
+        <header className="hero-gradient">
+          <div className="container">
+            <h1 className="animate-fadeInUp">
+              <FaShoppingCart /> Resumo da Compra
+            </h1>
+          </div>
+        </header>
+
+        <div className="cart-container container">
+          {error && <div className="alert-danger">{error}</div>}
 
           {carrinho.length === 0 ? (
-            <div className="cart-card">
+            <div className="cart-card animate-fadeInUp">
               <div className="empty-cart">
                 <h5>Seu carrinho está vazio!</h5>
                 <Link to="/planos">
-                    Ir para Planos <FaArrowRight size={14} />
+                  Escolher Plano <FaArrowRight />
                 </Link>
               </div>
             </div>
           ) : (
             <div className="cart-grid">
-
-              <div className="cart-card">
+              {/* ITENS DO CARRINHO */}
+              <div className="cart-card animate-fadeInUp">
                 <div className="item-list">
                   {carrinho.map((plano, index) => (
-                    <div key={index} className="cart-item">
+                    <div
+                      key={index}
+                      className="cart-item"
+                      style={{
+                        '--plan-color': plano.cor,
+                      } as React.CSSProperties}
+                    >
                       <div className="cart-item-details">
-                        <h6>{plano.nome}</h6>
-                        <small>Plano de Assinatura</small>
+                        <div className="plan-badge">
+                          {plano.nome.includes('Profissional') ? <FaStar /> : <FaCheckCircle />}
+                        </div>
+                        <div>
+                          <h6>{plano.nome}</h6>
+                          <small>Plano de Assinatura Mensal</small>
+                        </div>
                       </div>
                       <div className="d-flex align-items-center gap-3">
-                         <span className="fw-bold" style={{ color: 'var(--dark-gray)' }}>R${plano.valor.toFixed(2)}</span>
+                        <span className="price-tag">R${plano.valor.toFixed(2)}</span>
                         <button
                           className="btn-remove"
                           onClick={() => removerItem(index)}
-                          aria-label={`Remover ${plano.nome} do carrinho`}
+                          aria-label={`Remover ${plano.nome}`}
                         >
-                          <FaTrash size={16} />
+                          <FaTrash />
                         </button>
                       </div>
                     </div>
@@ -334,42 +437,41 @@ function Carrinho() {
                 </div>
               </div>
 
-              <div className="cart-card summary-card">
-                <h3>Resumo do Pedido</h3>
+              {/* RESUMO */}
+              <div className="cart-card summary-card animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+                <h3>
+                  <FaLock /> Resumo do Pedido
+                </h3>
 
-                <div className="d-flex justify-content-between text-muted mb-2">
-                    <span>Subtotal</span>
-                    <span>R${total.toFixed(2)}</span>
+                <div className="summary-row">
+                  <span>Subtotal</span>
+                  <span>R${total.toFixed(2)}</span>
                 </div>
-                <div className="d-flex justify-content-between text-muted">
-                    <span>Descontos</span>
-                    <span style={{ color: 'var(--success-green)' }}>R$0.00</span>
+                <div className="summary-row">
+                  <span>Descontos</span>
+                  <span style={{ color: 'var(--success)' }}>R$0,00</span>
                 </div>
 
-                <div className="total-row">
-                  <h4>Total</h4>
+                <div className="summary-row total">
+                  <span>Total</span>
                   <span>R${total.toFixed(2)}</span>
                 </div>
 
                 <button
                   className="checkout-btn"
                   onClick={finalizarCompra}
-                  disabled={loading || carrinho.length === 0}
-                  aria-label="Ir para o checkout e pagamento"
+                  disabled={loading}
                 >
                   {loading ? (
-                    <>
-                      <FaCreditCard size={18} /> Processando...
-                    </>
+                    <>Processando...</>
                   ) : (
-                    <>
-                      <FaLock size={18} /> Finalizar Compra
-                    </>
+                    <>Finalizar Compra</>
                   )}
                 </button>
-                <small className="d-block text-center mt-3 text-muted">
-                    O pagamento será processado de forma segura.
-                </small>
+
+                <div className="security-note">
+                  <FaLock /> Pagamento 100% seguro e criptografado
+                </div>
               </div>
             </div>
           )}

@@ -2,9 +2,23 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useFetch } from "../functions/GetData";
 import { Empresa } from "../interfaces/Empresa";
-import {Locacao} from "../interfaces/Locacao.tsx";
+import { Locacao } from "../interfaces/Locacao.tsx";
 import Navbar from "../components/Navbar";
-import { FaSearch, FaExclamationCircle, FaFilter, FaMapMarkerAlt, FaPhoneAlt, FaDollarSign, FaBuilding, FaTags, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import {
+  FaFilter,
+  FaDollarSign,
+  FaBuilding,
+  FaTags,
+  FaCheck
+} from "react-icons/fa6";
+import {
+  FaSearch,
+  FaExclamationCircle,
+  FaMapMarkerAlt,
+  FaPhoneAlt,
+  FaCheckCircle,
+  FaTimesCircle
+} from "react-icons/fa";
 import RatingStars from "../components/RatingStars";
 
 interface Servico {
@@ -18,143 +32,81 @@ interface FilterModalProps {
   onClose: () => void;
   onApply: () => void;
   onClear: () => void;
-  cidade: string;
-  setCidade: (c: string) => void;
-  estado: string;
-  setEstado: (e: string) => void;
-  bairro: string;
-  setBairro: (b: string) => void;
-  pais: string;
-  setPais: (p: string) => void;
-  tipoEmpresa: string;
-  setTipoEmpresa: (t: string) => void;
-  abertoAgoraFilter: boolean;
-  setAbertoAgoraFilter: (a: boolean) => void;
+  cidade: string; setCidade: (c: string) => void;
+  estado: string; setEstado: (e: string) => void;
+  bairro: string; setBairro: (b: string) => void;
+  pais: string; setPais: (p: string) => void;
+  tipoEmpresa: string; setTipoEmpresa: (t: string) => void;
+  abertoAgoraFilter: boolean; setAbertoAgoraFilter: (a: boolean) => void;
   tiposDisponiveis: string[];
   estados: string[];
 }
 
 const FilterModal: React.FC<FilterModalProps> = ({
-  show,
-  onClose,
-  onApply,
-  onClear,
-  cidade,
-  setCidade,
-  estado,
-  setEstado,
-  bairro,
-  setBairro,
-  pais,
-  setPais,
-  tipoEmpresa,
-  setTipoEmpresa,
-  abertoAgoraFilter,
-  setAbertoAgoraFilter,
-  tiposDisponiveis,
-  estados,
+  show, onClose, onApply, onClear,
+  cidade, setCidade, estado, setEstado, bairro, setBairro, pais, setPais,
+  tipoEmpresa, setTipoEmpresa, abertoAgoraFilter, setAbertoAgoraFilter,
+  tiposDisponiveis, estados,
 }) => {
   if (!show) return null;
 
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <button className="btn-close" onClick={onClose}>
-          &times;
-        </button>
+        <button className="btn-close" onClick={onClose} aria-label="Fechar">×</button>
         <h3><FaFilter /> Filtros Avançados</h3>
 
-        <div className="row">
-          <div className="col-md-6 form-group">
-            <label htmlFor="tipoEmpresaSelect">Tipo de Empresa</label>
-            <select
-              id="tipoEmpresaSelect"
-              className="form-select"
-              value={tipoEmpresa}
-              onChange={(e) => setTipoEmpresa(e.target.value)}
-            >
+        <div className="row g-3">
+          <div className="col-md-6">
+            <label className="form-label">Tipo de Empresa</label>
+            <select className="form-select" value={tipoEmpresa} onChange={(e) => setTipoEmpresa(e.target.value)}>
               <option value="">Todos</option>
-              {tiposDisponiveis.map((tipo) => (
-                <option key={tipo} value={tipo}>
-                  {tipo}
-                </option>
-              ))}
+              {tiposDisponiveis.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
-          <div className="col-md-6 form-group">
-            <label htmlFor="estadoSelect">Estado</label>
-            <select
-              id="estadoSelect"
-              className="form-select"
-              value={estado}
-              onChange={(e) => setEstado(e.target.value)}
-            >
+          <div className="col-md-6">
+            <label className="form-label">Estado</label>
+            <select className="form-select" value={estado} onChange={(e) => setEstado(e.target.value)}>
               <option value="">Todos</option>
-              {estados.map((est) => (
-                <option key={est} value={est}>
-                  {est}
-                </option>
-              ))}
+              {estados.map(e => <option key={e} value={e}>{e}</option>)}
             </select>
           </div>
         </div>
 
-        <div className="row">
-          <div className="col-md-6 form-group">
-            <label htmlFor="cidadeInput">Cidade</label>
-            <input
-              id="cidadeInput"
-              type="text"
-              className="form-control"
-              value={cidade}
-              onChange={(e) => setCidade(e.target.value)}
-            />
+        <div className="row g-3 mt-2">
+          <div className="col-md-6">
+            <label className="form-label">Cidade</label>
+            <input type="text" className="form-control" value={cidade} onChange={(e) => setCidade(e.target.value)} />
           </div>
-          <div className="col-md-6 form-group">
-            <label htmlFor="bairroInput">Bairro</label>
-            <input
-              id="bairroInput"
-              type="text"
-              className="form-control"
-              value={bairro}
-              onChange={(e) => setBairro(e.target.value)}
-            />
+          <div className="col-md-6">
+            <label className="form-label">Bairro</label>
+            <input type="text" className="form-control" value={bairro} onChange={(e) => setBairro(e.target.value)} />
           </div>
         </div>
 
-        <div className="row">
-            <div className="col-md-6 form-group">
-                <label htmlFor="paisInput">País</label>
-                <input
-                    id="paisInput"
-                    type="text"
-                    className="form-control"
-                    value={pais}
-                    onChange={(e) => setPais(e.target.value)}
-                />
-            </div>
+        <div className="row g-3 mt-2">
+          <div className="col-md-6">
+            <label className="form-label">País</label>
+            <input type="text" className="form-control" value={pais} onChange={(e) => setPais(e.target.value)} />
+          </div>
         </div>
 
-        <div className="form-group form-check mt-3 mb-4">
-            <input
-                type="checkbox"
-                className="form-check-input"
-                id="abertoAgoraCheck"
-                checked={abertoAgoraFilter}
-                onChange={(e) => setAbertoAgoraFilter(e.target.checked)}
-            />
-            <label className="form-check-label" htmlFor="abertoAgoraCheck">
-                Apenas empresas <strong>abertas agora</strong>
-            </label>
+        <div className="form-check mt-4">
+          <input
+            type="checkbox"
+            className="form-check-input"
+            id="abertoAgoraCheck"
+            checked={abertoAgoraFilter}
+            onChange={(e) => setAbertoAgoraFilter(e.target.checked)}
+          />
+          <label className="form-check-label fw-bold" htmlFor="abertoAgoraCheck">
+            Apenas empresas <span className="text-success">abertas agora</span>
+          </label>
         </div>
 
-        <div className="d-flex justify-content-between mt-4">
-          <button className="btn btn-warning" onClick={onClear}>
-            Limpar Filtros
-          </button>
-          <button className="btn btn-primary" onClick={onApply}>
-            Aplicar Filtros
-          </button>
+        <div className="d-flex gap-2 mt-4">
+          <button className="btn btn-warning flex-fill" onClick={onClear}>Limpar</button>
+          <button className="btn btn-success flex-fill" onClick={onApply}>Aplicar Filtros</button>
         </div>
       </div>
     </div>
@@ -162,77 +114,71 @@ const FilterModal: React.FC<FilterModalProps> = ({
 };
 
 const EmpresaCardSkeleton: React.FC = () => (
-    <div className="col-lg-4 col-md-6 mb-4">
-        <div className="card">
-            <div className="card-img-container skeleton skeleton-logo"></div>
-            <div className="card-body">
-                <div className="skeleton skeleton-line-long" style={{ height: '1.8rem', marginBottom: '1rem' }}></div>
-
-                <div className="card-details">
-                    <div className="d-flex align-items-center mb-3">
-                        <div className="skeleton-circle"></div>
-                        <div className="skeleton-circle"></div>
-                        <div className="skeleton-circle"></div>
-                        <div className="skeleton-circle"></div>
-                        <div className="skeleton-circle"></div>
-                        <div className="skeleton skeleton-line-short" style={{ width: '30%', marginLeft: '1rem' }}></div>
-                    </div>
-
-                    <div className="skeleton skeleton-line-medium"></div>
-                    <div className="skeleton skeleton-line-long"></div>
-                    <div className="skeleton skeleton-line-medium"></div>
-                </div>
-
-                <div className="skeleton skeleton-line-short" style={{ width: '40%', marginTop: '1rem' }}></div>
-                <div className="skeleton skeleton-line-long" style={{ width: '85%' }}></div>
-                <div className="skeleton" style={{ height: '3.3rem', marginTop: 'auto' }}></div>
-            </div>
+  <div className="col-lg-4 col-md-6 mb-4">
+    <div className="card h-100">
+      <div className="card-img-container skeleton skeleton-logo"></div>
+      <div className="card-body d-flex flex-column">
+        <div className="skeleton skeleton-line-long mb-3" style={{ height: '2rem' }}></div>
+        <div className="d-flex gap-1 mb-3">
+          {[...Array(5)].map((_, i) => <div key={i} className="skeleton-circle"></div>)}
+          <div className="skeleton skeleton-line-short ms-2" style={{ width: '40%' }}></div>
         </div>
+        <div className="skeleton skeleton-line-medium mb-2"></div>
+        <div className="skeleton skeleton-line-long mb-2"></div>
+        <div className="skeleton skeleton-line-medium mb-3"></div>
+        <div className="skeleton skeleton-line-short mb-2" style={{ width: '50%' }}></div>
+        <div className="skeleton mt-auto" style={{ height: '48px' }}></div>
+      </div>
     </div>
+  </div>
 );
 
 const ListaServicos: React.FC<{ servicos?: Servico[] }> = ({ servicos }) => (
-    <div className="list-servicos">
-        <h6><FaDollarSign /> Serviços Oferecidos:</h6>
-        <ul className="list-unstyled">
-            {servicos && servicos.length > 0 ? (
-                servicos.slice(0, 3).map((servico, i) => (
-                    <li key={i}>
-                        {servico.nome} (R$ {servico.preco})
-                    </li>
-                ))
-            ) : (
-                <li>Nenhum serviço cadastrado</li>
-            )}
-            {servicos && servicos.length > 3 && (
-                <li className="text-muted text-small">
-                    e mais {servicos.length - 3} serviço(s)...
-                </li>
-            )}
-        </ul>
-    </div>
+  <div className="list-servicos">
+    <h6><FaDollarSign /> Serviços Oferecidos:</h6>
+    <ul className="list-unstyled mb-0">
+      {servicos && servicos.length > 0 ? (
+        servicos.slice(0, 3).map((s, i) => (
+          <li key={i} className="d-flex align-items-center gap-2 text-success">
+            <FaCheck style={{ fontSize: '0.8rem' }} />
+            {s.nome} (R$ {s.preco.toFixed(2)})
+          </li>
+        ))
+      ) : (
+        <li className="text-muted">Nenhum serviço cadastrado</li>
+      )}
+      {servicos && servicos.length > 3 && (
+        <li className="text-muted small d-flex align-items-center gap-2">
+          <FaCheck style={{ fontSize: '0.7rem', opacity: 0.6 }} />
+          e mais {servicos.length - 3} serviço(s)...
+        </li>
+      )}
+    </ul>
+  </div>
 );
 
 const ListaLocacoes: React.FC<{ locacoes?: Locacao[] }> = ({ locacoes }) => (
-    <div className="list-servicos">
-        <h6><FaTags /> Locações oferecidas:</h6>
-        <ul className="list-unstyled">
-            {locacoes && locacoes.length > 0 ? (
-                locacoes.slice(0, 3).map((locacao, i) => (
-                    <li key={i}>
-                        {locacao.nome} (Duração: {locacao.duracao})
-                    </li>
-                ))
-            ) : (
-                <li>Nenhum item de locação cadastrado</li>
-            )}
-            {locacoes && locacoes.length > 3 && (
-                <li className="text-muted text-small">
-                    e mais {locacoes.length - 3} item(s)...
-                </li>
-            )}
-        </ul>
-    </div>
+  <div className="list-servicos">
+    <h6><FaTags /> Locações Disponíveis:</h6>
+    <ul className="list-unstyled mb-0">
+      {locacoes && locacoes.length > 0 ? (
+        locacoes.slice(0, 3).map((l, i) => (
+          <li key={i} className="d-flex align-items-center gap-2 text-success">
+            <FaCheck style={{ fontSize: '0.8rem' }} />
+            {l.nome} ({l.duracao})
+          </li>
+        ))
+      ) : (
+        <li className="text-muted">Nenhum item cadastrado</li>
+      )}
+      {locacoes && locacoes.length > 3 && (
+        <li className="text-muted small d-flex align-items-center gap-2">
+          <FaCheck style={{ fontSize: '0.7rem', opacity: 0.6 }} />
+          e mais {locacoes.length - 3} item(s)...
+        </li>
+      )}
+    </ul>
+  </div>
 );
 
 function EmpresasSearch() {
@@ -247,29 +193,6 @@ function EmpresasSearch() {
   const empresas = useFetch<Empresa[]>("/api/empresa");
 
   const tiposDisponiveis = ["Serviço", "Locação"];
-
-  const filteredEmpresas = empresas.data?.filter((empresa: Empresa) => {
-    const estaAberta = empresa.aberto_agora;
-
-    const matchesSearch = empresa.nome.toLowerCase().includes(search.toLowerCase());
-    const matchesCidade = cidade ? empresa.cidade.toLowerCase().includes(cidade.toLowerCase()) : true;
-    const matchesEstado = estado ? empresa.estado.toLowerCase().includes(estado.toLowerCase()) : true;
-    const matchesBairro = bairro ? empresa.bairro.toLowerCase().includes(bairro.toLowerCase()) : true;
-    const matchesPais = pais ? empresa.pais.toLowerCase().includes(pais.toLowerCase()) : true;
-    const matchesTipoEmpresa = tipoEmpresa ? empresa.tipo.toLowerCase() === tipoEmpresa.toLowerCase() : true;
-    const matchesAbertoAgora = abertoAgoraFilter ? estaAberta : true;
-
-    return (
-        matchesSearch &&
-        matchesCidade &&
-        matchesEstado &&
-        matchesBairro &&
-        matchesPais &&
-        matchesTipoEmpresa &&
-        matchesAbertoAgora
-    );
-  });
-
   const estados = [
     "Acre", "Alagoas", "Amapá", "Amazonas", "Bahia", "Ceará", "Distrito Federal",
     "Espírito Santo", "Goiás", "Maranhão", "Mato Grosso", "Mato Grosso do Sul",
@@ -278,621 +201,463 @@ function EmpresasSearch() {
     "Roraima", "Santa Catarina", "São Paulo", "Sergipe", "Tocantins"
   ];
 
+  const filteredEmpresas = empresas.data?.filter((empresa: Empresa) => {
+    const matchesSearch = empresa.nome.toLowerCase().includes(search.toLowerCase());
+    const matchesCidade = cidade ? empresa.cidade.toLowerCase().includes(cidade.toLowerCase()) : true;
+    const matchesEstado = estado ? empresa.estado.toLowerCase().includes(estado.toLowerCase()) : true;
+    const matchesBairro = bairro ? empresa.bairro.toLowerCase().includes(bairro.toLowerCase()) : true;
+    const matchesPais = pais ? empresa.pais.toLowerCase().includes(pais.toLowerCase()) : true;
+    const matchesTipo = tipoEmpresa ? empresa.tipo === tipoEmpresa : true;
+    const matchesAberto = abertoAgoraFilter ? empresa.aberto_agora : true;
+
+    return matchesSearch && matchesCidade && matchesEstado && matchesBairro && matchesPais && matchesTipo && matchesAberto;
+  });
+
   const clearFilters = () => {
-    setSearch("");
-    setCidade("");
-    setEstado("");
-    setBairro("");
-    setPais("");
-    setTipoEmpresa("");
-    setAbertoAgoraFilter(false);
+    setSearch(""); setCidade(""); setEstado(""); setBairro(""); setPais(""); setTipoEmpresa(""); setAbertoAgoraFilter(false);
     setShowModal(false);
   };
 
-  const applyFilters = () => {
-    setShowModal(false);
-  };
+  const applyFilters = () => setShowModal(false);
 
   return (
     <div className="min-vh-100">
       <style>{`
         :root {
-          --primary-blue: #003087;
-          --accent-blue: #0056b3;
-          --light-blue: #e0f2f7;
-          --dark-gray: #333333;
-          --medium-gray: #666666;
-          --light-gray-bg: #f9f9f9;
+          --primary: #003087;
+          --primary-dark: #00205b;
+          --accent: #f6c107;
+          --success: #28a745;
+          --danger: #dc3545;
+          --info: #0056b3;
+          --gray-100: #f8f9fa;
+          --gray-200: #e9ecef;
+          --gray-600: #6c757d;
           --white: #ffffff;
-          --success-green: #28a745;
-          --danger-red: #dc3545;
-          --warning-orange: #fd7e14;
-          --border-light: #e0e0e0;
+          --shadow-sm: 0 4px 12px rgba(0,0,0,0.08);
+          --shadow-md: 0 8px 25px rgba(0,0,0,0.15);
+          --shadow-lg: 0 15px 40px rgba(0,0,0,0.25);
+          --radius: 20px;
+          --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .custom-bg {
-          background-color: var(--light-gray-bg);
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shimmer { 0% { background-position: -468px 0; } 100% { background-position: 468px 0; } }
+
+        .hero-bg {
+          background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+          min-height: 100vh;
+          position: relative;
+          overflow: hidden;
+        }
+        .hero-bg::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at 20% 80%, rgba(246,193,7,0.15), transparent 50%),
+                      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1), transparent 50%);
+          pointer-events: none;
         }
 
-        .empresas-header {
-          background-color: var(--primary-blue);
-          color: var(--white);
-          padding: 3rem 0;
+        .search-header {
+          padding: 4rem 1rem 3rem;
           text-align: center;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+          position: relative;
+          z-index: 1;
+          animation: fadeInUp 0.8s ease-out;
         }
-        .empresas-header h1 {
-          font-weight: 700;
-          font-size: 2.8rem;
-          margin-bottom: 0.8rem;
+        .search-header h1 {
+          color: white;
+          font-weight: 800;
+          font-size: 3rem;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.75rem;
-          text-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+          gap: 1rem;
+          text-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-        .empresas-header .lead {
-          font-size: 1.3rem;
-          max-width: 800px;
-          margin: 0.5rem auto 0;
-          line-height: 1.6;
+        .search-header p {
+          color: rgba(255,255,255,0.9);
+          font-size: 1.2rem;
+          max-width: 700px;
+          margin: 1rem auto 0;
         }
 
-        .search-section {
-          padding: 2.5rem 0;
-          text-align: center;
-          background-color: var(--white);
-          border-bottom: 1px solid var(--border-light);
-        }
-        .search-section .input-group {
-          max-width: 700px;
+        .search-bar-wrapper {
+          max-width: 800px;
           margin: 0 auto;
+          padding: 0 1rem;
+          position: relative;
+          z-index: 1;
+        }
+        .search-input-group {
           display: flex;
           gap: 1rem;
-          align-items: stretch;
+          background: white;
+          border-radius: 16px;
+          padding: 0.75rem;
+          box-shadow: var(--shadow-lg);
+          animation: fadeInUp 0.8s ease-out 0.2s both;
         }
-        .search-section .form-control {
-          border-radius: 8px;
-          border: 1px solid var(--border-light);
-          padding: 0.85rem 1.25rem;
-          font-size: 1.05rem;
-          color: var(--dark-gray);
+        .search-input {
           flex: 1;
-          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
-          transition: all 0.2s ease;
+          border: none;
+          outline: none;
+          font-size: 1.1rem;
+          padding: 0.75rem 1rem;
+          color: #212529;
         }
-        .search-section .form-control:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 0.2rem rgba(0, 86, 179, 0.25);
-        }
-        .search-section .btn-filter {
-          background-color: var(--accent-blue);
-          border-color: var(--accent-blue);
-          color: var(--white);
-          border-radius: 8px;
-          padding: 0.85rem 2rem;
-          font-weight: 600;
-          transition: all 0.3s ease;
-          flex-shrink: 0;
+        .search-input::placeholder { color: var(--gray-600); }
+        .btn-filter {
+          background: linear-gradient(135deg, var(--info), var(--primary));
+          color: white;
+          border: none;
+          padding: 0.75rem 2rem;
+          border-radius: 12px;
+          font-weight: 700;
           display: flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: 0.75rem;
+          transition: var(--transition);
+          box-shadow: 0 6px 16px rgba(0, 48, 135, 0.25);
         }
-        .search-section .btn-filter:hover {
-          background-color: var(--primary-blue);
-          border-color: var(--primary-blue);
-          transform: translateY(-2px);
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        .btn-filter:hover {
+          background: linear-gradient(135deg, var(--primary), var(--info));
+          transform: translateY(-3px);
+          box-shadow: 0 8px 20px rgba(0, 48, 135, 0.35);
         }
 
         .modal-overlay {
           position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.65);
+          inset: 0;
+          background: rgba(0,0,0,0.7);
           display: flex;
-          justify-content: center;
           align-items: center;
-          z-index: 1000;
+          justify-content: center;
+          z-index: 1050;
+          backdrop-filter: blur(8px);
         }
         .modal-content {
-          background: var(--white);
-          border-radius: 12px;
+          background: white;
+          border-radius: var(--radius);
           padding: 2.5rem;
-          max-width: 550px;
+          max-width: 560px;
           width: 90%;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+          box-shadow: var(--shadow-lg);
+          animation: fadeInUp 0.4s ease-out;
           position: relative;
-          animation: slideIn 0.3s ease-out;
+          border-top: 6px solid var(--accent);
         }
-        @keyframes slideIn {
-          from { transform: translateY(-70px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-        .modal-content h3 {
-          color: var(--primary-blue);
-          font-weight: 700;
-          margin-bottom: 2rem;
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          font-size: 1.8rem;
-          border-bottom: 1px solid var(--border-light);
-          padding-bottom: 1rem;
-        }
-        .modal-content .btn-close {
+        .modal-content::before {
+          content: '';
           position: absolute;
-          top: 1.2rem;
-          right: 1.2rem;
+          top: 0; left: 0;
+          width: 100%; height: 6px;
+          background: linear-gradient(90deg, var(--primary), var(--info), var(--accent));
+        }
+        .btn-close {
+          position: absolute;
+          top: 1rem; right: 1rem;
           background: none;
           border: none;
           font-size: 1.8rem;
-          color: var(--medium-gray);
+          color: var(--gray-600);
           cursor: pointer;
-          opacity: 0.7;
-          transition: opacity 0.2s;
+          transition: var(--transition);
         }
-        .modal-content .btn-close:hover {
-          opacity: 1;
-          color: var(--dark-gray);
+        .btn-close:hover { color: var(--danger); transform: rotate(90deg); }
+
+        .form-label {
+          font-weight: 600;
+          color: var(--primary);
+          margin-bottom: 0.5rem;
         }
-        .modal-content .form-group {
-            margin-bottom: 1.5rem;
-        }
-        .modal-content .form-group label {
-            font-weight: 600;
-            color: var(--dark-gray);
-            margin-bottom: 0.4rem;
-            display: block;
-            font-size: 1rem;
-        }
-        .modal-content .form-control,
-        .modal-content .form-select {
-          border-radius: 8px;
-          padding: 0.8rem 1rem;
-          border: 1px solid var(--border-light);
-          transition: border-color 0.2s, box-shadow 0.2s;
+        .form-control, .form-select {
+          border: 2px solid var(--gray-200);
+          border-radius: 12px;
+          padding: 0.75rem 1rem;
           font-size: 1rem;
+          transition: var(--transition);
         }
-        .modal-content .form-control:focus,
-        .modal-content .form-select:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 0.2rem rgba(0, 48, 135, 0.25);
+        .form-control:focus, .form-select:focus {
+          border-color: var(--primary);
+          box-shadow: 0 0 0 4px rgba(0, 48, 135, 0.15);
+          outline: none;
         }
-        .modal-content .btn-primary, .modal-content .btn-warning {
-            border-radius: 8px;
-            padding: 0.8rem 1.8rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .modal-content .btn-primary {
-          background-color: var(--primary-blue);
-          border-color: var(--primary-blue);
-        }
-        .modal-content .btn-warning {
-          background-color: var(--warning-orange);
-          border-color: var(--warning-orange);
-        }
-        .modal-content .btn-primary:hover, .modal-content .btn-warning:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        .form-check-input:checked {
+          background-color: var(--success);
+          border-color: var(--success);
         }
 
-
-        .empresas-list {
-          padding: 3rem 0;
+        .empresas-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+          gap: 2rem;
+          padding: 3rem 1rem;
+          max-width: 1400px;
+          margin: 0 auto;
         }
-        .empresas-list .card {
-          background-color: var(--white);
-          border-radius: 15px;
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+        .empresa-card {
+          background: white;
+          border-radius: var(--radius);
+          overflow: hidden;
+          box-shadow: var(--shadow-md);
+          transition: var(--transition);
+          border-top: 6px solid var(--info);
+          animation: fadeInUp 0.6s ease-out;
           height: 100%;
           display: flex;
           flex-direction: column;
-          border: none;
-          overflow: hidden;
         }
-        .empresas-list .card:hover {
+        .empresa-card:hover {
           transform: translateY(-8px);
-          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+          box-shadow: var(--shadow-lg);
         }
-        .empresas-list .card-img-container {
-          width: 100%;
-          height: 220px;
+        .card-img-container {
+          height: 180px;
+          background: var(--gray-100);
           display: flex;
-          justify-content: center;
           align-items: center;
-          background-color: var(--light-gray-bg);
-          border-bottom: 1px solid var(--border-light);
+          justify-content: center;
           overflow: hidden;
+          position: relative;
         }
-        .empresas-list .card-img-top {
-          max-width: 90%;
+        .card-img-top {
           max-height: 90%;
+          max-width: 90%;
           object-fit: contain;
-          margin: auto;
-          padding: 1rem;
           transition: transform 0.3s ease;
         }
-        .empresas-list .card:hover .card-img-top {
-            transform: scale(1.05);
-        }
-        .empresas-list .card-body {
+        .empresa-card:hover .card-img-top { transform: scale(1.05); }
+
+        .card-body {
           padding: 1.8rem;
-          text-align: left;
           flex-grow: 1;
           display: flex;
           flex-direction: column;
         }
-        .empresas-list .card-title {
-          color: var(--primary-blue);
-          font-weight: 700;
-          font-size: 1.8rem;
-          margin-bottom: 0.75rem;
-          line-height: 1.3;
-        }
-        .empresas-list .card-subtitle {
-            font-size: 0.95rem;
-            color: var(--medium-gray);
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .empresas-list .card-details {
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-light);
-        }
-        .empresas-list .card-details p {
-            margin-bottom: 0.6rem;
-            font-size: 0.95rem;
-            color: var(--dark-gray);
-            display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
-        }
-        .empresas-list .card-details p strong {
-            color: var(--primary-blue);
-            font-weight: 600;
-        }
-        .empresas-list .card-details p .icon {
-            color: var(--accent-blue);
-            font-size: 1.1rem;
-            flex-shrink: 0;
-            position: relative;
-            top: 2px;
-        }
-
-        .status-aberto {
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.8rem !important;
-            font-size: 1rem !important;
-        }
-        .status-aberto .icon-status {
-            font-size: 1.2rem;
-        }
-        .status-aberto.open {
-            color: var(--success-green);
-        }
-        .status-aberto.closed {
-            color: var(--danger-red);
-        }
-        .empresas-list .card-details p:has(.status-aberto) {
-            border-bottom: 1px solid var(--border-light);
-            padding-bottom: 1rem;
-            margin-bottom: 1rem !important;
-        }
-        .empresas-list .card-details {
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-light);
-        }
-        
-        .empresas-list .list-servicos {
-            margin-bottom: 1.5rem;
-        }
-        .empresas-list .list-servicos h6 {
-            color: var(--primary-blue);
-            font-weight: 600;
-            font-size: 1.05rem;
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .empresas-list .list-servicos ul {
-            padding-left: 1.2rem;
-            list-style: none;
-        }
-        .empresas-list .list-servicos ul li {
-            position: relative;
-            padding-left: 1.5rem;
-            margin-bottom: 0.4rem;
-            font-size: 0.9rem;
-            color: var(--medium-gray);
-        }
-        .empresas-list .list-servicos ul li::before {
-            content: "•";
-            color: var(--success-green);
-            position: absolute;
-            left: 0;
-            font-weight: bold;
-        }
-        .empresas-list .btn-success {
-          background-color: var(--success-green);
-          border-color: var(--success-green);
-          padding: 0.9rem;
-          font-weight: 700;
-          border-radius: 8px;
-          margin-top: auto;
-          transition: all 0.3s ease;
-          width: 100%;
-          font-size: 1.05rem;
-        }
-        .empresas-list .btn-success:hover {
-          background-color: #218838;
-          border-color: #1e7e34;
-          transform: translateY(-3px);
-          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-        }
-        .empresas-list .rating-container {
+        .card-title {
+          font-weight: 800;
+          font-size: 1.6rem;
+          color: var(--primary);
           margin-bottom: 1rem;
         }
 
-        .message {
-          font-size: 1.2rem;
-          padding: 2rem;
-          border-radius: 12px;
-          box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-          max-width: 700px;
-          margin: 3rem auto;
-          text-align: center;
+        .status-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-weight: 700;
+          font-size: 0.95rem;
+          padding: 0.4rem 0.8rem;
+          border-radius: 50px;
+          margin-bottom: 1rem;
+        }
+        .status-open {
+          background: rgba(40,167,69,0.15);
+          color: var(--success);
+          border: 1px solid var(--success);
+        }
+        .status-closed {
+          background: rgba(220,53,69,0.15);
+          color: var(--danger);
+          border: 1px solid var(--danger);
+        }
+
+        .info-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.75rem;
+          margin-bottom: 0.75rem;
+          font-size: 0.95rem;
+          color: var(--gray-600);
+        }
+        .info-item strong {
+          color: var(--primary);
+          min-width: 80px;
+        }
+        .info-icon {
+          color: var(--info);
+          font-size: 1.1rem;
+          flex-shrink: 0;
+          margin-top: 0.15rem;
+        }
+
+        .list-servicos h6 {
+          color: var(--primary);
+          font-weight: 700;
+          font-size: 1.05rem;
+          margin: 1.5rem 0 0.75rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .btn-view {
+          background: linear-gradient(135deg, var(--success), #1e7e34);
+          color: white;
+          border: none;
+          padding: 1rem;
+          border-radius: 14px;
+          font-weight: 700;
+          font-size: 1.05rem;
+          margin-top: auto;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 1rem;
-          font-weight: 500;
+          gap: 0.75rem;
+          transition: var(--transition);
+          box-shadow: 0 6px 16px rgba(40,167,69,0.25);
         }
-        .message.warning {
-          color: var(--warning-orange);
-          background-color: #fff8e1;
-          border: 1px solid var(--warning-orange);
+        .btn-view:hover {
+          background: linear-gradient(135deg, #1e7e34, var(--success));
+          transform: translateY(-3px);
+          box-shadow: 0 8px 20px rgba(40,167,69,0.35);
         }
 
-        @keyframes shimmer {
-            0% { background-position: -468px 0; }
-            100% { background-position: 468px 0; }
+        .no-results {
+          text-align: center;
+          padding: 4rem 2rem;
+          background: white;
+          border-radius: var(--radius);
+          box-shadow: var(--shadow-md);
+          max-width: 600px;
+          margin: 2rem auto;
+          animation: fadeInUp 0.6s ease-out;
         }
 
         .skeleton {
-            background-color: var(--border-light);
-            border-radius: 8px;
-            height: 1.2rem;
-            margin-bottom: 0.75rem;
-            background-image: linear-gradient(to right, var(--border-light) 0%, #ececec 20%, var(--border-light) 40%, var(--border-light) 100%);
-            background-repeat: no-repeat;
-            background-size: 800px 104px;
-            animation: shimmer 1.2s linear infinite;
+          background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+          background-size: 200% 100%;
+          animation: shimmer 1.5s infinite;
+          border-radius: 8px;
         }
-        .skeleton-logo {
-            height: 220px;
-            margin-bottom: 0;
-            border-radius: 15px 15px 0 0;
-            background-size: 100% 100%;
-        }
-        .skeleton-line-long { width: 90%; }
-        .skeleton-line-medium { width: 70%; }
-        .skeleton-line-short { width: 50%; }
-        .skeleton-circle { 
-            height: 20px; 
-            width: 20px; 
-            border-radius: 50%; 
-            display: inline-block; 
-            margin-right: 4px;
-            background-color: var(--border-light);
-            background-image: linear-gradient(to right, var(--border-light) 0%, #ececec 50%, var(--border-light) 100%);
-            animation: shimmer 1.2s linear infinite;
-        }
+        .skeleton-logo { height: 180px; border-radius: var(--radius) var(--radius) 0 0; }
+        .skeleton-line-long { height: 1.6rem; width: 85%; margin-bottom: 1rem; }
+        .skeleton-line-medium { height: 1.2rem; width: 70%; margin-bottom: 0.75rem; }
+        .skeleton-line-short { height: 1rem; width: 50%; }
+        .skeleton-circle { width: 20px; height: 20px; border-radius: 50%; display: inline-block; margin-right: 4px; }
 
-
-        @media (max-width: 991px) {
-          .empresas-header { padding: 2.5rem 0; }
-          .empresas-header h1 { font-size: 2.3rem; }
-          .empresas-header .lead { font-size: 1.15rem; }
-          .search-section { padding: 2rem 0; }
-          .search-section .input-group { max-width: 90%; }
-          .empresas-list .card-title { font-size: 1.5rem; }
-          .empresas-list .card-img-container { height: 180px; }
-          .empresas-list .card-body { padding: 1.5rem; }
-        }
-
-        @media (max-width: 767px) {
-          .empresas-header { padding: 2rem 1rem; }
-          .empresas-header h1 { font-size: 2rem; gap: 0.5rem; }
-          .empresas-header .lead { font-size: 1rem; }
-          .search-section { padding: 1.5rem 1rem; }
-          .search-section .input-group {
-            flex-direction: column;
-            gap: 0.75rem;
-            max-width: 100%;
-          }
-          .search-section .form-control, .search-section .btn-filter {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            font-size: 0.95rem;
-          }
-          .modal-content { padding: 2rem 1.5rem; width: 95%; }
-          .modal-content h3 { font-size: 1.5rem; }
-          .modal-content .btn-close { font-size: 1.5rem; }
-          .modal-content .btn-primary, .modal-content .btn-warning {
-            padding: 0.7rem 1.2rem;
-            font-size: 0.95rem;
-          }
-
-          .empresas-list { padding: 2rem 0; }
-          .empresas-list .card { border-radius: 10px; }
-          .empresas-list .card-img-container { height: 160px; }
-          .empresas-list .card-body { padding: 1.2rem; }
-          .empresas-list .card-title { font-size: 1.3rem; margin-bottom: 0.5rem; }
-          .empresas-list .card-subtitle { font-size: 0.85rem; margin-bottom: 1rem; }
-          .empresas-list .card-details p, .empresas-list .list-servicos ul li { font-size: 0.88rem; }
-          .empresas-list .card-details p .icon { font-size: 1rem; }
-          .empresas-list .btn-success { padding: 0.7rem; font-size: 0.95rem; }
-
-          .message {
-            font-size: 1rem;
-            padding: 1.5rem;
-            margin: 2rem auto;
-          }
+        @media (max-width: 768px) {
+          .search-header h1 { font-size: 2.2rem; }
+          .search-input-group { flex-direction: column; padding: 0.5rem; }
+          .btn-filter { padding: 0.75rem 1.5rem; }
+          .empresas-grid { grid-template-columns: 1fr; padding: 2rem 1rem; }
         }
       `}</style>
-      <div className="custom-bg min-vh-100">
+
+      <div className="hero-bg">
         <Navbar />
-        <header className="empresas-header">
+
+        <header className="search-header">
           <div className="container">
-            <h1>
-              <FaSearch /> Busca de Empresas
-            </h1>
-            <p className="lead">
-              Encontre estabelecimentos e profissionais cadastrados para agendar seus serviços.
-            </p>
+            <h1><FaSearch /> Busca de Empresas</h1>
+            <p>Encontre serviços e locações com agendamento instantâneo em todo o Brasil.</p>
           </div>
         </header>
-        <section className="search-section container-fluid">
-          <div className="input-group">
+
+        <div className="search-bar-wrapper">
+          <div className="search-input-group">
             <input
               type="text"
-              className="form-control"
-              placeholder="Pesquisar por nome da empresa ou serviço..."
+              className="search-input"
+              placeholder="Nome da empresa, serviço ou localização..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <button
-              className="btn btn-filter"
-              onClick={() => setShowModal(true)}
-              aria-label="Abrir Filtros"
-            >
+            <button className="btn btn-filter" onClick={() => setShowModal(true)}>
               <FaFilter /> Filtros
             </button>
           </div>
-        </section>
+        </div>
 
         <FilterModal
           show={showModal}
           onClose={() => setShowModal(false)}
           onApply={applyFilters}
           onClear={clearFilters}
-          cidade={cidade}
-          setCidade={setCidade}
-          estado={estado}
-          setEstado={setEstado}
-          bairro={bairro}
-          setBairro={setBairro}
-          pais={pais}
-          setPais={setPais}
-          tipoEmpresa={tipoEmpresa}
-          setTipoEmpresa={setTipoEmpresa}
-          abertoAgoraFilter={abertoAgoraFilter}
-          setAbertoAgoraFilter={setAbertoAgoraFilter}
+          cidade={cidade} setCidade={setCidade}
+          estado={estado} setEstado={setEstado}
+          bairro={bairro} setBairro={setBairro}
+          pais={pais} setPais={setPais}
+          tipoEmpresa={tipoEmpresa} setTipoEmpresa={setTipoEmpresa}
+          abertoAgoraFilter={abertoAgoraFilter} setAbertoAgoraFilter={setAbertoAgoraFilter}
           tiposDisponiveis={tiposDisponiveis}
           estados={estados}
         />
 
-        <section className="empresas-list container">
+        <div className="container">
           {empresas.loading ? (
-            <div className="row">
-                {[...Array(6)].map((_, index) => (
-                    <EmpresaCardSkeleton key={index} />
-                ))}
+            <div className="empresas-grid">
+              {[...Array(6)].map((_, i) => <EmpresaCardSkeleton key={i} />)}
             </div>
           ) : filteredEmpresas && filteredEmpresas.length > 0 ? (
-            <div className="row">
-              {filteredEmpresas.map((empresa, index) => {
-                const estaAberta = empresa.aberto_agora;
-
-                return (
-                  <div key={index} className="col-lg-4 col-md-6 mb-4">
-                    <div className="card">
-                      <div className="card-img-container">
-                        <img
-                          src={empresa.logo || "https://via.placeholder.com/220x220?text=Sem+Logo"}
-                          alt={empresa.nome}
-                          className="card-img-top"
-                          loading="lazy"
-                        />
-                      </div>
-                      <div className="card-body">
-                        <h5 className="card-title">{empresa.nome}</h5>
-
-                        <div className="card-details">
-                            <RatingStars
-                              score={empresa.nota_empresa}
-                              ratingCount={empresa.avaliacoes_empresa}
-                            />
-                            <p className={`status-aberto ${estaAberta ? 'open' : 'closed'}`}>
-                                {estaAberta ? (
-                                    <>
-                                        <FaCheckCircle className="icon-status" />
-                                        <strong>Aberto Agora</strong>
-                                    </>
-                                ) : (
-                                    <>
-                                        <FaTimesCircle className="icon-status" />
-                                        <strong>Fechado Agora</strong>
-                                    </>
-                                )}
-                            </p>
-                            <p>
-                              <FaBuilding className="icon" />
-                              <strong>Tipo:</strong> {empresa.tipo}
-                            </p>
-                            <p>
-                              <FaMapMarkerAlt className="icon" />
-                              <strong>Localidade:</strong> {empresa.cidade}, {empresa.estado}, {empresa.pais}
-                            </p>
-                            {empresa.telefone && (
-                                <p>
-                                  <FaPhoneAlt className="icon" />
-                                  <strong>Telefone:</strong> {empresa.telefone}
-                                </p>
-                            )}
-                        </div>
-
-                        {empresa.tipo === "Locação" ? (
-                            <ListaLocacoes locacoes={empresa.locacoes} />
-                        ) : (
-                            <ListaServicos servicos={empresa.servicos} />
-                        )}
-
-                        <Link
-                          to={`/empresas/${empresa.slug}`}
-                          className="btn btn-success"
-                        >
-                          Ver Detalhes e Agendar
-                        </Link>
-                      </div>
-                    </div>
+            <div className="empresas-grid">
+              {filteredEmpresas.map((empresa, i) => (
+                <div key={i} className="empresa-card">
+                  <div className="card-img-container">
+                    <img
+                      src={empresa.logo || "https://via.placeholder.com/300x180?text=Sem+Logo"}
+                      alt={empresa.nome}
+                      className="card-img-top"
+                      loading="lazy"
+                    />
                   </div>
-                );
-              })}
+                  <div className="card-body">
+                    <h5 className="card-title">{empresa.nome}</h5>
+
+                    <div className="mb-3">
+                      <RatingStars score={empresa.nota_empresa} ratingCount={empresa.avaliacoes_empresa} />
+                    </div>
+
+                    <div className={`status-badge ${empresa.aberto_agora ? 'status-open' : 'status-closed'}`}>
+                      {empresa.aberto_agora ? <FaCheckCircle /> : <FaTimesCircle />}
+                      {empresa.aberto_agora ? "Aberto Agora" : "Fechado"}
+                    </div>
+
+                    <div className="mb-3">
+                      <div className="info-item">
+                        <FaBuilding className="info-icon" />
+                        <div><strong>Tipo:</strong> {empresa.tipo}</div>
+                      </div>
+                      <div className="info-item">
+                        <FaMapMarkerAlt className="info-icon" />
+                        <div><strong>Local:</strong> {empresa.cidade}, {empresa.estado}</div>
+                      </div>
+                      {empresa.telefone && (
+                        <div className="info-item">
+                          <FaPhoneAlt className="info-icon" />
+                          <div><strong>Tel:</strong> {empresa.telefone}</div>
+                        </div>
+                      )}
+                    </div>
+
+                    {empresa.tipo === "Locação" ? (
+                      <ListaLocacoes locacoes={empresa.locacoes} />
+                    ) : (
+                      <ListaServicos servicos={empresa.servicos} />
+                    )}
+
+                    <Link to={`/empresas/${empresa.slug}`} className="btn btn-view mt-3">
+                      Ver Detalhes e Agendar
+                    </Link>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
-            <div className="message warning">
-              <FaExclamationCircle /> Nenhuma empresa encontrada com os filtros e busca atuais.
+            <div className="no-results">
+              <FaExclamationCircle size={48} className="text-warning mb-3" />
+              <h4>Nenhuma empresa encontrada</h4>
+              <p>Tente ajustar os filtros ou a busca.</p>
             </div>
           )}
-        </section>
+        </div>
+
+        <footer className="text-center py-4 text-white" style={{ opacity: 0.8, fontSize: '0.9rem' }}>
+          Centenas de empresas • Agendamento online • Avaliações reais
+        </footer>
       </div>
     </div>
   );

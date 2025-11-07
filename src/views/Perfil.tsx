@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useFetch } from "../functions/GetData";
 import { UserProfile } from "../interfaces/User";
-import { Usage  } from "../interfaces/Usage";
+import { Usage } from "../interfaces/Usage";
 import { Pagamentos } from "../interfaces/Pagamentos";
 
 import Navbar from "../components/Navbar";
-import { FaUser, FaEnvelope, FaKey, FaEye, FaEyeSlash, FaCreditCard, FaPix,
-  FaRegCreditCard, FaChartSimple, FaGaugeHigh, FaCalendarCheck, FaMoneyBillTransfer,
-  FaBusinessTime, FaBriefcase, FaUsers } from "react-icons/fa6";
-import { FaSpinner, FaCircleCheck, FaCircleXmark } from "react-icons/fa6";
-import {FaEdit} from "react-icons/fa";
+import {
+  FaUser, FaEnvelope, FaKey, FaEye, FaEyeSlash, FaChartSimple, FaGaugeHigh, FaCalendarCheck, FaMoneyBillTransfer,
+  FaBusinessTime, FaUsers, FaSpinner, FaCircleCheck,
+  FaCircleXmark, FaArrowRight, FaCheck
+} from "react-icons/fa6";
 import { Link } from "react-router-dom";
+import {FaEdit, FaExclamationTriangle} from "react-icons/fa";
 
 interface ConsolidatedUsageItem {
-    empresa: string;
-    tipo: 'Serviço' | 'Locação';
-    current: number;
-    max: number;
+  empresa: string;
+  tipo: 'Serviço' | 'Locação';
+  current: number;
+  max: number;
 }
-
 
 const Profile = () => {
   const token = localStorage.getItem("access_token");
@@ -40,31 +40,52 @@ const Profile = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (user.data) {
-      setUserData(user.data);
+  const formatExpiryDate = (isoString: string) => {
+    const date = new Date(isoString);
+    const now = new Date();
+    const diffTime = date.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    const formatted = date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    if (diffDays <= 0) {
+      return <span className="text-danger fw-bold">Expirado</span>;
+    } else if (diffDays <= 3) {
+      return <span className="text-warning fw-bold">Expira em {diffDays} dia{diffDays > 1 ? 's' : ''}</span>;
     }
+
+    return <span>{formatted}</span>;
+  };
+
+  useEffect(() => {
+    if (user.data) setUserData(user.data);
   }, [user.data]);
 
   useEffect(() => {
     if (usage.data) {
-        const { limite_funcionarios, limite_locacoes, funcionarios_por_empresa, locacoes_por_empresa } = usage.data;
+      const { limite_funcionarios, limite_locacoes, funcionarios_por_empresa, locacoes_por_empresa } = usage.data;
 
-        const locacaoItems: ConsolidatedUsageItem[] = locacoes_por_empresa.map(item => ({
-            empresa: item.empresa,
-            tipo: 'Locação',
-            current: item.total_locativos,
-            max: limite_locacoes,
-        }));
+      const locacaoItems: ConsolidatedUsageItem[] = locacoes_por_empresa.map(item => ({
+        empresa: item.empresa,
+        tipo: 'Locação',
+        current: item.total_locativos,
+        max: limite_locacoes,
+      }));
 
-        const servicoItems: ConsolidatedUsageItem[] = funcionarios_por_empresa.map(item => ({
-            empresa: item.empresa,
-            tipo: 'Serviço',
-            current: item.total_funcionarios,
-            max: limite_funcionarios,
-        }));
+      const servicoItems: ConsolidatedUsageItem[] = funcionarios_por_empresa.map(item => ({
+        empresa: item.empresa,
+        tipo: 'Serviço',
+        current: item.total_funcionarios,
+        max: limite_funcionarios,
+      }));
 
-        setConsolidatedUsage([...locacaoItems, ...servicoItems]);
+      setConsolidatedUsage([...locacaoItems, ...servicoItems]);
     }
   }, [usage.data]);
 
@@ -82,19 +103,16 @@ const Profile = () => {
     setSuccess(null);
 
     if (!userData.first_name || !userData.username || !userData.email) {
-        setError("Todos os campos do perfil são obrigatórios.");
-        setLoading(false);
-        return;
+      setError("Todos os campos do perfil são obrigatórios.");
+      setLoading(false);
+      return;
     }
 
     try {
       const url = import.meta.env.VITE_API_URL;
-
       const response = await fetch(url + "/api/user/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           usuario_token: token,
           first_name: userData.first_name,
@@ -103,14 +121,11 @@ const Profile = () => {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Erro ao salvar alterações.");
-      }
-
-      setSuccess("Alterações salvas com sucesso! (Dados do Perfil)");
+      if (!response.ok) throw new Error("Erro ao salvar alterações.");
+      setSuccess("Perfil atualizado com sucesso!");
       setIsEditing(false);
     } catch (e: any) {
-        setError(e.message || "Erro ao salvar alterações.");
+      setError(e.message || "Erro ao salvar alterações.");
     } finally {
       setLoading(false);
     }
@@ -126,8 +141,8 @@ const Profile = () => {
       return;
     }
     if (newPassword.length < 6) {
-        setError("A nova senha deve ter pelo menos 6 caracteres.");
-        return;
+      setError("A nova senha deve ter pelo menos 6 caracteres.");
+      return;
     }
 
     setLoading(true);
@@ -135,7 +150,6 @@ const Profile = () => {
     setSuccess(null);
     try {
       const url = import.meta.env.VITE_API_URL;
-
       const response = await fetch(url + "/api/change-password/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -147,7 +161,6 @@ const Profile = () => {
       });
 
       const data = await response.json();
-
       if (!response.ok) {
         setError(data.message || "Erro ao alterar a senha");
         return;
@@ -158,7 +171,7 @@ const Profile = () => {
       setNewPasswordConfirm("");
       setCurrentPassword("");
     } catch (e: any) {
-        setError(e.message || "Erro de conexão ao alterar a senha.");
+      setError(e.message || "Erro de conexão ao alterar a senha.");
     } finally {
       setLoading(false);
     }
@@ -176,40 +189,24 @@ const Profile = () => {
 
   const getPaymentStatusBadge = (status: string) => {
     switch (status) {
-        case "Pago":
-            return <span className="badge bg-success-soft text-success"><FaCircleCheck className="me-1" /> {status}</span>;
-        case "Pendente":
-            return <span className="badge bg-warning-soft text-warning"><FaCalendarCheck className="me-1" /> {status}</span>;
-        default:
-            return <span className="badge bg-danger-soft text-danger"><FaCircleXmark className="me-1" /> {status}</span>;
+      case "Pago":
+        return <span className="badge bg-success"><FaCircleCheck /> {status}</span>;
+      case "Pendente":
+        return <span className="badge bg-warning text-dark"><FaCalendarCheck /> {status}</span>;
+      default:
+        return <span className="badge bg-danger"><FaCircleXmark /> {status}</span>;
     }
   };
 
   if (user.loading || usage.loading || payments.loading) {
     return (
-        <div className="min-vh-100 custom-bg">
-            <Navbar />
-            <div className="profile-container container">
-                <div className="loading-container text-center py-5">
-                    <FaSpinner className="fa-spin text-primary" size={30} />
-                    <p className="text-muted mt-2">Carregando dados do perfil...</p>
-                </div>
-            </div>
+      <div className="min-vh-100 hero-bg">
+        <Navbar />
+        <div className="d-flex align-items-center justify-content-center flex-column min-vh-100">
+          <FaSpinner className="fa-spin text-white" size={48} />
+          <p className="text-white mt-3 fs-5">Carregando seu perfil...</p>
         </div>
-    );
-  }
-
-  if (!usage.data) {
-    return (
-        <div className="min-vh-100 custom-bg">
-            <Navbar />
-            <div className="profile-container container">
-                <div className="alert alert-danger text-center py-5">
-                    <FaCircleXmark size={30} className="mb-2" />
-                    <p className="mb-0">Não foi possível carregar os dados de uso e limite do plano.</p>
-                </div>
-            </div>
-        </div>
+      </div>
     );
   }
 
@@ -218,521 +215,521 @@ const Profile = () => {
     const percentage = calculateProgress(current, max);
 
     return (
-        <>
-            <div className="progress">
-                <div
-                    className={`progress-bar ${getProgressBarColor(percentage)}`}
-                    role="progressbar"
-                    style={{ width: `${percentage}%` }}
-                    aria-valuenow={current}
-                    aria-valuemin={0}
-                    aria-valuemax={max}
-                >
-                    {current}/{max}
-                </div>
-            </div>
-            <p className="text-muted text-center mt-2" style={{fontSize: '0.8rem'}}>
-                {tipo === 'Locação' ? 'Locações/Espaços em uso' : 'Funcionários em uso'}
-            </p>
-        </>
+      <div className="progress-wrapper">
+        <div className="progress">
+          <div
+            className={`progress-bar ${getProgressBarColor(percentage)}`}
+            style={{ width: `${percentage}%` }}
+          >
+            {current}/{max}
+          </div>
+        </div>
+        <p className="text-muted small text-center mt-1">
+          {tipo === 'Locação' ? 'Locações ativas' : 'Funcionários cadastrados'}
+        </p>
+      </div>
     );
   };
 
   return (
     <div className="min-vh-100">
       <style>{`
-        /* Paleta de cores (Ajustadas para mais profissionalismo) */
         :root {
-          --primary-blue: #003087; /* Foco Principal */
-          --accent-blue: #0056b3; /* Destaque */
-          --dark-gray: #212529; /* Texto Principal */
-          --medium-gray: #6c757d; /* Texto Secundário */
-          --light-gray-bg: #f5f7fa; /* Fundo do Corpo */
+          --primary: #003087;
+          --primary-dark: #00205b;
+          --accent: #f6c107;
+          --success: #28a745;
+          --warning: #fd7e14;
+          --danger: #dc3545;
+          --info: #0056b3;
+          --gray-100: #f8f9fa;
+          --gray-200: #e9ecef;
+          --gray-600: #6c757d;
           --white: #ffffff;
-          --success-green: #28a745;
-          --warning-orange: #fd7e14;
-          --danger-red: #dc3545;
-          --border-light: #e0e0e0;
-
-          /* Soft Backgrounds para Badges */
-          --success-soft: #d4edda;
-          --warning-soft: #fff3cd;
-          --danger-soft: #f8d7da;
-          --primary-soft: #cfe2ff;
+          --shadow-sm: 0 4px 12px rgba(0,0,0,0.08);
+          --shadow-md: 0 8px 25px rgba(0,0,0,0.15);
+          --shadow-lg: 0 15px 40px rgba(0,0,0,0.25);
+          --radius: 20px;
+          --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Estilos gerais */
-        .custom-bg {
-          background-color: var(--light-gray-bg);
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-        /* Container & Título */
-        .profile-container {
-          padding: 3.5rem 0;
-        }
-        .profile-container h1 {
-          color: var(--primary-blue);
-          font-weight: 800;
-          font-size: 2.5rem;
-          margin-bottom: 3rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.75rem;
-          text-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Cartões Base */
-        .base-card {
-          background-color: var(--white);
-          border-radius: 12px;
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-          padding: 2rem;
-          margin-bottom: 1.5rem;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-          border-left: 5px solid var(--primary-blue); /* Linha de destaque padrão */
-          height: 100%; /* Para alinhar na grid */
-        }
-        .base-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-        }
-        .base-card h4 {
-          font-weight: 700;
-          font-size: 1.4rem;
-          margin-bottom: 1.5rem;
-          padding-bottom: 0.5rem;
-          border-bottom: 2px solid var(--border-light);
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          color: var(--dark-gray);
-        }
-        
-        /* Ajuste de Cor da Borda e Título por Seção */
-        .plan-card { border-left-color: var(--accent-blue); }
-        .plan-card h4 { color: var(--accent-blue); }
-        .usage-card { border-left-color: var(--warning-orange); }
-        .usage-card h4 { color: var(--warning-orange); }
-        .payment-card { border-left-color: var(--success-green); }
-        .payment-card h4 { color: var(--success-green); }
-
-        /* Formulário de Perfil */
-        .input-icon {
+        .hero-bg {
+          background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+          min-height: 100vh;
           position: relative;
+          overflow: hidden;
         }
-        .input-icon svg {
+        .hero-bg::before {
+          content: '';
           position: absolute;
-          top: 50%;
-          left: 0.8rem;
-          transform: translateY(-50%);
-          color: var(--medium-gray);
-          font-size: 1.1rem;
+          inset: 0;
+          background: radial-gradient(circle at 20% 80%, rgba(246,193,7,0.15), transparent 50%),
+                      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1), transparent 50%);
+          pointer-events: none;
+        }
+
+        .profile-content {
+          padding: 3rem 1rem;
+          position: relative;
           z-index: 1;
         }
-        /* Botão de Toggle de Senha */
-        .password-toggle {
-            position: absolute;
-            top: 50%;
-            right: 1rem;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--medium-gray);
-            font-size: 1.1rem;
-            padding: 0;
-            z-index: 2; /* Acima do input */
-        }
-        .form-control {
-          border: 1px solid var(--border-light);
-          border-radius: 8px;
-          padding: 0.75rem 1rem 0.75rem 2.8rem; /* Aumenta o padding para o ícone */
-          font-size: 1rem;
-          color: var(--dark-gray);
-        }
-        .form-control:focus {
-          border-color: var(--primary-blue);
-          box-shadow: 0 0 0 0.2rem rgba(0, 48, 135, 0.15);
-        }
-        .form-control:disabled {
-          background-color: #f8f9fa;
-          color: var(--medium-gray);
-        }
-        .form-label {
-          color: var(--primary-blue);
-          font-weight: 600;
-        }
 
-        /* Botões */
-        .btn {
-          padding: 0.8rem;
-          border-radius: 8px;
-          font-weight: 600;
-          transition: all 0.3s ease;
+        .profile-header {
+          text-align: center;
+          margin-bottom: 3rem;
+          animation: fadeInUp 0.8s ease-out;
+        }
+        .profile-header h1 {
+          color: white;
+          font-weight: 800;
+          font-size: 2.8rem;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.5rem;
+          gap: 1rem;
+          text-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .btn-success { background-color: var(--success-green); border-color: var(--success-green); }
-        .btn-warning { background-color: var(--warning-orange); border-color: var(--warning-orange); color: var(--dark-gray); }
-        .btn-secondary { background-color: var(--medium-gray); border-color: var(--medium-gray); }
+        .profile-header p {
+          color: rgba(255,255,255,0.9);
+          font-size: 1.1rem;
+          max-width: 600px;
+          margin: 1rem auto 0;
+        }
 
-        /* Progress Bars (Uso) */
-        .progress-section {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            border-radius: 8px;
-            background-color: var(--light-gray-bg);
-            border: 1px solid var(--border-light);
+        .profile-grid {
+          display: grid;
+          grid-template-columns: 1fr 1.6fr;
+          gap: 2rem;
+          max-width: 1400px;
+          margin: 0 auto;
         }
-        .progress-section h6 {
-            font-weight: 600;
-            color: var(--dark-gray);
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem; /* Aumentei o gap para ícone */
+
+        .profile-card {
+          background: white;
+          border-radius: var(--radius);
+          padding: 2.5rem;
+          box-shadow: var(--shadow-lg);
+          border-top: 6px solid var(--accent);
+          animation: fadeInUp 0.8s ease-out;
+          position: relative;
+          overflow: hidden;
         }
+        .profile-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0;
+          width: 100%; height: 6px;
+          background: linear-gradient(90deg, var(--primary), var(--info), var(--accent));
+        }
+
+        .section-title {
+          font-weight: 700;
+          font-size: 1.5rem;
+          margin-bottom: 1.5rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 2px dashed var(--gray-200);
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          color: var(--primary);
+        }
+
+        .input-wrapper {
+          position: relative;
+          margin-bottom: 1.5rem;
+        }
+        .input-icon {
+          position: absolute;
+          left: 1rem;
+          top: 50%;
+          transform: translateY(-50%);
+          color: var(--info);
+          font-size: 1.2rem;
+          pointer-events: none;
+        }
+        .form-control {
+          width: 100%;
+          padding: 1rem 1rem 1rem 3rem;
+          border: 2px solid var(--gray-200);
+          border-radius: 14px;
+          font-size: 1rem;
+          transition: var(--transition);
+        }
+        .form-control:focus {
+          border-color: var(--primary);
+          box-shadow: 0 0 0 4px rgba(0, 48, 135, 0.15);
+          outline: none;
+        }
+        .form-control:disabled {
+          background: var(--gray-100);
+          color: var(--gray-600);
+        }
+
+        .password-toggle {
+          position: absolute;
+          right: 1rem;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          color: var(--info);
+          font-size: 1.2rem;
+          cursor: pointer;
+          padding: 0.5rem;
+        }
+        .password-toggle:hover { color: var(--primary); }
+
+        .btn-primary {
+          background: linear-gradient(135deg, var(--primary), var(--info));
+          color: white;
+          border: none;
+          padding: 1rem;
+          border-radius: 14px;
+          font-weight: 700;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          transition: var(--transition);
+          box-shadow: 0 6px 16px rgba(0, 48, 135, 0.25);
+        }
+        .btn-primary:hover:not(:disabled) {
+          background: linear-gradient(135deg, var(--info), var(--primary));
+          transform: translateY(-3px);
+          box-shadow: 0 8px 20px rgba(0, 48, 135, 0.35);
+        }
+
+        .btn-success {
+          background: linear-gradient(135deg, var(--success), #1e7e34);
+          color: white;
+        }
+        .btn-success:hover:not(:disabled) {
+          background: linear-gradient(135deg, #1e7e34, var(--success));
+          transform: translateY(-3px);
+        }
+
+        .btn-warning {
+          background: linear-gradient(135deg, var(--warning), #e66a00);
+          color: white;
+        }
+        .btn-secondary {
+          background: #6c757d;
+          color: white;
+        }
+
+        .progress-wrapper { margin-bottom: 1.5rem; }
         .progress {
-          height: 1.25rem;
-          border-radius: 6px;
+          height: 2.2rem;
+          border-radius: 12px;
+          background: var(--gray-200);
+          overflow: hidden;
+          box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
         .progress-bar {
-          font-weight: 500;
-          font-size: 0.85rem;
-          white-space: nowrap; /* Impede a quebra de linha do texto */
+          font-weight: 600;
+          font-size: 0.9rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
+        .bg-success { background: linear-gradient(135deg, #28a745, #1e7e34); }
+        .bg-warning { background: linear-gradient(135deg, #fd7e14, #e66a00); }
+        .bg-danger { background: linear-gradient(135deg, #dc3545, #c82333); }
 
-        /* Tabela de pagamentos */
-        .table-striped > tbody > tr:nth-of-type(odd) > * {
-            background-color: #f0f3f6; /* Listra mais clara */
+        .table {
+          margin-bottom: 0;
+          font-size: 0.95rem;
         }
         .table th {
-          background-color: var(--primary-blue);
-          color: var(--white);
+          background: var(--primary);
+          color: white;
           font-weight: 600;
+          text-align: center;
           vertical-align: middle;
         }
+        .table td { vertical-align: middle; text-align: center; }
         .badge {
-          font-size: 0.85rem;
-          padding: 0.4rem 0.8rem;
-          border-radius: 6px;
           font-weight: 600;
-        }
-        .bg-success-soft { background-color: var(--success-soft) !important; color: var(--success-green) !important; }
-        .bg-warning-soft { background-color: var(--warning-soft) !important; color: var(--warning-orange) !important; }
-        .bg-danger-soft { background-color: var(--danger-soft) !important; color: var(--danger-red) !important; }
-        
-        /* LAYOUT EM COLUNAS */
-        @media (min-width: 992px) {
-            /* Grid principal: Perfil/Acesso e Limites (Lado a Lado) */
-            .profile-grid {
-                display: grid;
-                grid-template-columns: 1fr 1.5fr; /* Perfil menor, Limites e Pagamentos maior */
-                gap: 2rem;
-            }
-            .info-column {
-                display: flex;
-                flex-direction: column;
-            }
-            /* Sub-Grid dentro da info-column para Plano e Pagamentos (Lado a Lado) */
-            .plan-payment-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr; 
-                gap: 1.5rem;
-                margin-bottom: 1.5rem; /* Margem entre a sub-grid e o card de uso */
-            }
-            .usage-card-compact {
-                margin-bottom: 0.75rem;
-            }
-        }
-        
-        /* Responsividade */
-        @media (max-width: 991px) {
-            /* Em telas menores que 992px, vira pilha (coluna) */
-            .profile-grid, .plan-payment-grid {
-                display: block;
-            }
-            .base-card {
-                margin-bottom: 1.5rem;
-            }
+          padding: 0.4rem 0.8rem;
+          border-radius: 8px;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
         }
 
+        .plan-card, .payment-card, .usage-card {
+          border-top: 6px solid;
+        }
+        .plan-card { border-color: var(--info); }
+        .payment-card { border-color: var(--success); }
+        .usage-card { border-color: var(--warning); }
+
+        .alert {
+          padding: 1rem 1.25rem;
+          border-radius: 12px;
+          margin-bottom: 1.5rem;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          animation: fadeInUp 0.4s ease-out;
+        }
+        .alert-success { background: rgba(40,167,69,0.1); color: var(--success); border: 1px solid var(--success); }
+        .alert-danger { background: rgba(220,53,69,0.1); color: var(--danger); border: 1px solid var(--danger); }
+
+        @media (max-width: 992px) {
+          .profile-grid { grid-template-columns: 1fr; }
+          .profile-header h1 { font-size: 2.2rem; }
+        }
+        @media (max-width: 576px) {
+          .profile-card { padding: 2rem 1.5rem; }
+          .section-title { font-size: 1.3rem; }
+        }
       `}</style>
-      <div className="custom-bg min-vh-100">
+
+      <div className="hero-bg">
         <Navbar />
-        <div className="profile-container container">
-          <h1>
-            <FaUser /> Perfil e Assinatura
-          </h1>
+
+        <div className="profile-content container">
+          <div className="profile-header">
+            <h1><FaUser /> Meu Perfil</h1>
+            <p>Gerencie suas informações, plano e limites de uso com total controle.</p>
+          </div>
+
+          {error && (
+            <div className="alert alert-danger">
+              <FaExclamationTriangle /> {error}
+            </div>
+          )}
+          {success && (
+            <div className="alert alert-success">
+              <FaCheck /> {success}
+            </div>
+          )}
 
           <div className="profile-grid">
-            <div className="profile-form-column">
-                <div className="base-card">
-                    <h4><FaUser /> Dados Pessoais e Acesso</h4>
-                    {error && <div className="alert alert-danger">{error}</div>}
-                    {success && <div className="alert alert-success">{success}</div>}
-                    {userData && (
-                        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                    <form onSubmit={(e) => {e.preventDefault(); isEditing ? handleSave() : setIsEditing(true);}}>
-                        <div className="mb-3 input-icon">
-                        <label htmlFor="first_name" className="form-label">Nome Completo</label>
-                        <FaUser />
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="first_name"
-                            name="first_name"
-                            value={userData.first_name || ""}
-                            onChange={handleChange}
-                            disabled={!isEditing}
-                            required
-                        />
-                        </div>
-                        <div className="mb-3 input-icon">
-                        <label htmlFor="username" className="form-label">Nome de Usuário</label>
-                        <FaChartSimple />
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="username"
-                            name="username"
-                            value={userData.username || ""}
-                            onChange={handleChange}
-                            disabled={!isEditing}
-                            required
-                        />
-                        </div>
-                        <div className="mb-4 input-icon">
-                        <label htmlFor="email" className="form-label">E-mail</label>
-                        <FaEnvelope />
-                        <input
-                            type="email"
-                            className="form-control"
-                            id="email"
-                            name="email"
-                            value={userData.email || ""}
-                            onChange={handleChange}
-                            disabled={!isEditing}
-                            required
-                        />
-                        </div>
+            {/* Coluna Esquerda - Perfil e Senha */}
+            <div className="profile-card">
+              <h4 className="section-title"><FaUser /> Dados Pessoais</h4>
+              {userData && (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      if (isEditing) {
+                        handleSave();
+                      }
+                    }}
+                  >
+                  <div className="input-wrapper">
+                    <FaUser className="input-icon" />
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="first_name"
+                      value={userData.first_name || ""}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      placeholder="Nome completo"
+                      required
+                    />
+                  </div>
 
-                        <h5 className="text-primary mt-4 mb-3" style={{fontWeight: 600}}>Alterar Senha</h5>
-                        <div className="mb-3 input-icon">
-                        <label htmlFor="currentPassword" className="form-label">Senha Atual</label>
-                        <FaKey />
-                        <input
-                            type={showCurrentPassword ? "text" : "password"}
-                            className="form-control"
-                            id="currentPassword"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            disabled={!isEditing}
-                            placeholder="Necessária para qualquer alteração de senha"
-                        />
-                        <button
-                            type="button"
-                            className="password-toggle"
-                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        >
-                            {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
-                        </button>
-                        </div>
-                        <div className="mb-3 input-icon">
-                        <label htmlFor="newPassword" className="form-label">Nova Senha</label>
-                        <FaKey />
-                        <input
-                            type={showNewPassword ? "text" : "password"}
-                            className="form-control"
-                            id="newPassword"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            disabled={!isEditing}
-                            placeholder="Mínimo 6 caracteres"
-                        />
-                        <button
-                            type="button"
-                            className="password-toggle"
-                            onClick={() => setShowNewPassword(!showNewPassword)}
-                        >
-                            {showNewPassword ? <FaEyeSlash /> : <FaEye />}
-                        </button>
-                        </div>
-                        <div className="mb-4 input-icon">
-                        <label htmlFor="newPasswordConfirm" className="form-label">Confirmar Nova Senha</label>
-                        <FaKey />
-                        <input
-                            type={showConfirmPassword ? "text" : "password"}
-                            className="form-control"
-                            id="newPasswordConfirm"
-                            value={newPasswordConfirm}
-                            onChange={(e) => setNewPasswordConfirm(e.target.value)}
-                            disabled={!isEditing}
-                            placeholder="Repita a nova senha"
-                        />
-                        <button
-                            type="button"
-                            className="password-toggle"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        >
-                            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                        </button>
-                        </div>
+                  <div className="input-wrapper">
+                    <FaChartSimple className="input-icon" />
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="username"
+                      value={userData.username || ""}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      placeholder="Nome de usuário"
+                      required
+                    />
+                  </div>
 
-                        <div className="d-grid gap-2">
-                            {!isEditing ? (
-                                <button
-                                    type="button"
-                                    className="btn btn-primary"
-                                    onClick={() => setIsEditing(true)}
-                                    disabled={loading}
-                                >
-                                    <FaEdit /> Editar Informações
-                                </button>
-                            ) : (
-                                <>
-                                <button
-                                    type="button"
-                                    className="btn btn-success"
-                                    onClick={handleSave}
-                                    disabled={loading}
-                                >
-                                    {loading ? <FaSpinner className="fa-spin" /> : <FaCircleCheck />} Salvar Alterações
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-warning text-white"
-                                    onClick={handleChangePassword}
-                                    disabled={loading || !newPassword}
-                                >
-                                    {loading ? <FaSpinner className="fa-spin" /> : <FaKey />} Alterar Senha (Se preenchida)
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-secondary"
-                                    onClick={() => setIsEditing(false)}
-                                    disabled={loading}
-                                >
-                                    Cancelar
-                                </button>
-                                </>
-                            )}
-                        </div>
-                    </form>
+                  <div className="input-wrapper">
+                    <FaEnvelope className="input-icon" />
+                    <input
+                      type="email"
+                      className="form-control"
+                      name="email"
+                      value={userData.email || ""}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      placeholder="seu@email.com"
+                      required
+                    />
+                  </div>
+
+                  <h5 className="section-title mt-4"><FaKey /> Alterar Senha</h5>
+
+                  <div className="input-wrapper">
+                    <FaKey className="input-icon" />
+                    <input
+                      type={showCurrentPassword ? "text" : "password"}
+                      className="form-control"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      disabled={!isEditing}
+                      placeholder="Senha atual"
+                    />
+                    <button type="button" className="password-toggle" onClick={() => setShowCurrentPassword(!showCurrentPassword)}>
+                      {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+
+                  <div className="input-wrapper">
+                    <FaKey className="input-icon" />
+                    <input
+                      type={showNewPassword ? "text" : "password"}
+                      className="form-control"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      disabled={!isEditing}
+                      placeholder="Nova senha (mín. 6 caracteres)"
+                    />
+                    <button type="button" className="password-toggle" onClick={() => setShowNewPassword(!showNewPassword)}>
+                      {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+
+                  <div className="input-wrapper">
+                    <FaKey className="input-icon" />
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      className="form-control"
+                      value={newPasswordConfirm}
+                      onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                      disabled={!isEditing}
+                      placeholder="Confirmar nova senha"
+                    />
+                    <button type="button" className="password-toggle" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                      {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+
+                  <div className="d-grid gap-2 mt-4">
+                    {!isEditing ? (
+                      <button type="button" className="btn btn-primary" onClick={() => setIsEditing(true)} disabled={loading}>
+                        <FaEdit /> Editar Perfil
+                      </button>
+                    ) : (
+                      <>
+                        <button type="button" className="btn btn-success" onClick={handleSave} disabled={loading}>
+                          {loading ? <FaSpinner className="fa-spin" /> : <FaCircleCheck />} Salvar Alterações
+                        </button>
+                        <button type="button" className="btn btn-warning" onClick={handleChangePassword} disabled={loading || !newPassword}>
+                          {loading ? <FaSpinner className="fa-spin" /> : <FaKey />} Alterar Senha
+                        </button>
+                        <button type="button" className="btn btn-secondary" onClick={() => setIsEditing(false)} disabled={loading}>
+                          Cancelar
+                        </button>
+                      </>
                     )}
-                </div>
+                  </div>
+                </form>
+              )}
             </div>
 
-            <div className="info-column">
+            {/* Coluna Direita - Plano, Pagamentos, Uso */}
+            <div>
+              <div className="d-grid gap-3 mb-3" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                {/* Plano Ativo */}
+                <div className="profile-card plan-card">
+                  <h4 className="section-title"><FaCalendarCheck /> Plano Atual</h4>
+                  {usage.data?.plano_ativo ? (
+                    <div className="text-center">
+                      <p className="fw-bold fs-4 text-primary">{usage.data.plano_ativo}</p>
+                      <p className="text-muted small"><strong>{formatExpiryDate(usage.data.expira_em)}</strong></p>
+                      <Link to="/planos" className="btn btn-sm btn-primary mt-2">
+                        Gerenciar Plano <FaArrowRight />
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <p className="text-muted">Nenhum plano ativo</p>
+                      <Link to="/planos" className="btn btn-sm btn-success">
+                        Ver Planos <FaArrowRight />
+                      </Link>
+                    </div>
+                  )}
+                </div>
 
-                <div className="plan-payment-grid">
-                    <div className="base-card plan-card">
-                        <h4><FaCalendarCheck /> Plano Ativo</h4>
-                        {usage.data?.plano_ativo ? (
-                            <div className="text-center py-2">
-                                <p className="fw-bold fs-4 text-primary">{usage.data.plano_ativo}</p>
-                                <p className="text-muted mb-0">Válido até: <strong>{usage.data.expira_em}</strong></p>
-                                <Link to="/planos" className="btn btn-sm btn-primary mt-3">Gerenciar/Renovar Plano</Link>
-                            </div>
-                        ) : (
-                            <div className="text-center py-2">
-                                <p className="text-muted fs-5">Nenhum plano ativo.</p>
-                                <Link to="/planos" className="btn btn-sm btn-success mt-3">Ver Planos Disponíveis</Link>
-                            </div>
+                {/* Últimos Pagamentos */}
+                <div className="profile-card payment-card">
+                  <h4 className="section-title"><FaMoneyBillTransfer /> Últimos Pagamentos</h4>
+                  <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
+                    <table className="table table-sm">
+                      <thead>
+                        <tr>
+                          <th>Data</th>
+                          <th>Valor</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {payments.data?.pagamentos?.slice(0, 4).map((p, i) => (
+                          <tr key={i}>
+                            <td>{p.data}</td>
+                            <td>R$ {p.valor.toFixed(2)}</td>
+                            <td>{getPaymentStatusBadge(p.status)}</td>
+                          </tr>
+                        )) || (
+                          <tr><td colSpan={3} className="text-center text-muted">Nenhum</td></tr>
                         )}
-                    </div>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
 
-                    <div className="base-card payment-card">
-                        <h4><FaMoneyBillTransfer /> Histórico (5 Recentes)</h4>
-                        <div className="table-responsive" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                            <table className="table table-striped text-center align-middle mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Data</th>
-                                        <th>Valor</th>
-                                        <th>Status</th>
-                                        <th>Método</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {payments.data?.pagamentos && Array.isArray(payments.data.pagamentos) && payments.data.pagamentos.length > 0 ? (
-                                        payments.data.pagamentos.slice(0, 5).map((payment, index) => ( // Exibe os 5 mais recentes
-                                            <tr key={index}>
-                                                <td>{payment.data}</td>
-                                                <td>R$ {payment.valor.toFixed(2)}</td>
-                                                <td>{getPaymentStatusBadge(payment.status)}</td>
-                                                <td>
-                                                    {payment.tipo === "cartao_credito" ? (
-                                                        <FaCreditCard size={20} className="text-primary" title="Cartão de Crédito" />
-                                                    ) : payment.tipo === "pix" ? (
-                                                        <FaPix size={20} className="text-success" title="PIX" />
-                                                    ) : (
-                                                        <FaRegCreditCard size={20} className="text-muted" title="Outro/Não Especificado" />
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={4} className="text-center text-muted">
-                                                Nenhum pagamento.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
+              {/* Uso de Limites */}
+              <div className="profile-card usage-card">
+                <h4 className="section-title"><FaGaugeHigh /> Uso do Plano</h4>
+
+                <div className="progress-wrapper">
+                  <h6 className="mb-2"><FaBusinessTime /> Empresas Criadas</h6>
+                  <div className="progress">
+                    <div
+                      className={`progress-bar ${getProgressBarColor(calculateProgress(usage.data?.quantia_empresas_criadas || 0, usage.data?.limite_empresas || 1))}`}
+                      style={{ width: `${calculateProgress(usage.data?.quantia_empresas_criadas || 0, usage.data?.limite_empresas || 1)}%` }}
+                    >
+                      {usage.data?.quantia_empresas_criadas || 0}/{usage.data?.limite_empresas || 0}
                     </div>
+                  </div>
                 </div>
 
-                <div className="base-card usage-card">
-                    <h4><FaGaugeHigh /> Limites de Uso (Plano)</h4>
-
-                    <div className="progress-section">
-                        <h6><FaBusinessTime /> Limite de Empresas Criadas</h6>
-                        <div className="progress">
-                            <div
-                                className={`progress-bar ${getProgressBarColor(calculateProgress(usage.data.quantia_empresas_criadas, usage.data.limite_empresas))}`}
-                                role="progressbar"
-                                style={{ width: `${calculateProgress(usage.data.quantia_empresas_criadas, usage.data.limite_empresas)}%` }}
-                                aria-valuenow={usage.data.quantia_empresas_criadas}
-                                aria-valuemin={0}
-                                aria-valuemax={usage.data.limite_empresas}
-                            >
-                                {usage.data.quantia_empresas_criadas}/{usage.data.limite_empresas}
-                            </div>
-                        </div>
-                        <p className="text-muted text-center mt-2" style={{fontSize: '0.9rem'}}>Empresas em uso</p>
+                {consolidatedUsage.length > 0 ? (
+                  consolidatedUsage.map((item, i) => (
+                    <div key={i} className="progress-wrapper">
+                      <h6 className="mb-2" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        {item.tipo === 'Locação' ? <FaCalendarCheck /> : <FaUsers />}
+                        {item.tipo === 'Locação'
+                          ? `Limite de Locações para ${item.empresa}: ${item.current} / ${item.max}`
+                          : `Limite de Funcionários para ${item.empresa}: ${item.current} / ${item.max}`
+                        }
+                      </h6>
+                      {renderUsageProgress(item)}
                     </div>
-
-                    {consolidatedUsage.length > 0 ? (
-                        <>
-                        <h6 className="mt-3"><FaBriefcase /> Limites de Uso por Empresa</h6>
-                        {consolidatedUsage.map((item, index) => (
-                            <div key={index} className="progress-section usage-card-compact">
-                                <h6>
-                                    {item.tipo === "Locação" ? <FaCalendarCheck /> : <FaUsers />}
-                                    {item.empresa}
-                                </h6>
-
-                                {renderUsageProgress(item)}
-
-                            </div>
-                        ))}
-                        </>
-                    ) : (
-                        <div className="progress-section">
-                           <p className="text-center text-muted mb-0">Nenhuma empresa criada para acompanhar seus limites de uso.</p>
-                        </div>
-                    )}
-                </div>
-
+                  ))
+                ) : (
+                  <p className="text-center text-muted small">Nenhuma empresa criada.</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
+
+        <footer className="text-center py-4 text-white" style={{ opacity: 0.8, fontSize: '0.9rem' }}>
+          Gerencie seu perfil com segurança • Alterações salvas automaticamente
+        </footer>
       </div>
     </div>
   );

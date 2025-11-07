@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { FaUser, FaEnvelope, FaKey, FaEye, FaEyeSlash, FaLink, FaSpinner } from "react-icons/fa6";
+import { FaUser, FaEnvelope, FaKey, FaEye, FaEyeSlash, FaLink, FaSpinner, FaExclamation, FaArrowRight, FaGift } from "react-icons/fa6";
 import {FaPlusCircle} from "react-icons/fa";
 
 function Register() {
@@ -21,340 +21,414 @@ function Register() {
     setError(null);
     try {
       const url = import.meta.env.VITE_API_URL;
-
-      const response = await axios.post(url + "/api/register/", {
+      await axios.post(`${url}/api/register/`, {
         username: email,
         first_name: name,
-        email: email,
-        password: password,
+        email,
+        password,
         codigo_usado: referralCode || null,
       });
 
-      // Redireciona para o login e passa a mensagem de sucesso
       navigate("/login", {
         state: {
-          successMessage: "Conta criada com sucesso! Por favor, <strong>confirme seu e-mail</strong> antes de fazer login. Enviamos as instruções para o seu endereço.",
+          successMessage: "Conta criada com sucesso! Verifique seu e-mail para ativar sua conta.",
         },
       });
-
     } catch (err: any) {
-      setError(
-        err.response?.data?.detail ||
-          "Erro ao registrar. Por favor, verifique seus dados e tente novamente."
-      );
+      setError(err.response?.data?.detail || "Erro ao criar conta. Tente novamente.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   return (
     <div className="min-vh-100">
       <style>{`
-        /* Cores Aprimoradas */
         :root {
-          --primary-blue: #003087;
-          --accent-blue: #0056b3;
-          --dark-gray: #212529;
-          --light-gray-bg: #f5f7fa;
+          --primary: #003087;
+          --primary-dark: #00205b;
+          --accent: #f6c107;
+          --success: #28a745;
+          --danger: #dc3545;
+          --info: #0056b3;
+          --gray-100: #f8f9fa;
+          --gray-200: #e9ecef;
+          --gray-600: #6c757d;
           --white: #ffffff;
-          --success-green: #28a745;
-          --danger-red: #dc3545;
-          --shadow-color: rgba(0, 0, 0, 0.15);
+          --shadow-sm: 0 4px 12px rgba(0,0,0,0.08);
+          --shadow-md: 0 8px 25px rgba(0,0,0,0.15);
+          --shadow-lg: 0 15px 40px rgba(0,0,0,0.25);
+          --radius: 24px;
+          --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .custom-bg {
-          background-color: var(--light-gray-bg);
-          background-image: linear-gradient(135deg, var(--light-gray-bg) 0%, var(--white) 100%);
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-        .register-container {
+        .hero-bg {
+          background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+          min-height: 100vh;
           display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: calc(100vh - 70px);
-          padding: 2rem 1rem;
-        }
-
-        /* Cartão de Registro */
-        .register-card {
-          background-color: var(--white);
-          border-radius: 20px;
-          box-shadow: 0 10px 30px var(--shadow-color);
-          padding: 3rem;
-          max-width: 480px; /* Um pouco maior para caber mais campos */
-          width: 100%;
-          transition: transform 0.4s ease, box-shadow 0.4s ease;
-          border-top: 5px solid var(--primary-blue);
-        }
-        .register-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-        }
-        .register-card h2 {
-          color: var(--dark-gray);
-          font-weight: 800;
-          font-size: 2.25rem;
-          margin-bottom: 2rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.75rem;
-          letter-spacing: -0.04em;
-        }
-        .register-card h2 svg {
-            color: var(--primary-blue);
-            font-size: 2.5rem;
-        }
-
-        .form-label {
-          color: var(--dark-gray);
-          font-weight: 700;
-          font-size: 1.05rem;
-          margin-bottom: 0.5rem;
-          display: block;
-          text-align: left;
-        }
-
-        /* Input com Ícone Aprimorado */
-        .input-icon {
+          flex-direction: column;
           position: relative;
+          overflow: hidden;
+        }
+        .hero-bg::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at 20% 80%, rgba(246,193,7,0.15), transparent 50%),
+                      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1), transparent 50%);
+          pointer-events: none;
+        }
+
+        .register-content {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem 1rem;
+          position: relative;
+          z-index: 1;
+        }
+
+        .register-card {
+          background: white;
+          border-radius: var(--radius);
+          padding: 3rem 2.5rem;
+          max-width: 500px;
+          width: 100%;
+          box-shadow: var(--shadow-lg);
+          border-top: 6px solid var(--accent);
+          animation: fadeInUp 0.8s ease-out;
+          position: relative;
+          overflow: hidden;
+        }
+        .register-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0;
+          width: 100%; height: 6px;
+          background: linear-gradient(90deg, var(--primary), var(--info), var(--accent));
+        }
+
+        .register-header {
+          text-align: center;
+          margin-bottom: 2.5rem;
+        }
+        .register-header h1 {
+          color: #1a1a1a;
+          font-weight: 800;
+          font-size: 2.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 1rem;
+          margin: 0;
+        }
+        .register-header .icon {
+          color: var(--primary);
+          font-size: 2.8rem;
+        }
+        .register-header p {
+          color: var(--gray-600);
+          margin-top: 0.75rem;
+          font-size: 1.05rem;
+        }
+
+        .form-group {
           margin-bottom: 1.5rem;
         }
-        .input-icon .left-icon {
+        .form-label {
+          display: block;
+          color: #212529;
+          font-weight: 600;
+          font-size: 1rem;
+          margin-bottom: 0.5rem;
+        }
+
+        .input-wrapper {
+          position: relative;
+        }
+        .input-icon {
           position: absolute;
-          top: 50%;
           left: 1rem;
+          top: 50%;
           transform: translateY(-50%);
-          color: var(--accent-blue);
-          font-size: 1.1rem;
+          color: var(--info);
+          font-size: 1.2rem;
           pointer-events: none;
-          transition: color 0.3s ease;
-          z-index: 10;
+          transition: var(--transition);
         }
         .form-control {
-          border: 1px solid #d1d5db;
-          border-radius: 10px;
-          padding: 1rem 1rem 1rem 3rem; /* Espaço para o ícone */
-          font-size: 1rem;
           width: 100%;
-          transition: border-color 0.3s ease, box-shadow 0.3s ease;
+          padding: 1rem 1rem 1rem 3rem;
+          border: 2px solid var(--gray-200);
+          border-radius: 14px;
+          font-size: 1rem;
+          transition: var(--transition);
+          background: white;
         }
         .form-control:focus {
-          border-color: var(--primary-blue);
-          box-shadow: 0 0 0 3px rgba(0, 48, 135, 0.2);
+          border-color: var(--primary);
+          box-shadow: 0 0 0 4px rgba(0, 48, 135, 0.15);
           outline: none;
         }
-        .form-control:focus + .left-icon {
-            color: var(--primary-blue);
-        }
-        .form-control::placeholder {
-          color: #a0aec0;
+        .form-control:focus ~ .input-icon {
+          color: var(--primary);
         }
 
         .password-toggle {
           position: absolute;
-          top: 50%;
           right: 1rem;
+          top: 50%;
           transform: translateY(-50%);
           background: none;
           border: none;
-          color: var(--accent-blue);
-          font-size: 1.1rem;
+          color: var(--info);
+          font-size: 1.2rem;
           cursor: pointer;
           padding: 0.5rem;
-          z-index: 10;
+          transition: var(--transition);
         }
         .password-toggle:hover {
-          color: var(--primary-blue);
+          color: var(--primary);
         }
-        
-        /* Botão de Submit com Gradiente */
-        .submit-btn {
-          background: linear-gradient(135deg, var(--success-green), #218838);
-          color: var(--white);
+
+        .referral-group {
+          background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+          border: 1px dashed var(--accent);
+          border-radius: 16px;
+          padding: 1.5rem;
+          margin: 1.5rem 0;
+          text-align: center;
+        }
+        .referral-group .label {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          color: var(--primary);
           font-weight: 700;
-          padding: 1rem;
-          border-radius: 10px;
-          transition: all 0.3s ease;
+          margin-bottom: 0.75rem;
+        }
+        .referral-group p {
+          color: var(--gray-600);
+          font-size: 0.9rem;
+          margin: 0 0 1rem;
+        }
+
+        .submit-btn {
+          background: linear-gradient(135deg, var(--success), #1e7e34);
+          color: white;
           border: none;
-          width: 100%;
+          padding: 1.1rem;
+          border-radius: 14px;
+          font-weight: 700;
           font-size: 1.15rem;
+          width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 0.75rem;
-          box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
           margin-top: 1rem;
+          transition: var(--transition);
+          box-shadow: 0 6px 16px rgba(40, 167, 69, 0.25);
         }
-        .submit-btn:hover {
-          background: linear-gradient(135deg, #218838, var(--success-green));
+        .submit-btn:hover:not(:disabled) {
+          background: linear-gradient(135deg, #1e7e34, var(--success));
           transform: translateY(-3px);
-          box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+          box-shadow: 0 8px 20px rgba(40, 167, 69, 0.35);
         }
         .submit-btn:disabled {
-          background: #ccc;
-          color: var(--dark-gray);
+          background: #d1d5db;
+          color: var(--gray-600);
           cursor: not-allowed;
-          opacity: 0.8;
           transform: none;
           box-shadow: none;
         }
 
-        .alert-danger {
-          background-color: #fcebeb;
-          color: var(--danger-red);
-          border: 1px solid #f9d7da;
-          padding: 1rem;
-          border-radius: 8px;
+        .alert {
+          padding: 1rem 1.25rem;
+          border-radius: 12px;
           margin-bottom: 1.5rem;
-          text-align: center;
           font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          animation: fadeInUp 0.4s ease-out;
+        }
+        .alert-danger {
+          background: rgba(220, 53, 69, 0.1);
+          color: var(--danger);
+          border: 1px solid var(--danger);
         }
 
-        .link-container {
-          display: flex;
-          justify-content: center;
-          margin-top: 1.5rem;
-          padding-top: 1rem;
-          border-top: 1px solid #e2e8f0;
-          font-size: 0.95rem;
+        .footer-links {
+          text-align: center;
+          margin-top: 2rem;
+          padding-top: 1.5rem;
+          border-top: 1px dashed var(--gray-200);
         }
-        .link-container a {
-          color: var(--accent-blue);
+        .footer-links a {
+          color: var(--info);
           font-weight: 600;
           text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          transition: var(--transition);
         }
-        .link-container a:hover {
-          color: var(--primary-blue);
+        .footer-links a:hover {
+          color: var(--primary);
           text-decoration: underline;
+        }
+
+        .brand-footer {
+          text-align: center;
+          padding: 1.5rem;
+          color: rgba(255,255,255,0.8);
+          font-size: 0.9rem;
         }
 
         @media (max-width: 576px) {
           .register-card {
             padding: 2rem 1.5rem;
+            margin: 1rem;
           }
-          .register-card h2 {
-            font-size: 1.75rem;
+          .register-header h1 {
+            font-size: 2rem;
           }
           .form-control {
-            font-size: 0.9rem;
-            padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+            padding: 0.9rem 0.9rem 0.9rem 2.8rem;
           }
-          .submit-btn {
-            font-size: 1.05rem;
-            padding: 0.8rem;
+          .input-icon, .password-toggle {
+            font-size: 1.1rem;
           }
-          .input-icon .left-icon, .password-toggle {
-            font-size: 1rem;
-            left: 0.75rem;
-          }
-          .password-toggle {
-            right: 0.75rem;
-          }
+          .password-toggle { right: 0.8rem; }
+          .referral-group { padding: 1.2rem; }
+          .submit-btn { font-size: 1.05rem; }
         }
       `}</style>
 
-      <div className="custom-bg min-vh-100">
+      <div className="hero-bg">
         <Navbar />
-        <div className="register-container">
+
+        <div className="register-content">
           <div className="register-card">
-            <h2>
-              <FaPlusCircle /> Nova Conta
-            </h2>
+            <div className="register-header">
+              <h1>
+                <FaPlusCircle className="icon" /> Crie sua Conta
+              </h1>
+              <p>Comece a gerenciar suas empresas com inteligência e controle total.</p>
+            </div>
+
             <form onSubmit={handleRegister}>
-              <div className="input-icon">
-                <label htmlFor="name" className="form-label">
-                  Nome Completo
-                </label>
-                <FaUser className="left-icon" />
-                <input
-                  type="text"
-                  className="form-control"
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Seu nome completo"
-                  required
-                />
+              <div className="form-group">
+                <label htmlFor="name" className="form-label">Nome Completo</label>
+                <div className="input-wrapper">
+                  <FaUser className="input-icon" />
+                  <input
+                    type="text"
+                    id="name"
+                    className="form-control"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Seu nome"
+                    required
+                  />
+                </div>
               </div>
 
-              <div className="input-icon">
-                <label htmlFor="email" className="form-label">
-                  E-mail
-                </label>
-                <FaEnvelope className="left-icon" />
-                <input
-                  type="email"
-                  className="form-control"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Seu melhor e-mail"
-                  required
-                />
+              <div className="form-group">
+                <label htmlFor="email" className="form-label">E-mail</label>
+                <div className="input-wrapper">
+                  <FaEnvelope className="input-icon" />
+                  <input
+                    type="email"
+                    id="email"
+                    className="form-control"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="seu@email.com"
+                    required
+                  />
+                </div>
               </div>
 
-              <div className="input-icon">
-                <label htmlFor="password" className="form-label">
-                  Senha
-                </label>
-                <FaKey className="left-icon" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  className="form-control"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Crie uma senha forte"
-                  required
-                />
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={togglePasswordVisibility}
-                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
+              <div className="form-group">
+                <label htmlFor="password" className="form-label">Senha</label>
+                <div className="input-wrapper">
+                  <FaKey className="input-icon" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    className="form-control"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Mínimo 8 caracteres"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={togglePasswordVisibility}
+                    aria-label={showPassword ? "Ocultar" : "Mostrar"}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
               </div>
 
-              <div className="input-icon">
-                <label htmlFor="referral-code" className="form-label">
-                  Código de Indicação (Opcional)
-                </label>
-                <FaLink className="left-icon" />
-                <input
-                  type="text"
-                  className="form-control"
-                  id="referral-code"
-                  value={referralCode}
-                  onChange={(e) => setReferralCode(e.target.value)}
-                  placeholder="Código do seu amigo (se houver)"
-                />
+              <div className="referral-group">
+                <div className="label">
+                  <FaGift /> Código de Indicação (Opcional)
+                </div>
+                <p>Ganhe benefícios extras com um código de amigo!</p>
+                <div className="input-wrapper">
+                  <FaLink className="input-icon" />
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value)}
+                    placeholder="EX: ABC123"
+                  />
+                </div>
               </div>
 
-              {error && <div className="alert-danger">{error}</div>}
+              {error && (
+                <div className="alert alert-danger">
+                  <FaExclamation /> {error}
+                </div>
+              )}
 
               <button type="submit" className="submit-btn" disabled={isLoading}>
                 {isLoading ? (
                   <>
-                    <FaSpinner className="fa-spin" /> Registrando...
+                    <FaSpinner className="fa-spin" /> Criando conta...
                   </>
                 ) : (
-                  "Criar minha conta"
+                  <>
+                    Criar Conta <FaArrowRight />
+                  </>
                 )}
               </button>
             </form>
 
-            <div className="link-container">
-              <Link to="/login">Já tem uma conta? Faça login</Link>
+            <div className="footer-links">
+              <Link to="/login">
+                Já tem conta? Faça login
+              </Link>
             </div>
           </div>
         </div>
+
+        <footer className="brand-footer">
+          Cadastro grátis • Sem cartão • Ativação instantânea
+        </footer>
       </div>
     </div>
   );

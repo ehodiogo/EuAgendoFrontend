@@ -2,8 +2,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { FaKey, FaEnvelope, FaSpinner } from "react-icons/fa6";
-import {FaSignInAlt} from "react-icons/fa";
+import { FaKey, FaEnvelope, FaSpinner, FaCheck, FaExclamation, FaArrowRight } from "react-icons/fa6";
+import {FaShieldAlt, FaSignInAlt} from "react-icons/fa";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -14,14 +14,12 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Efeito para checar se há uma mensagem de sucesso vinda do /register
   useEffect(() => {
-    if (location.state && (location.state as { successMessage?: string }).successMessage) {
-      setSuccessMessage((location.state as { successMessage: string }).successMessage);
+    if (location.state?.successMessage) {
+      setSuccessMessage(location.state.successMessage);
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location.state, location.pathname, navigate]);
-
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,14 +29,9 @@ function Login() {
 
     try {
       const url = import.meta.env.VITE_API_URL;
+      const response = await axios.post(`${url}/api/login/`, { email, password });
 
-      const response = await axios.post(url + "/api/login/", {
-        email,
-        password,
-      });
-
-      const { access, refresh, is_expired_plan, tempo_restante } =
-        response.data;
+      const { access, refresh, is_expired_plan, tempo_restante } = response.data;
 
       localStorage.setItem("access_token", access);
       localStorage.setItem("refresh_token", refresh);
@@ -47,28 +40,17 @@ function Login() {
       localStorage.setItem("tempo_restante", tempo_restante.toString());
 
       navigate("/dashboard");
-    } catch (err: any) { // Usamos 'any' para facilitar o acesso à estrutura de erro do Axios
-
-      // 1. Tenta capturar a mensagem de erro específica do backend (se for JSON)
-      const apiError =
-        err.response?.data?.erro ||         // Se o backend usar a chave "erro"
-        err.response?.data?.detail ||       // Se o backend usar a chave "detail" (padrão Django Rest Framework)
-        err.response?.data?.non_field_errors; // Se for um erro de campos não específicos
-
+    } catch (err: any) {
+      const apiError = err.response?.data?.erro || err.response?.data?.detail || err.response?.data?.non_field_errors;
       let errorMessage = "Erro de login. Verifique suas credenciais e tente novamente.";
 
       if (apiError) {
-          // Se for um array (como non_field_errors), pegue o primeiro elemento
-          errorMessage = Array.isArray(apiError) ? apiError[0] : apiError;
+        errorMessage = Array.isArray(apiError) ? apiError[0] : apiError;
       }
 
-      // Se o erro for 403 (Forbidden), sabemos que é provavelmente o e-mail não confirmado
       if (err.response?.status === 403) {
-          // Mantemos a mensagem da API, que é específica.
-          // Ex: "Conta ainda não confirmada. Verifique seu e-mail."
-          errorMessage = apiError || "Conta não ativada. Por favor, confirme seu e-mail.";
+        errorMessage = apiError || "Conta não ativada. Confirme seu e-mail para acessar.";
       }
-
 
       setError(errorMessage);
       console.error("Erro no login:", err.response || err);
@@ -80,273 +62,332 @@ function Login() {
   return (
     <div className="min-vh-100">
       <style>{`
-        /* Cores Aprimoradas */
         :root {
-          --primary-blue: #003087;
-          --accent-blue: #0056b3;
-          --dark-gray: #212529;
-          --light-gray-bg: #f5f7fa;
+          --primary: #003087;
+          --primary-dark: #00205b;
+          --accent: #f6c107;
+          --success: #28a745;
+          --danger: #dc3545;
+          --info: #0056b3;
+          --gray-100: #f8f9fa;
+          --gray-200: #e9ecef;
+          --gray-600: #6c757d;
           --white: #ffffff;
-          --success-green: #28a745;
-          --danger-red: #dc3545;
-          --shadow-color: rgba(0, 0, 0, 0.15);
+          --shadow-sm: 0 4px 12px rgba(0,0,0,0.08);
+          --shadow-md: 0 8px 25px rgba(0,0,0,0.15);
+          --shadow-lg: 0 15px 40px rgba(0,0,0,0.25);
+          --radius: 24px;
+          --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .custom-bg {
-          background-color: var(--light-gray-bg);
-          background-image: linear-gradient(135deg, var(--light-gray-bg) 0%, var(--white) 100%);
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes shimmer { 0% { background-position: -468px 0; } 100% { background-position: 468px 0; } }
 
-        .login-container {
+        .hero-bg {
+          background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+          min-height: 100vh;
           display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: calc(100vh - 70px);
-          padding: 2rem 1rem;
-        }
-
-        /* Cartão de Login */
-        .login-card {
-          background-color: var(--white);
-          border-radius: 20px;
-          box-shadow: 0 10px 30px var(--shadow-color);
-          padding: 3rem;
-          max-width: 420px;
-          width: 100%;
-          transition: transform 0.4s ease, box-shadow 0.4s ease;
-          border-top: 5px solid var(--primary-blue); /* Linha de destaque */
-        }
-        .login-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-        }
-        .login-card h2 {
-          color: var(--dark-gray);
-          font-weight: 800;
-          font-size: 2.25rem;
-          margin-bottom: 2rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.75rem;
-          letter-spacing: -0.04em;
-        }
-        .login-card h2 svg {
-            color: var(--primary-blue);
-            font-size: 2.5rem;
-        }
-
-        .form-label {
-          color: var(--dark-gray);
-          font-weight: 700;
-          font-size: 1.05rem;
-          margin-bottom: 0.5rem;
-          display: block;
-          text-align: left;
-        }
-
-        /* Input com Ícone Aprimorado */
-        .input-icon {
+          flex-direction: column;
           position: relative;
+          overflow: hidden;
+        }
+        .hero-bg::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at 20% 80%, rgba(246,193,7,0.15), transparent 50%),
+                      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1), transparent 50%);
+          pointer-events: none;
+        }
+
+        .login-content {
+          flex: 1;
           display: flex;
           align-items: center;
+          justify-content: center;
+          padding: 2rem 1rem;
+          position: relative;
+          z-index: 1;
+        }
+
+        .login-card {
+          background: white;
+          border-radius: var(--radius);
+          padding: 3rem 2.5rem;
+          max-width: 440px;
+          width: 100%;
+          box-shadow: var(--shadow-lg);
+          border-top: 6px solid var(--accent);
+          animation: fadeInUp 0.8s ease-out;
+          position: relative;
+          overflow: hidden;
+        }
+        .login-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0;
+          width: 100%; height: 6px;
+          background: linear-gradient(90deg, var(--primary), var(--info), var(--accent));
+        }
+
+        .login-header {
+          text-align: center;
+          margin-bottom: 2.5rem;
+        }
+        .login-header h1 {
+          color: #1a1a1a;
+          font-weight: 800;
+          font-size: 2.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 1rem;
+          margin: 0;
+        }
+        .login-header .icon {
+          color: var(--primary);
+          font-size: 2.8rem;
+        }
+        .login-header p {
+          color: var(--gray-600);
+          margin-top: 0.75rem;
+          font-size: 1.05rem;
+        }
+
+        .form-group {
           margin-bottom: 1.5rem;
         }
-        .input-icon svg {
+        .form-label {
+          display: block;
+          color: #212529;
+          font-weight: 600;
+          font-size: 1rem;
+          margin-bottom: 0.5rem;
+        }
+
+        .input-wrapper {
+          position: relative;
+        }
+        .input-icon {
           position: absolute;
           left: 1rem;
-          color: var(--accent-blue);
-          font-size: 1.1rem;
+          top: 50%;
+          transform: translateY(-50%);
+          color: var(--info);
+          font-size: 1.2rem;
           pointer-events: none;
-          transition: color 0.3s ease;
+          transition: var(--transition);
         }
         .form-control {
-          border: 1px solid #d1d5db;
-          border-radius: 10px;
-          padding: 1rem 1rem 1rem 3rem;
-          font-size: 1rem;
           width: 100%;
-          transition: border-color 0.3s ease, box-shadow 0.3s ease;
+          padding: 1rem 1rem 1rem 3rem;
+          border: 2px solid var(--gray-200);
+          border-radius: 14px;
+          font-size: 1rem;
+          transition: var(--transition);
+          background: white;
         }
         .form-control:focus {
-          border-color: var(--primary-blue);
-          box-shadow: 0 0 0 3px rgba(0, 48, 135, 0.2);
+          border-color: var(--primary);
+          box-shadow: 0 0 0 4px rgba(0, 48, 135, 0.15);
           outline: none;
         }
-        .form-control:focus + svg {
-            color: var(--primary-blue);
+        .form-control:focus + .input-icon {
+          color: var(--primary);
         }
-        .form-control::placeholder {
-          color: #a0aec0;
-        }
-        
-        /* Botão de Submit com Gradiente */
+
         .submit-btn {
-          background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
-          color: var(--white);
-          font-weight: 700;
-          padding: 1rem;
-          border-radius: 10px;
-          transition: all 0.3s ease;
+          background: linear-gradient(135deg, var(--primary), var(--info));
+          color: white;
           border: none;
-          width: 100%;
+          padding: 1.1rem;
+          border-radius: 14px;
+          font-weight: 700;
           font-size: 1.15rem;
+          width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 0.75rem;
-          box-shadow: 0 4px 15px rgba(0, 48, 135, 0.3);
+          margin-top: 1rem;
+          transition: var(--transition);
+          box-shadow: 0 6px 16px rgba(0, 48, 135, 0.25);
         }
-        .submit-btn:hover {
-          background: linear-gradient(135deg, var(--accent-blue), var(--primary-blue));
+        .submit-btn:hover:not(:disabled) {
+          background: linear-gradient(135deg, var(--info), var(--primary));
           transform: translateY(-3px);
-          box-shadow: 0 6px 20px rgba(0, 48, 135, 0.4);
+          box-shadow: 0 8px 20px rgba(0, 48, 135, 0.35);
         }
         .submit-btn:disabled {
-          background: #ccc;
-          color: var(--dark-gray);
+          background: #d1d5db;
+          color: var(--gray-600);
           cursor: not-allowed;
-          opacity: 0.8;
           transform: none;
           box-shadow: none;
         }
 
-        /* Alerta de Erro */
-        .alert-danger {
-          background-color: #fcebeb;
-          color: var(--danger-red);
-          border: 1px solid #f9d7da;
-          padding: 1rem;
-          border-radius: 8px;
+        .alert {
+          padding: 1rem 1.25rem;
+          border-radius: 12px;
           margin-bottom: 1.5rem;
-          text-align: center;
           font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          animation: fadeInUp 0.4s ease-out;
         }
-        
-        /* Alerta de Sucesso (Novo Estilo) */
         .alert-success {
-          background-color: #eaf8ee; /* Light Green */
-          color: var(--success-green);
-          border: 1px solid #c3e6cb;
-          padding: 1rem;
-          border-radius: 8px;
-          margin-bottom: 1.5rem;
-          text-align: center;
-          font-weight: 600;
+          background: rgba(40, 167, 69, 0.1);
+          color: var(--success);
+          border: 1px solid var(--success);
+        }
+        .alert-danger {
+          background: rgba(220, 53, 69, 0.1);
+          color: var(--danger);
+          border: 1px solid var(--danger);
         }
 
-
-        .link-container {
+        .footer-links {
           display: flex;
           justify-content: space-between;
-          margin-top: 1.5rem;
-          padding-top: 1rem;
-          border-top: 1px solid #e2e8f0;
+          margin-top: 2rem;
+          padding-top: 1.5rem;
+          border-top: 1px dashed var(--gray-200);
           font-size: 0.95rem;
         }
-        .link-container a {
-          color: var(--accent-blue);
+        .footer-links a {
+          color: var(--info);
           font-weight: 600;
           text-decoration: none;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          transition: var(--transition);
         }
-        .link-container a:hover {
-          color: var(--primary-blue);
+        .footer-links a:hover {
+          color: var(--primary);
           text-decoration: underline;
+        }
+
+        .brand-footer {
+          text-align: center;
+          padding: 1.5rem;
+          color: rgba(255,255,255,0.8);
+          font-size: 0.9rem;
         }
 
         @media (max-width: 576px) {
           .login-card {
             padding: 2rem 1.5rem;
+            margin: 1rem;
           }
-          .login-card h2 {
-            font-size: 1.75rem;
+          .login-header h1 {
+            font-size: 2rem;
           }
           .form-control {
-            font-size: 0.9rem;
-            padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+            padding: 0.9rem 0.9rem 0.9rem 2.8rem;
+          }
+          .input-icon {
+            left: 0.9rem;
+            font-size: 1.1rem;
           }
           .submit-btn {
             font-size: 1.05rem;
-            padding: 0.8rem;
+            padding: 1rem;
           }
-          .input-icon svg {
-            left: 0.75rem;
-            font-size: 1rem;
+          .footer-links {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
           }
         }
       `}</style>
 
-      <div className="custom-bg min-vh-100">
+      <div className="hero-bg">
         <Navbar />
-        <div className="login-container">
-          <div className="login-card">
-            <h2>
-              <FaSignInAlt /> Acesso ao Sistema
-            </h2>
 
-            {/* Exibe a mensagem de sucesso se houver (vinda do Register) */}
+        <div className="login-content">
+          <div className="login-card">
+            <div className="login-header">
+              <h1>
+                <FaSignInAlt className="icon" /> Bem-vindo
+              </h1>
+              <p>Acesse sua conta e gerencie suas empresas com total controle.</p>
+            </div>
+
             {successMessage && (
-                <div className="alert-success mb-3" dangerouslySetInnerHTML={{ __html: successMessage }} />
+              <div className="alert alert-success">
+                <FaCheck /> <span dangerouslySetInnerHTML={{ __html: successMessage }} />
+              </div>
             )}
 
             <form onSubmit={handleLogin}>
-              <div className="mb-3">
-                <label htmlFor="email" className="form-label">
-                  E-mail
-                </label>
-                <div className="input-icon">
-                  <FaEnvelope />
+              <div className="form-group">
+                <label htmlFor="email" className="form-label">E-mail</label>
+                <div className="input-wrapper">
+                  <FaEnvelope className="input-icon" />
                   <input
                     type="email"
-                    className="form-control"
                     id="email"
+                    className="form-control"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="exemplo@empresa.com"
+                    placeholder="seu@email.com"
                     required
                   />
                 </div>
               </div>
-              <div className="mb-3">
-                <label htmlFor="password" className="form-label">
-                  Senha
-                </label>
-                <div className="input-icon">
-                  <FaKey />
+
+              <div className="form-group">
+                <label htmlFor="password" className="form-label">Senha</label>
+                <div className="input-wrapper">
+                  <FaKey className="input-icon" />
                   <input
                     type="password"
-                    className="form-control"
                     id="password"
+                    className="form-control"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Sua senha secreta"
+                    placeholder="••••••••"
                     required
                   />
                 </div>
               </div>
 
-              {error && <div className="alert-danger">{error}</div>}
+              {error && (
+                <div className="alert alert-danger">
+                  <FaExclamation /> {error}
+                </div>
+              )}
 
-              <button
-                type="submit"
-                className="submit-btn"
-                disabled={isLoading}
-              >
+              <button type="submit" className="submit-btn" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <FaSpinner className="fa-spin" /> Entrando...
                   </>
                 ) : (
-                  "Entrar"
+                  <>
+                    Entrar <FaArrowRight />
+                  </>
                 )}
               </button>
             </form>
-            <div className="link-container">
-              <Link to="/cadastro">Criar uma nova conta</Link>
-              <Link to="/esqueci-senha">Esqueci minha senha</Link>
+
+            <div className="footer-links">
+              <Link to="/cadastro">
+                Criar conta gratuita
+              </Link>
+              <Link to="/esqueci-senha">
+                Esqueci a senha
+              </Link>
             </div>
           </div>
         </div>
+
+        <footer className="brand-footer">
+          <FaShieldAlt /> Sistema seguro • Dados protegidos • Acesso instantâneo
+        </footer>
       </div>
     </div>
   );

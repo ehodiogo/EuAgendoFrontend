@@ -6,258 +6,288 @@ import Navbar from "../components/Navbar";
 import { FaChevronDown, FaSpinner, FaBuilding } from "react-icons/fa6";
 import React from "react";
 
+const SkeletonEmpresaCard: React.FC = () => (
+  <div className="empresa-card skeleton-card">
+    <div className="empresa-info">
+      <div className="skeleton skeleton-icon"></div>
+      <div>
+        <div className="skeleton skeleton-line" style={{ width: '200px', height: '1.5rem' }}></div>
+      </div>
+    </div>
+    <div className="skeleton skeleton-toggle" style={{ width: '24px', height: '24px', borderRadius: '50%' }}></div>
+  </div>
+);
+
 const EmpresasUsuario = () => {
   const token = localStorage.getItem("access_token");
-  const empresas = useFetch<Empresa[]>(
-    `/api/empresas-usuario/?usuario_token=${token}`
-  );
+  const { data: empresas, loading } = useFetch<Empresa[]>(`/api/empresas-usuario/?usuario_token=${token}`);
   const [dropdownAberto, setDropdownAberto] = useState<number | null>(null);
 
   const handleToggleDropdown = (empresaId: number) => {
-    setDropdownAberto(dropdownAberto === empresaId ? null : empresaId);
+    setDropdownAberto(prev => (prev === empresaId ? null : empresaId));
   };
 
   return (
-    <div className="min-vh-100">
+    <div className="hero-bg min-vh-100">
       <style>{`
-        /* Paleta de Cores (Consistente) */
         :root {
-          --primary-blue: #003087;
-          --accent-blue: #0056b3;
-          --dark-gray: #212529;
-          --light-gray-bg: #f5f7fa;
+          --primary: #003087;
+          --primary-dark: #00205b;
+          --accent: #f6c107;
+          --success: #28a745;
+          --danger: #dc3545;
+          --info: #0056b3;
+          --gray-100: #f8f9fa;
+          --gray-200: #e9ecef;
+          --gray-600: #6c757d;
           --white: #ffffff;
-          --success-green: #28a745;
-          --danger-red: #dc3545;
-          --shadow-color: rgba(0, 0, 0, 0.1);
+          --shadow-sm: 0 4px 12px rgba(0,0,0,0.08);
+          --shadow-md: 0 8px 25px rgba(0,0,0,0.15);
+          --shadow-lg: 0 15px 40px rgba(0,0,0,0.25);
+          --radius: 20px;
+          --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .custom-bg {
-          background-color: var(--light-gray-bg);
-          background-image: linear-gradient(135deg, var(--light-gray-bg) 0%, var(--white) 100%);
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shimmer { 0% { background-position: -468px 0; } 100% { background-position: 468px 0; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+        .hero-bg {
+          background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+          min-height: 100vh;
+          position: relative;
+          overflow: hidden;
+        }
+        .hero-bg::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at 20% 80%, rgba(246,193,7,0.15), transparent 50%),
+                      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1), transparent 50%);
+          pointer-events: none;
         }
 
         .empresas-container {
-          padding: 5rem 1rem 3rem;
+          padding: 4rem 1rem 3rem;
           max-width: 1200px;
           margin: 0 auto;
+          position: relative;
+          z-index: 1;
+          animation: fadeInUp 0.8s ease-out;
         }
 
-        /* Título Principal */
-        .empresas-container h1 {
-          color: var(--dark-gray);
+        .empresas-header {
+          text-align: center;
+          color: white;
+          margin-bottom: 3rem;
+        }
+        .empresas-header h1 {
           font-weight: 800;
-          font-size: 2.75rem;
-          margin-bottom: 0.5rem;
+          font-size: 2.5rem;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.75rem;
-          letter-spacing: -0.05em;
+          gap: 1rem;
+          text-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-        .empresas-container h1 svg {
-            color: var(--primary-blue);
-        }
-
-        .empresas-container .lead {
-          color: var(--dark-gray);
-          font-size: 1.15rem;
+        .empresas-header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
           max-width: 800px;
-          margin: 0 auto 3rem;
-          text-align: center;
-          opacity: 0.85;
+          margin: 1rem auto 0;
         }
 
-        /* Tabela & Responsividade */
-        .table-responsive {
-          border-radius: 16px;
-          overflow: hidden;
-          box-shadow: 0 10px 30px var(--shadow-color);
-          background-color: var(--white);
-          border: 1px solid #e0e7ff;
+        .empresas-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
         }
 
-        .table {
-            --bs-table-bg: var(--white);
-            --bs-table-striped-bg: #f8fafc;
-        }
-        
-        .table thead th {
-          background-color: var(--primary-blue);
-          color: var(--white);
-          font-weight: 700;
-          text-align: left;
-          padding: 1.25rem 1.5rem;
-          border: none;
-        }
-        .table thead th:first-child {
-            width: 50px; /* Largura para o ícone */
-            text-align: center;
-        }
-
-        .table tbody td {
-          vertical-align: middle;
-          padding: 1rem 1.5rem;
-          color: var(--dark-gray);
-          border-top: 1px solid #edf2f7;
-        }
-
-        .table tbody tr:hover {
-          background-color: var(--bs-table-striped-bg);
+        .empresa-card {
+          background: white;
+          border-radius: var(--radius);
+          padding: 1.5rem;
+          box-shadow: var(--shadow-md);
+          border-top: 6px solid var(--accent);
           cursor: pointer;
+          transition: var(--transition);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          animation: fadeInUp 0.6s ease-out;
+        }
+        .empresa-card:hover {
+          transform: translateY(-6px);
+          box-shadow: var(--shadow-lg);
+          border-top-color: var(--info);
+        }
+        .empresa-card.active {
+          border-top-color: var(--info);
+          box-shadow: 0 12px 30px rgba(0, 86, 179, 0.25);
         }
 
-        .table .toggle-icon {
-          color: var(--accent-blue);
+        .empresa-info {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+        .empresa-icon {
+          color: var(--info);
+          font-size: 2.2rem;
+        }
+        .empresa-title {
+          font-weight: 700;
+          font-size: 1.5rem;
+          color: var(--primary);
+          margin: 0;
+        }
+
+        .toggle-icon {
+          color: var(--info);
+          font-size: 1.4rem;
           transition: transform 0.3s ease;
-          font-size: 1.1rem;
         }
-
-        .table .toggle-icon.open {
+        .empresa-card.active .toggle-icon {
           transform: rotate(180deg);
         }
-        
-        /* Dropdown de Agendamentos */
-        .agendamentos-dropdown {
-          background-color: var(--white);
-          padding: 1.5rem;
-          border-top: 3px solid var(--primary-blue);
-          box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.05);
+
+        .dropdown-wrapper {
+          overflow: hidden;
+          max-height: 0;
+          transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .agendamentos-dropdown > div {
-            padding: 0; /* Remove padding extra do AgendamentosHoje, se houver */
+        .dropdown-wrapper.open {
+          max-height: 3000px;
         }
-        
-        /* Mensagens de Status */
-        .status-message {
-            text-align: center;
-            font-size: 1.25rem;
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            margin-top: 2rem;
-            font-weight: 600;
+
+        .dropdown-content {
+          background: white;
+          border-radius: 0 0 var(--radius) var(--radius);
+          padding: 2rem;
+          border-top: 3px dashed var(--gray-200);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+          margin-top: -1px;
         }
 
         .loading-container {
-          color: var(--primary-blue);
-          background-color: #e0e7ff;
+          text-align: center;
+          padding: 4rem 2rem;
+          color: white;
+          animation: pulse 1.5s infinite;
         }
 
-        .empty-container {
-          color: var(--dark-gray);
-          background-color: var(--white);
-          border: 1px solid #e2e8f0;
+        .no-results {
+          text-align: center;
+          padding: 5rem 2rem;
+          background: white;
+          border-radius: var(--radius);
+          box-shadow: var(--shadow-md);
+          max-width: 600px;
+          margin: 3rem auto;
+          animation: fadeInUp 0.6s ease-out;
+          border-top: 6px solid var(--accent);
         }
-        
-        .error-container {
-          color: var(--danger-red);
-          background-color: #fcebeb;
-          border: 1px solid var(--danger-red);
+        .no-results h3 {
+          color: var(--primary);
           font-weight: 700;
         }
 
-        .btn-primary-custom {
-            background-color: var(--primary-blue);
-            border: none;
-            color: var(--white);
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            margin-top: 1.5rem;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+        .skeleton {
+          background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+          background-size: 200% 100%;
+          animation: shimmer 1.5s infinite;
+          border-radius: 12px;
         }
-        .btn-primary-custom:hover {
-            background-color: var(--accent-blue);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 48, 135, 0.3);
+        .skeleton-card {
+          padding: 1.5rem;
+          border-radius: var(--radius);
+          background: white;
+          box-shadow: var(--shadow-md);
+          border-top: 6px solid var(--accent);
+          margin-bottom: 1.5rem;
+          height: 90px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
         }
+        .skeleton-icon { width: 50px; height: 50px; border-radius: 50%; }
+        .skeleton-line { height: 1.5rem; width: 60%; border-radius: 8px; }
+        .skeleton-toggle { width: 24px; height: 24px; border-radius: 50%; }
 
-        @media (max-width: 991px) {
-          .empresas-container {
-            padding: 3rem 1rem 2rem;
-          }
-          .table thead th, .table tbody td {
-            font-size: 0.95rem;
-            padding: 0.8rem 1rem;
-          }
-        }
-
-        @media (max-width: 576px) {
-          .empresas-container h1 {
-            font-size: 2.25rem;
-          }
-          .empresas-container .lead {
-            font-size: 1.05rem;
-          }
-          .table thead th:nth-child(3), .table tbody td:nth-child(3) {
-            display: none; /* Esconde CNPJ em telas muito pequenas */
-          }
-          .table thead th {
-             padding: 1rem;
-          }
-          .table tbody td {
-            padding: 0.75rem 1rem;
-          }
+        @media (max-width: 768px) {
+          .empresas-header h1 { font-size: 2rem; }
+          .empresa-card { padding: 1.2rem; }
+          .empresa-title { font-size: 1.3rem; }
+          .empresas-container { padding: 3rem 1rem; }
         }
       `}</style>
 
-      <div className="custom-bg min-vh-100">
-        <Navbar />
-        <div className="empresas-container container">
-          <h1 className="text-center">
+      <Navbar />
+
+      <div className="empresas-container container">
+        <header className="empresas-header">
+          <h1>
             <FaBuilding /> Suas Empresas
           </h1>
-          <p className="lead text-center">
-            Visualize e gerencie os agendamentos de hoje para as suas empresas.
+          <p>
+            Visualize e gerencie os agendamentos de hoje para todas as suas empresas cadastradas.
           </p>
+        </header>
 
-          {empresas.loading && (
-            <div className="loading-container status-message">
-              <FaSpinner className="fa-spin me-3" /> Carregando empresas...
-            </div>
-          )}
+        {loading ? (
+          <div className="loading-container">
+            <FaSpinner className="fa-spin" size={48} />
+            <p className="mt-3 h5">Carregando suas empresas...</p>
+          </div>
+        ) : !empresas || empresas.length === 0 ? (
+          <div className="no-results">
+            <FaBuilding size={56} className="text-warning mb-3" />
+            <h3>Nenhuma empresa encontrada</h3>
+            <p className="text-muted">
+              Verifique se você está logado ou cadastre sua primeira empresa.
+            </p>
+          </div>
+        ) : (
+          <div className="empresas-grid">
+            {empresas.map((empresa) => {
+              const isOpen = dropdownAberto === empresa.id;
+              return (
+                <React.Fragment key={empresa.id}>
+                  {/* Card da Empresa */}
+                  <div
+                    className={`empresa-card ${isOpen ? "active" : ""}`}
+                    onClick={() => handleToggleDropdown(empresa.id)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === "Enter" && handleToggleDropdown(empresa.id)}
+                    aria-expanded={isOpen}
+                  >
+                    <div className="empresa-info">
+                      <FaBuilding className="empresa-icon" />
+                      <h4 className="empresa-title">{empresa.nome}</h4>
+                    </div>
+                    <FaChevronDown className="toggle-icon" />
+                  </div>
 
-          {!empresas.loading && empresas.data && empresas.data.length > 0 && (
-            <div className="table-responsive">
-              <table className="table table-striped">
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>Nome da Empresa</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {empresas.data.map((empresa: Empresa) => (
-                    <React.Fragment key={empresa.id}>
-                      <tr onClick={() => handleToggleDropdown(empresa.id)} role="button" aria-expanded={dropdownAberto === empresa.id}>
-                        <td className="text-center">
-                          <FaChevronDown
-                            className={`toggle-icon ${
-                              dropdownAberto === empresa.id ? "open" : ""
-                            }`}
-                          />
-                        </td>
-                        <td>{empresa.nome}</td>
-                      </tr>
-                      {dropdownAberto === empresa.id && (
-                        <tr>
-                          <td colSpan={3} className="agendamentos-dropdown">
-                            <AgendamentosHoje empresa={empresa} />
-                          </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                  {/* Dropdown com AgendamentosHoje */}
+                  <div className={`dropdown-wrapper ${isOpen ? "open" : ""}`}>
+                    <div className="dropdown-content">
+                      <AgendamentosHoje empresa={empresa} />
+                    </div>
+                  </div>
+                </React.Fragment>
+              );
+            })}
+          </div>
+        )}
       </div>
+
+      {/* Skeleton para loading (se necessário em outros contextos) */}
+      {loading && (
+        <div className="empresas-grid">
+          {[...Array(3)].map((_, i) => <SkeletonEmpresaCard key={i} />)}
+        </div>
+      )}
     </div>
   );
 };
