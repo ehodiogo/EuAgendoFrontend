@@ -464,7 +464,7 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
           </Form.Group>
 
           <Tabs activeKey={activeTab} onSelect={k => setActiveTab(k as string)} className="mb-4 fw-bolder" variant="underline">
-            <Tab eventKey="geral" title="1. Dados Gerais">
+            <Tab eventKey="geral" title={<span style={{ color: '#007bff', fontWeight: 'bold' }}>1. Dados Gerais</span>}>
               <div className="p-4 rounded mt-3 border bg-light">
                 <h4 className="mb-4 fw-bold" style={{ color: '#005f99' }}>Informações Essenciais</h4>
                 <Row className="mb-3">
@@ -554,7 +554,7 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
               </div>
             </Tab>
 
-            <Tab eventKey="horarios" title="2. Horários de Operação">
+            <Tab eventKey="horarios" title={<span style={{ color: '#007bff', fontWeight: 'bold' }}>2. Horários de Operação</span>}>
               <div className="p-4 rounded mt-3 border bg-light">
                 <h4 className="mb-3 fw-bold" style={{ color: '#005f99' }}>Padrão (Segunda a Sexta)</h4>
                 <Row className="mb-4">
@@ -604,7 +604,14 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
             </Tab>
 
             {empresa.tipo === "Serviço" && (
-              <Tab eventKey="servicos_funcionarios" title="3. Catálogo, Equipe e Fidelidade">
+                <Tab
+                  eventKey="servicos_funcionarios"
+                  title={
+                    <span style={{ color: '#007bff', fontWeight: 'bold' }}>
+                      3. Catálogo, Equipe e Fidelidade
+                    </span>
+                  }
+                >
                 <Alert variant="info" className="mt-3 fw-bold">
                   Defina sua equipe e associe serviços aos profissionais.
                 </Alert>
@@ -839,8 +846,15 @@ export default function EmpresaForm({ initialData, onSubmit }: EmpresaFormProps)
               </Tab>
             )}
 
-            {empresa.tipo === "Locação" && (
-              <Tab eventKey="locacoes" title="3. Catálogo de Quadras/Espaços">
+              {empresa.tipo === "Locação" && (
+                <Tab
+                  eventKey="locacoes"
+                  title={
+                    <span style={{ color: '#007bff', fontWeight: 'bold' }}>
+                      3. Catálogo de Quadras/Espaços
+                    </span>
+                  }
+                >
                 <Alert variant="warning" className="mt-3 fw-bold">Defina as locações, preço e regras de fidelidade.</Alert>
                 <h4 className="mb-3 mt-4 fw-bolder" style={{ color: '#003087' }}>Catálogo de Locações ({locacoes.length})</h4>
                 <div className="p-3 rounded" style={{ backgroundColor: '#fffbe8', border: '1px solid #ffeb3b' }}>
