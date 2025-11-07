@@ -299,7 +299,7 @@ function Home() {
             <div className="row align-items-center g-5">
               <div className="col-lg-6 animate-fadeInUp">
                 <h1 className="display-3 fw-bold mb-4 lh-1">
-                  Pare de Perder <span style={{ color: 'var(--accent)' }}>R$ 3.000/mês</span><br />
+                  Pare de Perder <span style={{ color: 'var(--accent)' }}>R$ $.$$$/mês</span><br />
                   em Faltas e Desorganização
                 </h1>
                 <p className="lead mb-4 opacity-90 fs-5">
@@ -338,13 +338,13 @@ function Home() {
             <div className="container">
               <div className="row text-center text-white small">
                 <div className="col-6 col-md-3">
-                  <strong>2.847</strong><br />empresas ativas
+                  <strong>Várias</strong><br />empresas ativas
                 </div>
                 <div className="col-6 col-md-3">
-                  <strong>94,2%</strong><br />de satisfação
+                  <strong>Alta taxa</strong><br />de satisfação
                 </div>
                 <div className="col-6 col-md-3">
-                  <strong>1.2M+</strong><br />agendamentos
+                  <strong>Inúmeros</strong><br />agendamentos
                 </div>
                 <div className="col-6 col-md-3">
                   <strong>24/7</strong><br />suporte humano

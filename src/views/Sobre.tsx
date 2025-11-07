@@ -199,7 +199,7 @@ function Sobre() {
               </div>
               <div className="col-lg-5 text-center animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
                 <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-4 p-4 shadow-lg">
-                  <h3 className="fw-bold mb-3">+2.800 empresas</h3>
+                  <h3 className="fw-bold mb-3">Várias empresas</h3>
                   <p className="mb-0 opacity-90">já transformaram suas agendas</p>
                 </div>
               </div>
@@ -210,13 +210,13 @@ function Sobre() {
             <div className="container">
               <div className="row text-center text-white small">
                 <div className="col-6 col-md-3">
-                  <strong>98%</strong><br />Satisfação
+                  <strong>Alta taxa de</strong><br />Satisfação
                 </div>
                 <div className="col-6 col-md-3">
-                  <strong>1.2M+</strong><br />Agendamentos
+                  <strong>Inúmeros</strong><br />agendamentos
                 </div>
                 <div className="col-6 col-md-3">
-                  <strong>80%</strong><br />Redução de faltas
+                  <strong>Alta taxa de</strong><br />Redução de faltas
                 </div>
                 <div className="col-6 col-md-3">
                   <strong>24/7</strong><br />Suporte
