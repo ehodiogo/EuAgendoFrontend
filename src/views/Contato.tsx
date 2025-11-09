@@ -361,7 +361,7 @@ function Contato() {
               </div>
               <div className="col-lg-4 text-center animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
                 <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-4 p-4 shadow-lg">
-                  <h3 className="fw-bold mb-2">98%</h3>
+                  <h3 className="fw-bold mb-2">Alta taxa</h3>
                   <p className="mb-0 opacity-90">de satisfação</p>
                 </div>
               </div>
@@ -382,7 +382,7 @@ function Contato() {
                 <div className="stat-label">Suporte disponível</div>
               </div>
               <div className="stat-item animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-                <div className="stat-number">+2.800</div>
+                <div className="stat-number">Inúmeros</div>
                 <div className="stat-label">Clientes atendidos</div>
               </div>
             </div>

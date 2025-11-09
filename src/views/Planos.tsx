@@ -553,7 +553,7 @@ function Planos() {
               </div>
               <div className="col-lg-5 text-center animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
                 <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-4 p-4 shadow-lg">
-                  <h3 className="fw-bold mb-2">+2.800 empresas</h3>
+                  <h3 className="fw-bold mb-2">Várias empresas</h3>
                   <p className="mb-0 opacity-90">já confiam no VemAgendar</p>
                 </div>
               </div>
